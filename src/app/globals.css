@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+/*
+  Generic design tokens for the demo store.
+  Palette: black / white / gray with a yellow accent. No brand assets.
+*/
+@theme {
+  --color-ink: #111111;
+  --color-ink-soft: #555555;
+  --color-paper: #ffffff;
+  --color-mist: #f2f2f2;
+  --color-stone: #e4e4e4;
+  --color-accent: #ffed00;
+  --color-accent-strong: #e6d600;
+
+  --font-sans: var(--font-sans), Arial, Helvetica, sans-serif;
+
+  --breakpoint-3xl: 120rem;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #111111;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Utility: full-bleed section helper used by hero/banners */
+.container-page {
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 768px) {
+  .container-page {
+    padding-inline: 2rem;
+  }
+}
+
+/*
+  ── Unified interaction system ──────────────────────────────────────────
+  One consistent motion language across the whole site so hovers and links
+  feel the same everywhere (buttons, cards, footer links, object labels).
+*/
+
+/* Lift: every clickable "surface" (buttons, cards, tiles) shares this. */
+.hover-lift {
+  transition:
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.35);
+}
+.hover-lift:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+/* Underline sweep: only for object/nav links, never body text. */
+.nav-underline {
+  position: relative;
+}
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-underline:hover::after {
+  transform: scaleX(1);
+}
+
+/* Shared accent-bar sweep used by the mega-menu / category links. */
+.link-slide {
+  transition: padding-left 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s;
+}
+.link-slide:hover {
+  padding-left: 0.4rem;
+  color: var(--color-ink);
+}
+
+/* Hide native scrollbar (used by themed horizontal rails). */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Animated "wave" gradient band — themed scroll progress indicator. */
+@keyframes wave-slide {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+.wave-track {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-accent) 0%,
+    #fff7a0 25%,
+    var(--color-accent-strong) 50%,
+    #fff7a0 75%,
+    var(--color-accent) 100%
+  );
+  background-size: 200% 100%;
+  animation: wave-slide 3s linear infinite;
+}
+
+/* Themed range slider: filled track (set via --fill inline) + accent thumb. */
+.range-themed {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--color-accent) 0%,
+    var(--color-accent) var(--fill, 100%),
+    var(--color-stone) var(--fill, 100%),
+    var(--color-stone) 100%
+  );
+  cursor: pointer;
+}
+.range-themed::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 22px;
+  width: 22px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  border: 3px solid var(--color-accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+.range-themed::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+.range-themed::-moz-range-thumb {
+  height: 22px;
+  width: 22px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  border: 3px solid var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-lift,
+  .nav-underline::after,
+  .link-slide {
+    transition: none;
+  }
+  .hover-lift:hover {
+    transform: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

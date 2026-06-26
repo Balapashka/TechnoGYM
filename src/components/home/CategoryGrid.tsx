@@ -1,0 +1,37 @@
+import Link from "next/link";
+import Image from "next/image";
+import { getMedia } from "@/lib/media";
+
+type CategoryTile = { slug: string; name: string };
+
+/** "Shop by category" grid of image tiles. */
+export function CategoryGrid({ categories }: { categories: CategoryTile[] }) {
+  const tile = getMedia("categoryTile");
+  return (
+    <section className="container-page py-12">
+      <h2 className="mb-6 text-2xl font-black uppercase tracking-tight md:text-3xl">
+        Shop by category
+      </h2>
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        {categories.map((c) => (
+          <Link
+            key={c.slug}
+            href={`/category/${c.slug}`}
+            className="group relative aspect-[4/5] overflow-hidden bg-mist"
+          >
+            <Image
+              src={tile.src ?? tile.placeholder}
+              alt={c.name}
+              fill
+              sizes="(max-width: 768px) 50vw, 25vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            <span className="absolute bottom-4 left-4 z-10 bg-accent px-2 py-1 text-sm font-black uppercase text-ink">
+              {c.name}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}

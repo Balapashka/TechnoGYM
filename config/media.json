@@ -1,0 +1,57 @@
+{
+  "$comment": "Media slots for the demo. Replace `src` with a real asset path (place the file in /public and point src at it, e.g. \"/media/hero.mp4\"). While `src` is null the placeholder is shown. Keep the exact dimensions for a pixel-perfect swap.",
+  "hero": {
+    "type": "video",
+    "width": 1920,
+    "height": 1080,
+    "aspect": "16:9",
+    "placeholder": "/placeholders/hero-1920x1080.svg",
+    "src": null,
+    "note": "Homepage hero background video (mp4, 1920x1080). null -> poster placeholder."
+  },
+  "categoryTile": {
+    "type": "image",
+    "width": 800,
+    "height": 1000,
+    "aspect": "4:5",
+    "placeholder": "/placeholders/category-800x1000.svg",
+    "src": null,
+    "note": "Tile image in the 'shop by category' row."
+  },
+  "productCard": {
+    "type": "image",
+    "width": 1000,
+    "height": 1000,
+    "aspect": "1:1",
+    "placeholder": "/placeholders/product-1000x1000.svg",
+    "src": null,
+    "note": "Square product image used in carousels and the catalog grid."
+  },
+  "productGallery": {
+    "type": "image",
+    "width": 1600,
+    "height": 1200,
+    "aspect": "4:3",
+    "placeholder": "/placeholders/gallery-1600x1200.svg",
+    "src": null,
+    "note": "Product detail gallery frames."
+  },
+  "lifestyle": {
+    "type": "image",
+    "width": 1600,
+    "height": 900,
+    "aspect": "16:9",
+    "placeholder": "/placeholders/lifestyle-1600x900.svg",
+    "src": null,
+    "note": "Lifestyle banner blocks."
+  },
+  "logo": {
+    "type": "image",
+    "width": 200,
+    "height": 40,
+    "aspect": "5:1",
+    "placeholder": "/placeholders/logo-200x40.svg",
+    "src": null,
+    "note": "Brand logo (svg or png) in header/footer."
+  }
+}

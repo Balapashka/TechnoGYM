@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.gitignore
+*.md
+!README.md
+.env
+.env.*
+!.env.example
+prisma/*.db
+prisma/*.db-journal
+coverage
+.playwright-cli
+npm-debug.log*
+Dockerfile
+docker-compose.yml
