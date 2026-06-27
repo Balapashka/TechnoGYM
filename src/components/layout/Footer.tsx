@@ -1,17 +1,22 @@
+"use client";
+
 import Link from "next/link";
 import { Logo } from "./Logo";
 import { footerColumns, socialLinks, legalLinks } from "@/lib/nav";
 import { NewsletterForm } from "./NewsletterForm";
+import { useTranslation } from "@/i18n/useTranslation";
 
 /** Site footer: newsletter, link columns, social, legal + company line. */
 export function Footer() {
+  const t = useTranslation();
+
   return (
     <footer className="mt-auto bg-ink text-paper">
       <div className="container-page grid gap-10 py-14 md:grid-cols-4">
         <div>
-          <p className="mb-2 text-2xl font-black uppercase">Join us</p>
+          <p className="mb-2 text-2xl font-black uppercase">{t("footer.joinUs")}</p>
           <p className="mb-5 text-sm text-white/70">
-            Get tips and offers to reach your goals faster.
+            {t("footer.getTipsAndOffers")}
           </p>
           <NewsletterForm />
         </div>
@@ -60,8 +65,7 @@ export function Footer() {
           </Link>
         ))}
         <span className="basis-full pt-2 text-white/40">
-          Movigym is a fictional store. Educational demo only — generic content,
-          placeholder media, mock products.
+          {t("footer.legalDisclaimer")}
         </span>
       </div>
     </footer>

@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
+import { useTranslation } from "@/i18n/useTranslation";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
 /** Animated hero copy: each line lifts in, then the CTA. */
 export function HeroIntro() {
+  const t = useTranslation();
+
   return (
     <div className="container-page relative z-10 pb-16">
       <motion.p
@@ -15,7 +18,7 @@ export function HeroIntro() {
         transition={{ duration: 0.5, ease }}
         className="mb-3 text-sm font-bold uppercase tracking-widest text-accent"
       >
-        New season
+        {t("common.newSeason")}
       </motion.p>
       <motion.h1
         initial={{ opacity: 0, y: 26 }}
@@ -23,7 +26,7 @@ export function HeroIntro() {
         transition={{ duration: 0.6, ease, delay: 0.08 }}
         className="max-w-2xl text-4xl font-black uppercase leading-none tracking-tight md:text-6xl"
       >
-        Your workout, your style
+        {t("common.yourWorkoutYourStyle")}
       </motion.h1>
       <motion.p
         initial={{ opacity: 0, y: 20 }}
@@ -31,7 +34,7 @@ export function HeroIntro() {
         transition={{ duration: 0.6, ease, delay: 0.16 }}
         className="mt-4 max-w-lg text-white/80"
       >
-        Premium home fitness equipment, mock catalog for an educational demo.
+        {t("common.premiumHomeFitness")}
       </motion.p>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -42,7 +45,7 @@ export function HeroIntro() {
           href="/category/all"
           className="hover-lift mt-6 inline-flex rounded-full bg-accent px-7 py-3 text-sm font-bold uppercase text-ink hover:bg-accent-strong"
         >
-          Shop now
+          {t("common.shopNow")}
         </Link>
       </motion.div>
     </div>

@@ -14,6 +14,7 @@ export const COUNTRIES: Country[] = [
   { code: "IE", name: "Ireland", locale: "en-IE", currency: "EUR" },
   { code: "GB", name: "United Kingdom", locale: "en-GB", currency: "GBP" },
   { code: "US", name: "United States", locale: "en-US", currency: "USD" },
+  { code: "RU", name: "Russia", locale: "ru-RU", currency: "RUB" },
 ];
 
 export const DEFAULT_COUNTRY = COUNTRIES[1]; // Ireland (en-IE / EUR)

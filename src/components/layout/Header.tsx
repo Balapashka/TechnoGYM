@@ -5,10 +5,13 @@ import { CartButton } from "./CartButton";
 import { UserMenu } from "./UserMenu";
 import { primaryNav } from "@/lib/nav";
 import { getCurrentUser } from "@/lib/auth";
+import { getTranslation, type Locale } from "@/i18n/translations";
 
 /** Sticky top header: logo, mega-menu + nav, and account/cart actions. */
 export async function Header() {
   const user = await getCurrentUser();
+  // Default to English for server-rendered header; client components will use their locale
+  const locale: Locale = "en";
 
   return (
     <header className="sticky top-0 z-30 border-b border-stone bg-paper/95 backdrop-blur">
@@ -34,7 +37,7 @@ export async function Header() {
             href="/business"
             className="nav-underline hidden uppercase tracking-wide md:inline"
           >
-            For business
+            {getTranslation(locale, "common.forBusiness")}
           </Link>
           <UserMenu user={user} />
           <CartButton />
