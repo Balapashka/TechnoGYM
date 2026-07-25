@@ -37,45 +37,66 @@ export function StoriesPage() {
       </section>
 
       {/* Timeline */}
-      <section className="container-page relative py-20">
-        {/* growing center line */}
-        <motion.span
-          initial={{ scaleY: 0 }}
-          whileInView={{ scaleY: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.1, ease }}
-          className="absolute left-4 top-20 hidden h-[calc(100%-10rem)] w-px origin-top bg-stone md:left-1/2 md:block"
-        />
-        <ul className="space-y-12">
-          {c.tiles.map((tile, i) => {
-            const left = i % 2 === 0;
-            return (
-              <li
-                key={tile.title}
-                className={`relative md:flex ${left ? "md:justify-start" : "md:justify-end"}`}
-              >
-                <motion.div
-                  initial={{ opacity: 0, x: left ? -50 : 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.55, ease }}
-                  className="relative md:w-[45%]"
+      <section className="container-page py-20">
+        {/*
+          Isolated stacking context: the decorative line lives at z-0 inside
+          this wrapper only, so it can never cross the text sections or the
+          CTA below, and the cards always paint above it.
+        */}
+        {/* overflow-x-clip: cards animate in from x:±50 and must not create
+            a horizontal scrollbar while still below the viewport. */}
+        <div className="relative isolate overflow-x-clip">
+          <ul className="space-y-12 pl-10 md:pl-0">
+            {c.tiles.map((tile, i) => {
+              const left = i % 2 === 0;
+              const last = i === c.tiles.length - 1;
+              return (
+                <li
+                  key={tile.title}
+                  className={`relative md:flex ${left ? "md:justify-start" : "md:justify-end"}`}
                 >
-                  <span className="absolute -left-1.5 top-6 hidden h-3 w-3 rounded-full bg-accent ring-4 ring-paper md:left-auto md:right-[-1.6rem] md:block" />
-                  <div className="rounded-2xl border border-stone bg-paper p-6 shadow-sm">
-                    <span className="text-xs font-bold uppercase tracking-widest text-ink-soft">
-                      {t("landing.story", {
-                        number: String(i + 1).padStart(2, "0"),
-                      })}
-                    </span>
-                    <h3 className="mt-1 text-xl font-black uppercase">{tile.title}</h3>
-                    <p className="mt-2 text-sm text-ink-soft">{tile.text}</p>
-                  </div>
-                </motion.div>
-              </li>
-            );
-          })}
-        </ul>
+                  {/* Line segment from this card's marker to the next one's,
+                      so the line starts at the first dot and ends at the last. */}
+                  {!last && (
+                    <motion.span
+                      aria-hidden="true"
+                      // Centering lives in motion's own transform (x), because
+                      // motion overwrites the transform Tailwind classes set.
+                      style={{ x: "-50%" }}
+                      initial={{ scaleY: 0 }}
+                      whileInView={{ scaleY: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, ease }}
+                      className="pointer-events-none absolute bottom-[-4.875rem] left-[-1.5rem] top-[1.875rem] z-0 w-px origin-top bg-stone md:left-1/2"
+                    />
+                  )}
+                  {/* Marker, bound to its card's row (the li), on the line. */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute left-[-1.5rem] top-6 z-10 h-3 w-3 -translate-x-1/2 rounded-full bg-accent ring-4 ring-paper md:left-1/2"
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, x: left ? -50 : 50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-60px" }}
+                    transition={{ duration: 0.55, ease }}
+                    className="relative z-10 md:w-[45%]"
+                  >
+                    <div className="rounded-2xl border border-stone bg-paper p-6 shadow-sm">
+                      <span className="text-xs font-bold uppercase tracking-widest text-ink-soft">
+                        {t("landing.story", {
+                          number: String(i + 1).padStart(2, "0"),
+                        })}
+                      </span>
+                      <h3 className="mt-1 text-xl font-black uppercase">{tile.title}</h3>
+                      <p className="mt-2 text-sm text-ink-soft">{tile.text}</p>
+                    </div>
+                  </motion.div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
 
         <div className="mt-16 space-y-10">
           {c.sections.map((s) => (
