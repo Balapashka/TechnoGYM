@@ -13,15 +13,15 @@ export async function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-stone bg-paper/95 backdrop-blur">
       <div className="container-page flex h-16 items-center justify-between gap-6">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6 xl:gap-8">
           <Logo />
-          <nav className="hidden items-center gap-6 lg:flex">
+          <nav className="hidden items-center gap-4 lg:flex xl:gap-6">
             <MegaMenu />
             <PrimaryNav />
           </nav>
         </div>
 
-        <div className="flex items-center gap-5 text-sm font-semibold">
+        <div className="flex items-center gap-3 text-sm font-semibold xl:gap-5">
           <BusinessLink />
           <LocaleSwitcher />
           <UserMenu user={user} />

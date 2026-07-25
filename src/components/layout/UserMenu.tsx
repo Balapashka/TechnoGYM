@@ -27,7 +27,7 @@ export function UserMenu({ user }: { user: SessionUser | null }) {
         </Link>
         <Link
           href="/register"
-          className="rounded-full bg-ink px-4 py-1.5 text-xs uppercase tracking-wide text-paper transition hover:bg-ink-soft"
+          className="hidden rounded-full bg-ink px-4 py-1.5 text-xs uppercase tracking-wide text-paper transition hover:bg-ink-soft md:max-lg:inline-block xl:inline-block"
         >
           {t("common.join")}
         </Link>

@@ -45,7 +45,7 @@ export function LocaleSwitcher() {
         aria-label={t("locale.country")}
         value={country.code}
         onChange={(e) => setCountry(e.target.value)}
-        className="hidden rounded-full border border-stone bg-paper px-3 py-1 text-xs font-semibold md:block"
+        className="hidden rounded-full border border-stone bg-paper px-3 py-1 text-xs font-semibold md:max-lg:block xl:block"
       >
         {COUNTRIES.map((c) => (
           <option key={c.code} value={c.code}>
