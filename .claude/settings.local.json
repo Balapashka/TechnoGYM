@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(npm install *)",
+      "Bash(npm test *)",
+      "Bash(npm run *)",
+      "Bash(DATABASE_URL=\"file:./dev.db\" npm run build)",
+      "Bash(DATABASE_URL=\"file:./dev.db\" npx prisma migrate deploy)",
+      "Bash(DATABASE_URL=\"file:./dev.db\" npx prisma db seed)",
+      "Bash(DATABASE_URL=\"file:./dev.db\" PORT=3111 npx next *)",
+      "Bash(curl -s -o /dev/null http://localhost:3111/)",
+      "Bash(break)",
+      "Bash(curl -s http://localhost:3111/)",
+      "Bash(DATABASE_URL=\"file:./dev.db\" npx next *)",
+      "Bash(curl -s http://localhost:3111/category/strength)",
+      "Bash(curl -s http://localhost:3111/collections)",
+      "Bash(curl -s http://localhost:3111/category/strength -o /private/tmp/claude-501/-Users-babyknight-myData-TechnoGYM/19077b03-4aea-4269-8bb8-af2fdce5ecf1/scratchpad/plp.html)",
+      "Bash(python3 -)",
+      "Bash(npx vitest *)",
+      "Bash(pkill -f \"next start --port 3111\")"
+    ]
+  }
+}

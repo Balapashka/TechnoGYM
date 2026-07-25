@@ -1,0 +1,3 @@
+module.exports=[48811,a=>{"use strict";var b=a.i(87924),c=a.i(31289);let d={hidden:{},show:{transition:{staggerChildren:.08,delayChildren:.05}}},e={hidden:{opacity:0,y:24},show:{opacity:1,y:0,transition:{duration:.5,ease:[.16,1,.3,1]}}};a.s(["Stagger",0,function({children:a,className:e}){return(0,b.jsx)(c.motion.div,{className:e,variants:d,initial:"hidden",whileInView:"show",viewport:{once:!0,margin:"-60px"},children:a})},"StaggerItem",0,function({children:a,className:d}){return(0,b.jsx)(c.motion.div,{className:d,variants:e,children:a})}])}];
+
+//# sourceMappingURL=src_components_motion_Stagger_tsx_0suzad2._.js.map
