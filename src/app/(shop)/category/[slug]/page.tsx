@@ -1,6 +1,6 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { CatalogView } from "@/components/shop/CatalogView";
-import { CatalogHeader } from "@/components/shop/CatalogHeader";
+import { CatalogShell } from "@/components/shop/CatalogShell";
 import {
   getAllProducts,
   getProductsByCategory,
@@ -31,14 +31,7 @@ export default async function CategoryPage({
 
   if (slug === "all") {
     const products = await getAllProducts();
-    return (
-      <CategoryLayout
-        slug={null}
-        title="All products"
-        count={products.length}
-        view={products}
-      />
-    );
+    return <CategoryLayout slug={null} title="All products" view={products} />;
   }
 
   const categories = await getCategories();
@@ -50,7 +43,6 @@ export default async function CategoryPage({
     <CategoryLayout
       slug={category.slug}
       title={category.name}
-      count={products.length}
       view={products}
     />
   );
@@ -59,19 +51,19 @@ export default async function CategoryPage({
 function CategoryLayout({
   slug,
   title,
-  count,
   view,
 }: {
   slug: string | null;
   title: string;
-  count: number;
   view: Awaited<ReturnType<typeof getAllProducts>>;
 }) {
   return (
     <main className="flex flex-1 flex-col">
-      {/* Header is a client component so the category name follows the language switch. */}
-      <CatalogHeader slug={slug} fallbackTitle={title} count={count} />
-      <CatalogView products={view} />
+      {/* The shell is a client component: it reads the filter state from the
+          URL and keeps the header, chips and grid in sync reactively. */}
+      <Suspense>
+        <CatalogShell slug={slug} fallbackTitle={title} products={view} />
+      </Suspense>
     </main>
   );
 }

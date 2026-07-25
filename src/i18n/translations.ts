@@ -90,6 +90,9 @@ export interface Translation {
    */
   categories: Record<string, string>;
 
+  /** Sourcing-country labels, keyed by URL code (see src/lib/countries.ts). */
+  countries: Record<string, string>;
+
   // Catalog / PLP
   catalog: {
     eyebrow: string;
@@ -104,6 +107,14 @@ export interface Translation {
     inStockOnly: string;
     compare: string;
     noMatches: string;
+    filters: string;
+    resetAll: string;
+    activeFilters: string;
+    /** Chip remove button label — takes {name}. */
+    removeFilter: string;
+    emptyTitle: string;
+    /** Mobile filter sheet CTA — takes {count} (already declined). */
+    show: string;
   };
 
   // Footer
@@ -449,6 +460,10 @@ export const translations: Record<Locale, Translation> = {
       "cardio-accessories": "Аксессуары для кардио",
       recovery: "Восстановление",
     },
+    countries: {
+      cn: "Китай",
+      it: "Италия",
+    },
     catalog: {
       eyebrow: "Каталог",
       productCount: "{count} товаров",
@@ -460,6 +475,12 @@ export const translations: Record<Locale, Translation> = {
       maxPrice: "Максимальная цена",
       any: "Любая",
       inStockOnly: "Только в наличии",
+      filters: "Фильтры",
+      resetAll: "Сбросить всё",
+      activeFilters: "Активные фильтры",
+      removeFilter: "Убрать фильтр: {name}",
+      emptyTitle: "Ничего не найдено",
+      show: "Показать {count}",
       compare: "Сравнить",
       noMatches: "Нет товаров по выбранным фильтрам.",
     },
@@ -790,6 +811,10 @@ export const translations: Record<Locale, Translation> = {
       "cardio-accessories": "Cardio Accessories",
       recovery: "Recovery",
     },
+    countries: {
+      cn: "China",
+      it: "Italy",
+    },
     catalog: {
       eyebrow: "Catalog",
       productCount: "{count} products",
@@ -801,6 +826,12 @@ export const translations: Record<Locale, Translation> = {
       maxPrice: "Max price",
       any: "Any",
       inStockOnly: "In stock only",
+      filters: "Filters",
+      resetAll: "Reset all",
+      activeFilters: "Active filters",
+      removeFilter: "Remove filter: {name}",
+      emptyTitle: "Nothing found",
+      show: "Show {count}",
       compare: "Compare",
       noMatches: "No products match these filters.",
     },
@@ -1094,6 +1125,15 @@ export function errorKeyForStatus(status: number): string {
  * "5 товаров" with the correct Russian declension (1 товар / 2 товара /
  * 5 товаров). A plain "{count} товаров" string is wrong for most counts.
  */
+/** Localized sourcing-country label for a URL code (see src/lib/countries). */
+export function countryLabel(
+  locale: Locale,
+  code: string,
+  fallback?: string,
+): string {
+  return translations[locale].countries[code] ?? fallback ?? code;
+}
+
 export function formatProductCount(locale: Locale, count: number): string {
   if (locale !== "ru") return `${count} ${count === 1 ? "product" : "products"}`;
 
