@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { formatPrice } from "@/lib/format";
+import { useTranslation } from "@/i18n/useTranslation";
 
 /** One product row in the admin table, with inline delete. */
 export function ProductRow({
@@ -20,17 +21,18 @@ export function ProductRow({
   inStock: boolean;
 }) {
   const router = useRouter();
+  const t = useTranslation();
   const [busy, setBusy] = useState(false);
 
   async function remove() {
-    if (!confirm(`Delete "${name}"?`)) return;
+    if (!confirm(t("admin.confirmDelete", { name }))) return;
     setBusy(true);
     const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
     if (res.ok) {
       router.refresh();
     } else {
       setBusy(false);
-      alert("Could not delete the product");
+      alert(t("admin.errDeleteProduct"));
     }
   }
 
@@ -45,7 +47,7 @@ export function ProductRow({
             inStock ? "bg-green-100 text-green-800" : "bg-red-100 text-red-700"
           }`}
         >
-          {inStock ? "In stock" : "Out"}
+          {inStock ? t("admin.inStock") : t("admin.outOfStock")}
         </span>
       </td>
       <td className="px-4 py-3 text-right">
@@ -53,14 +55,14 @@ export function ProductRow({
           href={`/admin/products/${id}/edit`}
           className="font-bold underline hover:text-ink-soft"
         >
-          Edit
+          {t("admin.edit")}
         </Link>
         <button
           onClick={remove}
           disabled={busy}
           className="ml-4 font-bold text-red-600 underline hover:text-red-700"
         >
-          Delete
+          {t("admin.delete")}
         </button>
       </td>
     </tr>

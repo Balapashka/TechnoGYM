@@ -8,6 +8,9 @@ import { useCompareStore } from "@/store/compare-store";
 import { applyCatalog, type SortKey } from "@/lib/filter";
 import type { ProductDTO } from "@/lib/catalog";
 import { useTranslation } from "@/i18n/useTranslation";
+import { formatProductCount } from "@/i18n/translations";
+import { useDisplayCountry } from "@/store/locale-store";
+import { BASE_CURRENCY, formatPriceIn } from "@/lib/format";
 
 const SORT_OPTIONS: { key: SortKey; labelKey: string }[] = [
   { key: "featured", labelKey: "catalog.sortFeatured" },
@@ -26,6 +29,9 @@ export function CatalogView({ products }: { products: ProductDTO[] }) {
 
   const toggleCompare = useCompareStore((s) => s.toggle);
   const compareIds = useCompareStore((s) => s.ids);
+  const country = useDisplayCountry();
+  // Every product in a listing shares one currency; fall back to the base one.
+  const currency = products[0]?.currency ?? BASE_CURRENCY;
 
   const priceCeiling = useMemo(
     () => Math.max(...products.map((p) => p.priceCents), 0),
@@ -105,7 +111,7 @@ export function CatalogView({ products }: { products: ProductDTO[] }) {
               className="rounded-full bg-ink px-3 py-1 text-xs font-bold text-paper"
             >
               {maxPrice
-                ? `€${Math.round(maxPrice / 100).toLocaleString()}`
+                ? formatPriceIn(maxPrice, currency, country)
                 : t("catalog.any")}
             </motion.span>
           </div>
@@ -127,8 +133,8 @@ export function CatalogView({ products }: { products: ProductDTO[] }) {
             }}
           />
           <div className="mt-1 flex justify-between text-[11px] text-ink-soft">
-            <span>€0</span>
-            <span>€{Math.round(priceCeiling / 100).toLocaleString()}</span>
+            <span>{formatPriceIn(0, currency, country)}</span>
+            <span>{formatPriceIn(priceCeiling, currency, country)}</span>
           </div>
         </div>
 
@@ -155,7 +161,7 @@ export function CatalogView({ products }: { products: ProductDTO[] }) {
         </button>
 
         <p className="rounded-lg bg-mist px-3 py-2 text-xs font-semibold text-ink-soft">
-          {t("catalog.productCount", { count: visible.length })}
+          {formatProductCount(t.locale, visible.length)}
         </p>
       </aside>
 

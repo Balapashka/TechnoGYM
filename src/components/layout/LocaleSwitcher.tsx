@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useLocaleStore, COUNTRIES } from "@/store/locale-store";
 import { useTranslation } from "@/i18n/useTranslation";
 import { LOCALES } from "@/i18n/translations";
+import { useHydrated } from "@/lib/use-hydrated";
 
 /** Header control: RU/EN language toggle plus the CIS country selector. */
 export function LocaleSwitcher() {
@@ -15,8 +15,7 @@ export function LocaleSwitcher() {
 
   // Language/country come from persisted state, so render only after mount to
   // keep the server markup and the first client render identical.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
   if (!mounted) return null;
 
   return (

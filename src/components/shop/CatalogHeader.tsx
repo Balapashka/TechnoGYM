@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/i18n/useTranslation";
-import { categoryName } from "@/i18n/translations";
+import { categoryName, formatProductCount } from "@/i18n/translations";
 
 /**
  * PLP page header. Client-side so the category name and labels follow the
@@ -31,7 +31,7 @@ export function CatalogHeader({
           {title}
         </h1>
         <p className="mt-1 text-sm text-ink-soft">
-          {t("catalog.productCount", { count })}
+          {formatProductCount(t.locale, count)}
         </p>
       </div>
     </div>

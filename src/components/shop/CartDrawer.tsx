@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { useCartStore, cartTotalCents, lineKey } from "@/store/cart-store";
 import { useCartUiStore } from "@/store/cart-ui-store";
-import { useLocaleStore } from "@/store/locale-store";
-import { formatPrice } from "@/lib/format";
+import { useDisplayCountry } from "@/store/locale-store";
+import { BASE_CURRENCY, formatPriceIn } from "@/lib/format";
 import { useTranslation } from "@/i18n/useTranslation";
 
 /** Global slide-in cart. Opens when an item is added or the cart icon is tapped. */
@@ -19,10 +19,10 @@ export function CartDrawer() {
   const items = useCartStore((s) => s.items);
   const setQuantity = useCartStore((s) => s.setQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
-  const locale = useLocaleStore((s) => s.country.locale);
+  const country = useDisplayCountry();
 
   const total = cartTotalCents(items);
-  const currency = items[0]?.currency ?? "EUR";
+  const currency = items[0]?.currency ?? BASE_CURRENCY;
 
   return (
     <AnimatePresence>
@@ -122,7 +122,7 @@ export function CartDrawer() {
                               </button>
                             </div>
                             <span className="text-sm font-bold">
-                              {formatPrice(i.unitPriceCents * i.quantity, i.currency, locale)}
+                              {formatPriceIn(i.unitPriceCents * i.quantity, i.currency, country)}
                             </span>
                           </div>
                         </div>
@@ -144,7 +144,7 @@ export function CartDrawer() {
               <div className="space-y-3 border-t border-stone px-6 py-4">
                 <div className="flex justify-between font-bold">
                   <span>{t("cart.total")}</span>
-                  <span>{formatPrice(total, currency, locale)}</span>
+                  <span>{formatPriceIn(total, currency, country)}</span>
                 </div>
                 <button
                   onClick={() => {

@@ -25,7 +25,8 @@ export function Hero() {
       ) : (
         <Image
           src={hero.placeholder}
-          alt="Hero placeholder"
+          // Decorative background: the accessible hero copy lives in HeroIntro.
+          alt=""
           fill
           priority
           sizes="100vw"

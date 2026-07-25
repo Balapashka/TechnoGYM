@@ -7,11 +7,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { resetSchema, type ResetInput } from "@/schemas/auth";
 import { AuthCard, field, fieldError } from "@/components/auth/AuthCard";
+import { useTranslation } from "@/i18n/useTranslation";
+import { errorKeyForStatus } from "@/i18n/translations";
 
 /** Step 2 of the local reset flow: set a new password with the token. */
 export function ResetForm() {
   const router = useRouter();
   const params = useSearchParams();
+  const t = useTranslation();
   const [serverError, setServerError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
@@ -31,20 +34,19 @@ export function ResetForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    const json = await res.json().catch(() => ({}));
     if (res.ok) {
       setDone(true);
       setTimeout(() => router.push("/login"), 1400);
     } else {
-      setServerError(json.error ?? "Could not reset the password");
+      setServerError(t(errorKeyForStatus(res.status)));
     }
   });
 
   if (done) {
     return (
-      <AuthCard title="Password updated" subtitle="Redirecting to login…">
+      <AuthCard title={t("auth.passwordUpdated")} subtitle={t("common.loading")}>
         <p className="text-sm text-green-700">
-          Your password has been changed. You can now sign in.
+          {t("auth.passwordUpdatedBody")}
         </p>
       </AuthCard>
     );
@@ -52,20 +54,20 @@ export function ResetForm() {
 
   return (
     <AuthCard
-      title="Set new password"
-      subtitle="Paste your reset token and choose a new password."
+      title={t("auth.resetPassword")}
+      subtitle={t("auth.resetLead")}
     >
       <form onSubmit={onSubmit} noValidate className="space-y-4">
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
-            Reset token
+            {t("auth.resetToken")}
           </label>
           <input className={field} {...register("token")} />
           {errors.token && <p className={fieldError}>{errors.token.message}</p>}
         </div>
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
-            New password
+            {t("auth.password")}
           </label>
           <input className={field} type="password" {...register("password")} />
           {errors.password && (
@@ -74,7 +76,7 @@ export function ResetForm() {
         </div>
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
-            Confirm password
+            {t("auth.confirmPassword")}
           </label>
           <input className={field} type="password" {...register("confirm")} />
           {errors.confirm && (
@@ -89,12 +91,12 @@ export function ResetForm() {
           disabled={isSubmitting}
           className="hover-lift w-full rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase text-ink hover:bg-accent-strong disabled:opacity-50"
         >
-          {isSubmitting ? "Updating…" : "Update password"}
+          {isSubmitting ? t("common.loading") : t("auth.resetPassword")}
         </button>
 
         <p className="text-center text-sm text-ink-soft">
           <Link href="/login" className="font-bold text-ink underline">
-            Back to login
+            {t("auth.signIn")}
           </Link>
         </p>
       </form>

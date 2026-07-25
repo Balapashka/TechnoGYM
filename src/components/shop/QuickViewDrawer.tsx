@@ -7,8 +7,9 @@ import { motion, AnimatePresence } from "motion/react";
 import { useQuickViewStore } from "@/store/quickview-store";
 import { useCartStore } from "@/store/cart-store";
 import { useCartUiStore } from "@/store/cart-ui-store";
-import { useLocaleStore } from "@/store/locale-store";
-import { formatPrice, formatInstallment } from "@/lib/format";
+import { useDisplayCountry } from "@/store/locale-store";
+import { useTranslation } from "@/i18n/useTranslation";
+import { formatPriceIn, formatInstallmentIn } from "@/lib/format";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -21,7 +22,8 @@ export function QuickViewDrawer() {
   const close = useQuickViewStore((s) => s.close);
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartUiStore((s) => s.openCart);
-  const locale = useLocaleStore((s) => s.country.locale);
+  const country = useDisplayCountry();
+  const t = useTranslation();
   const [added, setAdded] = useState(false);
 
   const handleAdd = () => {
@@ -32,7 +34,7 @@ export function QuickViewDrawer() {
       name: product.name,
       image: product.images[0] ?? "/placeholders/product-1000x1000.svg",
       variantId: null,
-      variantName: product.variants[0]?.name ?? "Standard",
+      variantName: product.variants[0]?.name ?? t("product.standardConfig"),
       unitPriceCents: product.priceCents,
       currency: product.currency,
     });
@@ -62,11 +64,11 @@ export function QuickViewDrawer() {
           >
             <div className="flex items-center justify-between border-b border-stone px-6 py-4">
               <p className="text-xs font-bold uppercase tracking-widest text-ink-soft">
-                Quick view
+                {t("common.quickView")}
               </p>
               <button
                 onClick={close}
-                aria-label="Close"
+                aria-label={t("common.close")}
                 className="hover-lift grid h-9 w-9 place-items-center rounded-full border border-stone text-lg"
               >
                 ×
@@ -124,11 +126,18 @@ export function QuickViewDrawer() {
               <div className="mt-auto space-y-3 border-t border-stone pt-4">
                 <div>
                   <p className="text-2xl font-black">
-                    {formatPrice(product.priceCents, product.currency, locale)}
+                    {formatPriceIn(product.priceCents, product.currency, country)}
                   </p>
                   <p className="text-xs text-ink-soft">
-                    {formatInstallment(product.priceCents, 36, product.currency, locale)}
-                    /mo · 36 months
+                    {t("product.installment", {
+                      amount: formatInstallmentIn(
+                        product.priceCents,
+                        36,
+                        product.currency,
+                        country,
+                      ),
+                      months: 36,
+                    })}
                   </p>
                 </div>
                 <div className="flex gap-3">
@@ -136,14 +145,14 @@ export function QuickViewDrawer() {
                     onClick={handleAdd}
                     className="hover-lift flex-1 rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase text-ink"
                   >
-                    {added ? "Added ✓" : "Add to cart"}
+                    {added ? `${t("common.addedToCart")} ✓` : t("common.addToCart")}
                   </button>
                   <Link
                     href={`/product/${product.slug}`}
                     onClick={close}
                     className="hover-lift rounded-full border border-ink px-6 py-3 text-sm font-bold uppercase"
                   >
-                    Details
+                    {t("product.details")}
                   </Link>
                 </div>
               </div>

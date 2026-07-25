@@ -10,13 +10,15 @@ import { CartDrawer } from "@/components/shop/CartDrawer";
 
 const inter = Inter({
   variable: "--font-sans",
-  subsets: ["latin"],
+  // The storefront is Russian, so the Cyrillic subset must ship too — without
+  // it every Russian glyph falls back to a system font.
+  subsets: ["latin", "cyrillic"],
 });
 
 export const metadata: Metadata = {
-  title: "SPORT LINER — Demo Fitness Store",
+  title: "SPORT LINER — интернет-магазин тренажёров",
   description:
-    "Educational e-commerce demo. Generic content, placeholder media, mock products.",
+    "Демонстрационный интернет-магазин: кардио- и силовые тренажёры, свободные веса, аксессуары. Учебный проект — цены и характеристики приведены для примера.",
 };
 
 export default function RootLayout({
@@ -25,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
+    <html lang="ru" className={`${inter.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-paper text-ink antialiased">
         <Header />
         {children}

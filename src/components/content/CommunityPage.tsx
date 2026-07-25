@@ -3,19 +3,25 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import { landings } from "@/lib/landings";
+import { useTranslation } from "@/i18n/useTranslation";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const c = landings.community;
-const PHRASES = [
-  "You belong here",
-  "Every body welcome",
-  "No judgement",
-  "We've got you",
-  "Show up as you are",
+
+/** Supportive phrases for the scrolling band, as dictionary keys. */
+const PHRASE_KEYS = [
+  "landing.youBelongHere",
+  "landing.supportEveryBody",
+  "landing.noJudgement",
+  "landing.everyLevelWelcome",
+  "landing.trainYourWay",
 ];
 
 /** Community: bold spotlight hero, supportive marquee, rotate-in masonry tiles. */
 export function CommunityPage() {
+  const t = useTranslation();
+  const phrases = PHRASE_KEYS.map((key) => t(key));
+
   return (
     <div className="flex-1">
       <section className={`relative overflow-hidden ${c.gradient} text-paper`}>
@@ -47,7 +53,8 @@ export function CommunityPage() {
           animate={{ x: ["0%", "-50%"] }}
           transition={{ duration: 18, ease: "linear", repeat: Infinity }}
         >
-          {[...PHRASES, ...PHRASES].map((p, i) => (
+          {/* An even number of copies keeps the -50% loop seamless. */}
+          {[...phrases, ...phrases, ...phrases, ...phrases].map((p, i) => (
             <span key={i} className="flex items-center gap-8 text-xl font-black uppercase text-ink">
               {p}
               <span className="text-ink/40">✦</span>
@@ -58,9 +65,9 @@ export function CommunityPage() {
 
       {/* Rotate-in masonry tiles */}
       <section className="container-page columns-1 gap-5 py-16 sm:columns-2 lg:columns-3">
-        {c.tiles.map((t, i) => (
+        {c.tiles.map((tile, i) => (
           <motion.div
-            key={t.title}
+            key={tile.title}
             initial={{ opacity: 0, rotate: i % 2 ? 4 : -4, scale: 0.9 }}
             whileInView={{ opacity: 1, rotate: 0, scale: 1 }}
             viewport={{ once: true, margin: "-40px" }}
@@ -70,9 +77,9 @@ export function CommunityPage() {
               i % 3 === 0 ? "bg-ink text-paper" : "bg-mist"
             }`}
           >
-            <h3 className="text-2xl font-black uppercase">{t.title}</h3>
+            <h3 className="text-2xl font-black uppercase">{tile.title}</h3>
             <p className={`mt-2 text-sm ${i % 3 === 0 ? "text-white/70" : "text-ink-soft"}`}>
-              {t.text}
+              {tile.text}
             </p>
           </motion.div>
         ))}

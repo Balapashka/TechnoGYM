@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productSchema, type ProductInput } from "@/schemas/product";
 import { field, fieldError } from "@/components/auth/AuthCard";
+import { useTranslation } from "@/i18n/useTranslation";
+import { errorKeyForStatus } from "@/i18n/translations";
 
 type Category = { id: string; name: string };
 
@@ -14,7 +16,9 @@ export type ProductFormValues = {
   name: string;
   slug: string;
   description: string;
-  priceEuros: number;
+  priceRub: number;
+  brand: string;
+  originCountry: string;
   categoryId: string;
   badge: string;
   features: string;
@@ -30,6 +34,7 @@ export function ProductForm({
   initial?: ProductFormValues;
 }) {
   const router = useRouter();
+  const t = useTranslation();
   const isEdit = Boolean(initial?.id);
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -43,7 +48,9 @@ export function ProductForm({
       name: initial?.name ?? "",
       slug: initial?.slug ?? "",
       description: initial?.description ?? "",
-      priceEuros: initial?.priceEuros ?? 0,
+      priceRub: initial?.priceRub ?? 0,
+      brand: initial?.brand ?? "",
+      originCountry: initial?.originCountry ?? "",
       categoryId: initial?.categoryId ?? categories[0]?.id ?? "",
       badge: initial?.badge ?? "",
       features: initial?.features ?? "",
@@ -65,8 +72,7 @@ export function ProductForm({
       router.push("/admin/products");
       router.refresh();
     } else {
-      const json = await res.json().catch(() => ({}));
-      setServerError(json.error ?? "Could not save the product");
+        setServerError(t(errorKeyForStatus(res.status)));
     }
   });
 
@@ -74,13 +80,15 @@ export function ProductForm({
     <form onSubmit={onSubmit} noValidate className="max-w-2xl space-y-5">
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-xs font-bold uppercase">Name</label>
+          <label className="mb-1 block text-xs font-bold uppercase">
+            {t("admin.name")}
+          </label>
           <input className={field} {...register("name")} />
           {errors.name && <p className={fieldError}>{errors.name.message}</p>}
         </div>
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
-            Slug (URL)
+            {t("admin.slug")}
           </label>
           <input className={field} {...register("slug")} />
           {errors.slug && <p className={fieldError}>{errors.slug.message}</p>}
@@ -89,7 +97,7 @@ export function ProductForm({
 
       <div>
         <label className="mb-1 block text-xs font-bold uppercase">
-          Description
+          {t("admin.description")}
         </label>
         <textarea rows={3} className={field} {...register("description")} />
         {errors.description && (
@@ -100,21 +108,21 @@ export function ProductForm({
       <div className="grid gap-5 sm:grid-cols-3">
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
-            Price (€)
+            {t("admin.price")}
           </label>
           <input
             type="number"
-            step="0.01"
+            step="1"
             className={field}
-            {...register("priceEuros", { valueAsNumber: true })}
+            {...register("priceRub", { valueAsNumber: true })}
           />
-          {errors.priceEuros && (
-            <p className={fieldError}>{errors.priceEuros.message}</p>
+          {errors.priceRub && (
+            <p className={fieldError}>{errors.priceRub.message}</p>
           )}
         </div>
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
-            Category
+            {t("admin.category")}
           </label>
           <select className={field} {...register("categoryId")}>
             {categories.map((c) => (
@@ -129,21 +137,44 @@ export function ProductForm({
         </div>
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
-            Badge (optional)
+            {t("admin.badgeOptional")}
           </label>
           <input className={field} {...register("badge")} />
         </div>
       </div>
 
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label className="mb-1 block text-xs font-bold uppercase">
+            {t("product.brand")}
+          </label>
+          <input className={field} placeholder="Technogym" {...register("brand")} />
+          {errors.brand && <p className={fieldError}>{errors.brand.message}</p>}
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-bold uppercase">
+            {t("product.origin")}
+          </label>
+          <input
+            className={field}
+            placeholder="Италия"
+            {...register("originCountry")}
+          />
+          {errors.originCountry && (
+            <p className={fieldError}>{errors.originCountry.message}</p>
+          )}
+        </div>
+      </div>
+
       <div>
         <label className="mb-1 block text-xs font-bold uppercase">
-          Features (one per line)
+          {t("admin.featuresPerLine")}
         </label>
         <textarea rows={4} className={field} {...register("features")} />
       </div>
 
       <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" {...register("inStock")} /> In stock
+        <input type="checkbox" {...register("inStock")} /> {t("admin.inStock")}
       </label>
 
       {serverError && <p className="text-sm text-red-600">{serverError}</p>}
@@ -154,14 +185,18 @@ export function ProductForm({
           disabled={isSubmitting}
           className="hover-lift rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase text-ink disabled:opacity-50"
         >
-          {isSubmitting ? "Saving…" : isEdit ? "Save changes" : "Create product"}
+          {isSubmitting
+            ? t("admin.saving")
+            : isEdit
+              ? t("admin.saveChanges")
+              : t("admin.createProduct")}
         </button>
         <button
           type="button"
           onClick={() => router.push("/admin/products")}
           className="hover-lift rounded-full border border-stone px-6 py-3 text-sm font-bold uppercase"
         >
-          Cancel
+          {t("admin.cancel")}
         </button>
       </div>
     </form>

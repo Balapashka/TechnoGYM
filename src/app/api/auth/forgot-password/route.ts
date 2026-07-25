@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   const json = await request.json().catch(() => null);
   const parsed = forgotSchema.safeParse(json);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Enter a valid email" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid email" }, { status: 400 });
   }
 
   const user = await prisma.user.findUnique({
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       token: null,
-      message: "If that email exists, a reset link was generated.",
+      message: "Если такой email зарегистрирован, код для сброса создан.",
     });
   }
 
@@ -41,6 +41,6 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     token,
-    message: "Reset token generated (demo: shown here instead of emailed).",
+    message: "Код сброса создан (в демоверсии он показан здесь вместо письма).",
   });
 }

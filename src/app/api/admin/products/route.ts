@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { productSchema } from "@/schemas/product";
 import { packList } from "@/lib/json";
+import { BASE_CURRENCY } from "@/lib/format";
 
 const PRODUCT_IMG = "/placeholders/product-1000x1000.svg";
 const GALLERY_IMG = "/placeholders/gallery-1600x1200.svg";
@@ -45,8 +46,10 @@ export async function POST(request: Request) {
       name: parsed.data.name,
       slug: parsed.data.slug,
       description: parsed.data.description,
-      priceCents: Math.round(parsed.data.priceEuros * 100),
-      currency: "EUR",
+      priceCents: Math.round(parsed.data.priceRub * 100),
+      currency: BASE_CURRENCY,
+      brand: parsed.data.brand,
+      originCountry: parsed.data.originCountry,
       images: packList([PRODUCT_IMG, GALLERY_IMG, GALLERY_IMG]),
       features: packList(featuresToList(parsed.data.features)),
       badge: parsed.data.badge || null,

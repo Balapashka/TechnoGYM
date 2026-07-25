@@ -2,26 +2,25 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import {
   useCartStore,
   cartCount,
   cartTotalCents,
 } from "@/store/cart-store";
-import { formatPrice } from "@/lib/format";
-import { useLocaleStore } from "@/store/locale-store";
+import { BASE_CURRENCY, formatPriceIn } from "@/lib/format";
+import { useDisplayCountry } from "@/store/locale-store";
 import { useTranslation } from "@/i18n/useTranslation";
+import { useHydrated } from "@/lib/use-hydrated";
 
 /** Cart contents with quantity controls and an order summary. */
 export function CartView() {
   const items = useCartStore((s) => s.items);
   const setQuantity = useCartStore((s) => s.setQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
-  const locale = useLocaleStore((s) => s.country.locale);
+  const country = useDisplayCountry();
   const t = useTranslation();
 
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
   if (!mounted) return null;
 
   if (items.length === 0) {
@@ -41,7 +40,7 @@ export function CartView() {
   }
 
   const total = cartTotalCents(items);
-  const currency = items[0]?.currency ?? "EUR";
+  const currency = items[0]?.currency ?? BASE_CURRENCY;
 
   return (
     <div className="container-page grid flex-1 gap-10 py-10 lg:grid-cols-[1fr_22rem]">
@@ -117,10 +116,10 @@ export function CartView() {
                 </div>
               </div>
               <div className="text-right font-bold">
-                {formatPrice(
+                {formatPriceIn(
                   item.unitPriceCents * item.quantity,
                   item.currency,
-                  locale,
+                  country,
                 )}
               </div>
             </li>
@@ -135,7 +134,7 @@ export function CartView() {
         <div className="flex justify-between border-b border-stone pb-3 text-sm">
           <span>{t("cart.subtotal")}</span>
           <span className="font-bold">
-            {formatPrice(total, currency, locale)}
+            {formatPriceIn(total, currency, country)}
           </span>
         </div>
         <div className="flex justify-between py-3 text-sm text-ink-soft">

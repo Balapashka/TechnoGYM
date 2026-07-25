@@ -2,31 +2,31 @@ import { z } from "zod";
 
 export const registerSchema = z
   .object({
-    name: z.string().min(2, "Enter your name"),
-    email: z.string().min(1, "Email is required").email("Enter a valid email"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirm: z.string().min(6, "Confirm your password"),
+    name: z.string().min(2, "Укажите ваше имя"),
+    email: z.string().min(1, "Укажите email").email("Введите корректный email"),
+    password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
+    confirm: z.string().min(6, "Повторите пароль"),
   })
   .refine((d) => d.password === d.confirm, {
-    message: "Passwords do not match",
+    message: "Пароли не совпадают",
     path: ["confirm"],
   });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 
 export const forgotSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Enter a valid email"),
+  email: z.string().min(1, "Укажите email").email("Введите корректный email"),
 });
 export type ForgotInput = z.infer<typeof forgotSchema>;
 
 export const resetSchema = z
   .object({
-    token: z.string().min(1, "Reset token is required"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirm: z.string().min(6, "Confirm your password"),
+    token: z.string().min(1, "Укажите код сброса"),
+    password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
+    confirm: z.string().min(6, "Повторите пароль"),
   })
   .refine((d) => d.password === d.confirm, {
-    message: "Passwords do not match",
+    message: "Пароли не совпадают",
     path: ["confirm"],
   });
 export type ResetInput = z.infer<typeof resetSchema>;

@@ -6,6 +6,7 @@ import {
   getProductsByCategory,
   getCategories,
 } from "@/lib/catalog";
+import { DEFAULT_LOCALE, categoryName } from "@/i18n/translations";
 
 export async function generateMetadata({
   params,
@@ -13,12 +14,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const title = slug === "all" ? "All products" : titleize(slug);
-  return { title: `${title} — SPORT LINER` };
-}
+  if (slug === "all") return { title: "Все товары — SPORT LINER" };
 
-function titleize(slug: string) {
-  return slug.charAt(0).toUpperCase() + slug.slice(1);
+  // Titles are not reactive, so they use the default locale's category name.
+  const categories = await getCategories();
+  const dbName = categories.find((c) => c.slug === slug)?.name;
+  return { title: `${categoryName(DEFAULT_LOCALE, slug, dbName)} — SPORT LINER` };
 }
 
 export default async function CategoryPage({

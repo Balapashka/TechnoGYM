@@ -1,6 +1,9 @@
+"use client";
+
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { DEFAULT_LOCALE, type Locale } from "@/i18n/translations";
+import { useHydrated } from "@/lib/use-hydrated";
 
 export type Country = {
   code: string;
@@ -44,6 +47,16 @@ const initialState = {
   LocaleState,
   "country" | "language" | "cookieAccepted" | "countryModalDismissed"
 >;
+
+/**
+ * The country to format prices with. Falls back to the default country until
+ * the persisted store has hydrated, so server and first client render agree —
+ * prices are *converted* per country, so a mismatch here changes the number.
+ */
+export function useDisplayCountry(): Country {
+  const stored = useLocaleStore((s) => s.country);
+  return useHydrated() ? stored : DEFAULT_COUNTRY;
+}
 
 export const useLocaleStore = create<LocaleState>()(
   persist(

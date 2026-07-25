@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useCartStore, cartCount } from "@/store/cart-store";
 import { useCartUiStore } from "@/store/cart-ui-store";
+import { useTranslation } from "@/i18n/useTranslation";
+import { useHydrated } from "@/lib/use-hydrated";
 
 /** Cart button that opens the slide-in drawer, with a live item-count badge. */
 export function CartButton() {
+  const t = useTranslation();
   const items = useCartStore((s) => s.items);
   const openCart = useCartUiStore((s) => s.openCart);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
 
   const count = cartCount(items);
 
@@ -18,7 +19,7 @@ export function CartButton() {
     <button
       type="button"
       onClick={openCart}
-      aria-label="Cart"
+      aria-label={t("common.cart")}
       className="relative inline-flex items-center"
     >
       <svg

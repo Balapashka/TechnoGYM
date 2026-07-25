@@ -13,6 +13,10 @@ export type ProductDTO = {
   features: string[];
   badge: string | null;
   inStock: boolean;
+  /** Manufacturer, e.g. "Technogym". Empty string when unknown. */
+  brand: string;
+  /** Country of origin in Russian, e.g. "Италия". Empty string when unknown. */
+  originCountry: string;
   categorySlug: string;
   categoryName: string;
   variants: { id: string; name: string; priceDeltaCents: number }[];
@@ -29,6 +33,8 @@ type ProductWithRelations = {
   features: string;
   badge: string | null;
   inStock: boolean;
+  brand: string;
+  originCountry: string;
   category: { slug: string; name: string };
   variants: { id: string; name: string; priceDeltaCents: number }[];
 };
@@ -45,6 +51,8 @@ function toDTO(p: ProductWithRelations): ProductDTO {
     features: unpackList(p.features),
     badge: p.badge,
     inStock: p.inStock,
+    brand: p.brand,
+    originCountry: p.originCountry,
     categorySlug: p.category.slug,
     categoryName: p.category.name,
     variants: p.variants,

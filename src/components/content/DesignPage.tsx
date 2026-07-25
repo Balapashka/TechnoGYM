@@ -4,12 +4,14 @@ import { useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, useScroll } from "motion/react";
 import { landings } from "@/lib/landings";
+import { useTranslation } from "@/i18n/useTranslation";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const c = landings.design;
 
 /** Design: graphite "spec sheet" with big horizontal scroll-snap panels. */
 export function DesignPage() {
+  const t = useTranslation();
   const railRef = useRef<HTMLDivElement>(null);
   const { scrollXProgress } = useScroll({ container: railRef });
   const drag = useRef({ active: false, x: 0, left: 0 });
@@ -114,9 +116,9 @@ export function DesignPage() {
         onContextMenu={onContextMenu}
         className="no-scrollbar flex snap-x gap-6 overflow-x-auto px-4 pb-6 select-none md:px-8"
       >
-        {c.tiles.map((t, i) => (
+        {c.tiles.map((tile, i) => (
           <motion.article
-            key={t.title}
+            key={tile.title}
             style={{ pointerEvents: "none" }}
             initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
             whileInView={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
@@ -129,12 +131,12 @@ export function DesignPage() {
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs uppercase tracking-widest text-zinc-400">
-                Spec
+                {t("landing.spec")}
               </span>
             </div>
             <div>
-              <h3 className="text-3xl font-black uppercase">{t.title}</h3>
-              <p className="mt-3 text-zinc-400">{t.text}</p>
+              <h3 className="text-3xl font-black uppercase">{tile.title}</h3>
+              <p className="mt-3 text-zinc-400">{tile.text}</p>
             </div>
           </motion.article>
         ))}

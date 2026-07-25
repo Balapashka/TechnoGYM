@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { checkoutSchema, type CheckoutInput } from "@/schemas/checkout";
 import { useCartStore, cartTotalCents } from "@/store/cart-store";
-import { formatPrice } from "@/lib/format";
+import { BASE_CURRENCY, formatPriceIn } from "@/lib/format";
 import { useLocaleStore } from "@/store/locale-store";
+import { useHydrated } from "@/lib/use-hydrated";
 import { useTranslation } from "@/i18n/useTranslation";
 
-type Result = { orderId: string; total: number } | null;
+/** Order currency is captured here because the cart is cleared on success. */
+type Result = { orderId: string; total: number; currency: string } | null;
 
 /** Checkout form: validates with zod, posts to /api/checkout, clears cart. */
 export function CheckoutForm() {
@@ -19,10 +21,9 @@ export function CheckoutForm() {
   const country = useLocaleStore((s) => s.country);
   const t = useTranslation();
 
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHydrated();
   const [result, setResult] = useState<Result>(null);
   const [serverError, setServerError] = useState<string | null>(null);
-  useEffect(() => setMounted(true), []);
 
   const {
     register,
@@ -44,7 +45,7 @@ export function CheckoutForm() {
         <p className="text-ink-soft">
           {t("checkout.orderLabel")}{" "}
           <span className="font-mono">{result.orderId}</span> ·{" "}
-          {formatPrice(result.total, country.currency, country.locale)}
+          {formatPriceIn(result.total, result.currency, country)}
         </p>
         <Link
           href="/"
@@ -73,7 +74,7 @@ export function CheckoutForm() {
   }
 
   const total = cartTotalCents(items);
-  const currency = items[0]?.currency ?? "EUR";
+  const currency = items[0]?.currency ?? BASE_CURRENCY;
 
   const onSubmit = handleSubmit(async (data) => {
     setServerError(null);
@@ -100,7 +101,7 @@ export function CheckoutForm() {
 
     const json = (await res.json()) as { orderId: string; total: number };
     clear();
-    setResult(json);
+    setResult({ ...json, currency });
   });
 
   const field =
@@ -272,10 +273,10 @@ export function CheckoutForm() {
                 {i.name} × {i.quantity}
               </span>
               <span>
-                {formatPrice(
+                {formatPriceIn(
                   i.unitPriceCents * i.quantity,
                   i.currency,
-                  country.locale,
+                  country,
                 )}
               </span>
             </li>
@@ -283,7 +284,7 @@ export function CheckoutForm() {
         </ul>
         <div className="flex justify-between pt-3 font-bold">
           <span>{t("checkout.total")}</span>
-          <span>{formatPrice(total, currency, country.locale)}</span>
+          <span>{formatPriceIn(total, currency, country)}</span>
         </div>
       </aside>
     </div>

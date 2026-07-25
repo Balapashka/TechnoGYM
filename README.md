@@ -1,13 +1,16 @@
 # SPORT LINER — Demo Fitness Store
 
 > ⚠️ **Educational demo only.** This store ("SPORT LINER") was built to
-> practice modern e-commerce architecture and UX patterns. All text is generic,
-> all products/prices are mock data, and every image except the logo is a
-> placeholder.
+> practice modern e-commerce architecture and UX patterns. The catalog names
+> real manufacturers and their countries of origin, but **the model codes,
+> specifications and prices are all invented** — no listing here is a genuine
+> product offer, and the store is not affiliated with any brand it mentions.
 
-A full-stack e-commerce demo: homepage with hero + carousels, category listing
-with filters and product comparison, product detail pages with variants, a
-shopping cart, checkout that creates real orders, and a demo login.
+A full-stack e-commerce demo in Russian (English switchable): homepage with hero
++ carousels, category listing with filters and product comparison, product
+detail pages with variants, a shopping cart, checkout that creates real orders,
+and a demo login. Prices are in roubles and are converted for display when you
+switch country (Россия / Казахстан / Узбекистан / Кыргызстан).
 
 ## Tech stack
 

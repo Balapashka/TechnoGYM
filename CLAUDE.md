@@ -51,6 +51,14 @@ columns, so `Product.images` and `Product.features` are JSON **strings** in the 
 through `packList`/`unpackList` in `src/lib/json.ts` rather than `JSON.parse` inline. If you add a
 list-shaped product field, follow the same pattern and extend `toDTO`.
 
+**Catalog data.** `prisma/seed.ts` generates ~237 products across 12 categories from real
+manufacturer names (`brand`) with their home country (`originCountry`, in Russian) — model codes
+and prices are invented, so nothing is a genuine product listing. Product photography comes from
+`prisma/seed-images.ts`, a slug → verified `images.unsplash.com` URL map (the host is whitelisted
+in `next.config.ts`). `brand`/`originCountry` are non-null with an `""` default so the column could
+be added without a data migration; the UI (`ProductOrigin`) hides an empty value, and the admin
+form requires one.
+
 **Server/client split.** Pages under `src/app` are server components that fetch via `lib/catalog`
 and hand DTOs to client components (`CatalogView`, `ProductCard`, `AddToCart`, drawers…).
 `src/lib/auth.ts` is `import "server-only"` — never import it from a client component.
@@ -69,20 +77,34 @@ together: `src/app/admin/layout.tsx` redirects non-ADMINs, and **each** `/api/ad
 handler re-checks `getCurrentUser()?.role !== "ADMIN"` and returns 403. A new admin API route
 without that check is unprotected.
 
-**Money and locale.** Prices are integer cents everywhere (`priceCents`, `priceDeltaCents`,
-`totalCents`); only `src/lib/format.ts` converts to display strings. The selected country
-(`src/store/locale-store.ts`, persisted as `movigym-locale`, CIS countries only) drives the `Intl`
-formatting locale — display only, no FX conversion, so prices stay in the currency stored on the
-product.
+**Money and locale.** Prices are integer minor units everywhere (`priceCents` = kopeks,
+`priceDeltaCents`, `totalCents`); only `src/lib/format.ts` converts to display strings.
+`BASE_CURRENCY` is `RUB` — the catalog, the admin form (`priceRub`) and every order are in roubles.
+The selected country (`src/store/locale-store.ts`, persisted as `movigym-locale`, CIS countries
+only) drives both the `Intl` locale and a **display-only** conversion: `formatPriceIn(cents,
+currency, country)` / `formatInstallmentIn(...)` convert through the `DEMO_RATES` table (rounded
+stand-ins, not a real FX feed). Never convert a value on its way *into* the cart or the checkout
+payload — orders are stored in the product's own currency.
 
 **Language.** Russian is the default; English is the secondary option, switched via
 `LocaleSwitcher` in the header. The language is its own store field (`language`), independent of
 the country. Translations live in `src/i18n/translations.ts` and are read with `useTranslation()`,
 so **translated text only renders in client components** — a server component either delegates to a
-small client component (`CategoryName`, `CatalogHeader`, `PrimaryNav`) or falls back to
-`DEFAULT_LOCALE`. Category names are English in the DB, so `categoryName(locale, slug, dbName)`
-maps the seeded slug to its localized name. Adoption is partial: header, footer, catalog, cart and
-checkout are translated; marketing pages (`lib/pages.ts`, `lib/landings.ts`) are not.
+small client component (`CategoryName`, `CatalogHeader`, `PrimaryNav`, `CollectionsBanner`,
+`AccountView`, `AdminHeader`, …) or, for non-reactive `metadata`, uses a Russian literal. Never add
+`"use client"` to a page that queries Prisma, awaits `params`, or calls `getCurrentUser` — extract a
+child instead.
+
+Helpers worth knowing: `categoryName(locale, slug, dbName)` maps a seeded category slug to its
+localized name (DB names are the fallback), `formatProductCount(locale, n)` handles the Russian
+1/2/5 declension, and `orderStatusLabel(locale, status)` localizes the `OrderStatus` enum.
+`src/i18n/keys.test.ts` scans every `t("…")` literal in `src/` and fails if a key is missing from
+either dictionary — that is what catches a typo'd key before it reaches the screen.
+
+**Hydration.** Anything that renders persisted client state (cart, locale) must match the server
+markup on the first client render. Use `useHydrated()` from `src/lib/use-hydrated.ts` (a
+`useSyncExternalStore` shim) and render `null` until it is true — not a `setState` in an effect,
+which the `react-hooks` lint rules reject.
 
 **Media indirection.** No component hardcodes an asset path. `config/media.json` defines named
 slots (`hero`, `productCard`, `logo`, …) with exact dimensions and a `src: null` fallback to an
@@ -104,7 +126,8 @@ colors.
 ## Testing
 
 Vitest + jsdom, `globals: true`, `@` aliased to `src`, `vitest.setup.ts` shims `localStorage` so
-zustand `persist` works. Tests cover pure logic only — `lib/` (format, filter, order, media) and
-`store/` (cart, locale, compare). There are no component or route-handler tests and no test DB, so
-keep business rules in pure functions in `lib/`/`store/` where they can be tested, rather than
-inside route handlers or components.
+zustand `persist` works. Tests cover pure logic only — `lib/` (format, filter, order, media),
+`store/` (cart, locale, compare) and `i18n/` (dictionary parity, plural/status helpers, and the
+key-usage scan). There are no component or route-handler tests and no test DB, so keep business
+rules in pure functions in `lib/`/`store/` where they can be tested, rather than inside route
+handlers or components.

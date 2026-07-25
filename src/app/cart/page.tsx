@@ -1,6 +1,6 @@
 import { CartView } from "./CartView";
 
-export const metadata = { title: "Cart — SPORT LINER" };
+export const metadata = { title: "Корзина — SPORT LINER" };
 
 export default function CartPage() {
   return (

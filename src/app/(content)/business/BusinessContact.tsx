@@ -4,12 +4,14 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Reveal } from "@/components/motion/Reveal";
 import { field, fieldError } from "@/components/auth/AuthCard";
+import { useTranslation } from "@/i18n/useTranslation";
 
 type Form = { company: string; name: string; email: string; message: string };
 type Errors = Partial<Record<keyof Form, string>>;
 
 /** "Write us a letter" demo contact form. Validates locally; no real send. */
 export function BusinessContact() {
+  const t = useTranslation();
   const [form, setForm] = useState<Form>({
     company: "",
     name: "",
@@ -26,15 +28,22 @@ export function BusinessContact() {
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const next: Errors = {};
-    if (form.company.trim().length < 2) next.company = "Enter your company";
-    if (form.name.trim().length < 2) next.name = "Enter your name";
+    if (form.company.trim().length < 2)
+      next.company = t("business.errCompany");
+    if (form.name.trim().length < 2) next.name = t("business.errName");
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email))
-      next.email = "Enter a valid email";
+      next.email = t("business.errEmail");
     if (form.message.trim().length < 10)
-      next.message = "Tell us a little more (min 10 chars)";
+      next.message = t("business.errMessage");
     setErrors(next);
     if (Object.keys(next).length === 0) setSent(true);
   }
+
+  const benefits = [
+    { title: "business.benefitPricing", body: "business.benefitPricingBody" },
+    { title: "business.benefitService", body: "business.benefitServiceBody" },
+    { title: "business.benefitContact", body: "business.benefitContactBody" },
+  ];
 
   return (
     <div className="flex-1">
@@ -47,7 +56,7 @@ export function BusinessContact() {
             transition={{ duration: 0.5 }}
             className="mb-3 text-xs font-bold uppercase tracking-widest text-accent"
           >
-            For Business
+            {t("business.eyebrow")}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
@@ -55,12 +64,9 @@ export function BusinessContact() {
             transition={{ duration: 0.6, delay: 0.08 }}
             className="max-w-2xl text-4xl font-black uppercase md:text-6xl"
           >
-            Outfit your space
+            {t("business.title")}
           </motion.h1>
-          <p className="mt-4 max-w-lg text-white/80">
-            Hotels, studios, offices and clubs — tell us what you need and our
-            team will write back. (Demo form: nothing is actually sent.)
-          </p>
+          <p className="mt-4 max-w-lg text-white/80">{t("business.lead")}</p>
         </div>
       </section>
 
@@ -75,10 +81,11 @@ export function BusinessContact() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="py-10 text-center"
                 >
-                  <p className="text-2xl font-black uppercase">Letter sent ✓</p>
+                  <p className="text-2xl font-black uppercase">
+                    {t("business.sent")}
+                  </p>
                   <p className="mt-2 text-ink-soft">
-                    Thanks, {form.name}. This is a demo, so no email actually
-                    leaves your machine — but the flow works.
+                    {t("business.sentBody", { name: form.name })}
                   </p>
                 </motion.div>
               ) : (
@@ -90,14 +97,17 @@ export function BusinessContact() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
-                  <h2 className="text-xl font-black uppercase">Write us a letter</h2>
+                  <h2 className="text-xl font-black uppercase">
+                    {t("business.writeUs")}
+                  </h2>
                   <div className="grid gap-5 sm:grid-cols-2">
                     <div>
                       <label className="mb-1 block text-xs font-bold uppercase">
-                        Company
+                        {t("business.company")}
                       </label>
                       <input
                         className={field}
+                        aria-label={t("business.company")}
                         value={form.company}
                         onChange={(e) => set("company", e.target.value)}
                       />
@@ -107,10 +117,11 @@ export function BusinessContact() {
                     </div>
                     <div>
                       <label className="mb-1 block text-xs font-bold uppercase">
-                        Your name
+                        {t("business.yourName")}
                       </label>
                       <input
                         className={field}
+                        aria-label={t("business.yourName")}
                         value={form.name}
                         onChange={(e) => set("name", e.target.value)}
                       />
@@ -119,11 +130,12 @@ export function BusinessContact() {
                   </div>
                   <div>
                     <label className="mb-1 block text-xs font-bold uppercase">
-                      Email
+                      {t("auth.email")}
                     </label>
                     <input
                       type="email"
                       className={field}
+                      aria-label={t("auth.email")}
                       value={form.email}
                       onChange={(e) => set("email", e.target.value)}
                     />
@@ -131,11 +143,12 @@ export function BusinessContact() {
                   </div>
                   <div>
                     <label className="mb-1 block text-xs font-bold uppercase">
-                      Message
+                      {t("business.message")}
                     </label>
                     <textarea
                       rows={5}
                       className={field}
+                      aria-label={t("business.message")}
                       value={form.message}
                       onChange={(e) => set("message", e.target.value)}
                     />
@@ -147,7 +160,7 @@ export function BusinessContact() {
                     type="submit"
                     className="hover-lift rounded-full bg-accent px-8 py-3 text-sm font-bold uppercase text-ink"
                   >
-                    Send letter
+                    {t("business.send")}
                   </button>
                 </motion.form>
               )}
@@ -157,14 +170,10 @@ export function BusinessContact() {
 
         <Reveal direction="right">
           <aside className="space-y-6">
-            {[
-              { h: "Volume pricing", t: "Tiered rates for fit-outs of any size." },
-              { h: "Install & service", t: "Generic demo support, setup and maintenance plans." },
-              { h: "One point of contact", t: "A named account manager from first letter to delivery." },
-            ].map((b) => (
-              <div key={b.h} className="rounded-2xl border border-stone p-6">
-                <h3 className="font-black uppercase">{b.h}</h3>
-                <p className="mt-1 text-sm text-ink-soft">{b.t}</p>
+            {benefits.map((b) => (
+              <div key={b.title} className="rounded-2xl border border-stone p-6">
+                <h3 className="font-black uppercase">{t(b.title)}</h3>
+                <p className="mt-1 text-sm text-ink-soft">{t(b.body)}</p>
               </div>
             ))}
           </aside>

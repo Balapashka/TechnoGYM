@@ -1,4 +1,5 @@
 import type { InfoContent } from "@/lib/pages";
+import { InfoDefaultSections, InfoDemoNote } from "@/components/InfoPageParts";
 
 /** Generic content page used for all informational routes. */
 export function InfoPage({ content }: { content: InfoContent }) {
@@ -17,30 +18,21 @@ export function InfoPage({ content }: { content: InfoContent }) {
       </div>
 
       <div className="container-page grid gap-8 py-12 md:grid-cols-2">
-        {(content.sections ?? defaultSections).map((s) => (
-          <section key={s.heading}>
-            <h2 className="mb-2 text-xl font-bold uppercase">{s.heading}</h2>
-            <p className="text-ink-soft">{s.body}</p>
-          </section>
-        ))}
+        {content.sections ? (
+          content.sections.map((s) => (
+            <section key={s.heading}>
+              <h2 className="mb-2 text-xl font-bold uppercase">{s.heading}</h2>
+              <p className="text-ink-soft">{s.body}</p>
+            </section>
+          ))
+        ) : (
+          <InfoDefaultSections />
+        )}
       </div>
 
       <div className="container-page pb-16">
-        <p className="rounded bg-mist p-4 text-sm text-ink-soft">
-          This is an educational demo page with generic placeholder content.
-        </p>
+        <InfoDemoNote />
       </div>
     </main>
   );
 }
-
-const defaultSections: NonNullable<InfoContent["sections"]> = [
-  {
-    heading: "Placeholder section",
-    body: "Generic demo copy. Replace with real content when needed.",
-  },
-  {
-    heading: "Another section",
-    body: "More generic demo copy to fill the layout.",
-  },
-];

@@ -4,20 +4,33 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart-store";
 import { useCartUiStore } from "@/store/cart-ui-store";
-import { formatPrice, formatInstallment } from "@/lib/format";
-import { useLocaleStore } from "@/store/locale-store";
+import { formatPriceIn, formatInstallmentIn } from "@/lib/format";
+import { useDisplayCountry } from "@/store/locale-store";
+import { useTranslation } from "@/i18n/useTranslation";
 import type { ProductDTO } from "@/lib/catalog";
 
 /** Variant + quantity selector with a sticky add-to-cart bar. */
 export function AddToCart({ product }: { product: ProductDTO }) {
   const router = useRouter();
-  const locale = useLocaleStore((s) => s.country.locale);
+  const country = useDisplayCountry();
+  const t = useTranslation();
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartUiStore((s) => s.openCart);
 
-  const variants = product.variants.length
-    ? product.variants
-    : [{ id: "default", name: "Standard", priceDeltaCents: 0 }];
+  // Memoized so the fallback array keeps a stable identity between renders.
+  const variants = useMemo(
+    () =>
+      product.variants.length
+        ? product.variants
+        : [
+            {
+              id: "default",
+              name: t("product.standardConfig"),
+              priceDeltaCents: 0,
+            },
+          ],
+    [product.variants, t],
+  );
 
   const [variantId, setVariantId] = useState(variants[0].id);
   const [added, setAdded] = useState(false);
@@ -46,7 +59,9 @@ export function AddToCart({ product }: { product: ProductDTO }) {
   return (
     <div className="space-y-6">
       <div>
-        <p className="mb-2 text-xs font-bold uppercase tracking-wide">Version</p>
+        <p className="mb-2 text-xs font-bold uppercase tracking-wide">
+          {t("product.configuration")}
+        </p>
         <div className="flex flex-wrap gap-2">
           {variants.map((v) => (
             <button
@@ -62,7 +77,7 @@ export function AddToCart({ product }: { product: ProductDTO }) {
               {v.name}
               {v.priceDeltaCents > 0 && (
                 <span className="ml-1 text-ink-soft">
-                  +{formatPrice(v.priceDeltaCents, product.currency, locale)}
+                  +{formatPriceIn(v.priceDeltaCents, product.currency, country)}
                 </span>
               )}
             </button>
@@ -75,11 +90,18 @@ export function AddToCart({ product }: { product: ProductDTO }) {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-2xl font-black">
-              {formatPrice(unitPriceCents, product.currency, locale)}
+              {formatPriceIn(unitPriceCents, product.currency, country)}
             </p>
             <p className="text-xs text-ink-soft">
-              {formatInstallment(unitPriceCents, 36, product.currency, locale)}
-              /mo · 36 months
+              {t("product.installment", {
+                amount: formatInstallmentIn(
+                  unitPriceCents,
+                  36,
+                  product.currency,
+                  country,
+                ),
+                months: 36,
+              })}
             </p>
           </div>
           <div className="flex gap-3">
@@ -87,20 +109,22 @@ export function AddToCart({ product }: { product: ProductDTO }) {
               onClick={handleAdd}
               className="rounded bg-accent px-6 py-3 text-sm font-bold uppercase text-ink hover:bg-accent-strong"
             >
-              Add to cart
+              {t("common.addToCart")}
             </button>
             {added && (
               <button
                 onClick={() => router.push("/cart")}
                 className="rounded border border-ink px-6 py-3 text-sm font-bold uppercase hover:bg-ink hover:text-paper"
               >
-                Go to cart
+                {t("product.goToCart")}
               </button>
             )}
           </div>
         </div>
         {added && (
-          <p className="mt-2 text-xs text-ink-soft">Added to your cart.</p>
+          <p className="mt-2 text-xs text-ink-soft">
+            {t("product.addedToYourCart")}
+          </p>
         )}
       </div>
     </div>

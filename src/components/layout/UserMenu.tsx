@@ -60,7 +60,7 @@ export function UserMenu({ user }: { user: SessionUser | null }) {
               onClick={() => setOpen(false)}
               className="block px-4 py-2.5 text-sm hover:bg-mist"
             >
-              {t("cart.yourCart")} & {t("nav.products")}
+              {t("common.account")}
             </Link>
             {user.role === "ADMIN" && (
               <Link
@@ -68,7 +68,7 @@ export function UserMenu({ user }: { user: SessionUser | null }) {
                 onClick={() => setOpen(false)}
                 className="block px-4 py-2.5 text-sm font-bold text-ink hover:bg-mist"
               >
-                Admin dashboard
+                {t("account.adminDashboard")}
               </Link>
             )}
             <button

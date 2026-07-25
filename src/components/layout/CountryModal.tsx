@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocaleStore, COUNTRIES } from "@/store/locale-store";
 import { useTranslation } from "@/i18n/useTranslation";
+import { useHydrated } from "@/lib/use-hydrated";
 
 /**
  * First-visit modal asking the user to confirm their country/region.
@@ -17,8 +18,7 @@ export function CountryModal() {
   const dismiss = useLocaleStore((s) => s.dismissCountryModal);
   const t = useTranslation();
 
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

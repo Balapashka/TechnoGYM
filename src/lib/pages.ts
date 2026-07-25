@@ -1,6 +1,7 @@
 /**
- * Content pages reachable from the header/footer. Every link in the site
- * resolves to one of these generic placeholder pages so nothing is a dead end.
+ * Информационные страницы, доступные из шапки и подвала сайта. Каждая ссылка
+ * на сайте ведёт на одну из этих типовых страниц, чтобы посетитель нигде
+ * не попадал в тупик.
  */
 export type InfoContent = {
   title: string;
@@ -10,90 +11,90 @@ export type InfoContent = {
 
 export const infoPages: Record<string, InfoContent> = {
   wellness: {
-    title: "Wellness",
-    lead: "Our approach to training, recovery and a healthier daily routine.",
+    title: "Здоровый образ жизни",
+    lead: "Наш подход к тренировкам, восстановлению и здоровому ритму каждого дня.",
     sections: [
       {
-        heading: "Move every day",
-        body: "Generic placeholder copy about building sustainable habits with the right equipment.",
+        heading: "Движение каждый день",
+        body: "Демонстрационный текст о том, как формировать устойчивые привычки с правильно подобранным оборудованием.",
       },
       {
-        heading: "Train smarter",
-        body: "Generic placeholder copy about data-driven workouts and guided sessions.",
+        heading: "Тренируйтесь осознанно",
+        body: "Демонстрационный текст о тренировках на основе данных и занятиях под руководством тренера.",
       },
     ],
   },
   design: {
-    title: "Design",
-    lead: "Equipment designed to fit your home as naturally as your routine.",
+    title: "Дизайн",
+    lead: "Оборудование, которое вписывается в ваш интерьер так же естественно, как тренировки — в ваш распорядок.",
   },
   stories: {
-    title: "Stories",
-    lead: "Mock customer stories and editorial content for the demo.",
+    title: "Истории",
+    lead: "Вымышленные истории клиентов и редакционные материалы для демоверсии.",
   },
   community: {
-    title: "Community",
-    lead: "Join a placeholder community of people training at home.",
+    title: "Сообщество",
+    lead: "Присоединяйтесь к сообществу тех, кто тренируется дома (демонстрационный раздел).",
   },
   business: {
-    title: "For business",
-    lead: "Solutions for gyms, hotels and corporate wellness (demo content).",
+    title: "Для бизнеса",
+    lead: "Решения для фитнес-клубов, отелей и корпоративных программ здоровья (демонстрационный контент).",
   },
   account: {
-    title: "Your account",
-    lead: "Demo account area. Sign in from the login page to see your details.",
+    title: "Ваш аккаунт",
+    lead: "Демонстрационный личный кабинет. Войдите на странице авторизации, чтобы увидеть свои данные.",
   },
   contact: {
-    title: "Contact",
-    lead: "Reach our (fictional) team. This form is not connected to anything.",
+    title: "Контакты",
+    lead: "Свяжитесь с нашей (вымышленной) командой. Форма ни к чему не подключена.",
   },
   "customer-support": {
-    title: "Customer support",
-    lead: "Help center placeholder with FAQs and guides.",
+    title: "Поддержка клиентов",
+    lead: "Демонстрационный справочный центр с ответами на частые вопросы и инструкциями.",
   },
   shipping: {
-    title: "Shipping",
-    lead: "How delivery would work in a real store (demo text).",
+    title: "Доставка",
+    lead: "Как была бы устроена доставка в настоящем магазине (демонстрационный текст).",
   },
   returns: {
-    title: "Returns",
-    lead: "Return policy placeholder for the demo store.",
+    title: "Возврат товара",
+    lead: "Демонстрационные условия возврата для этого учебного магазина.",
   },
   about: {
-    title: "About",
-    lead: "SPORT LINER is the demo brand used for this educational project.",
+    title: "О компании",
+    lead: "SPORT LINER — вымышленный бренд, созданный для этого учебного проекта.",
   },
   sustainability: {
-    title: "Sustainability",
-    lead: "Placeholder commitments to people and the planet.",
+    title: "Экологичность",
+    lead: "Демонстрационный раздел об ответственном отношении к людям и планете.",
   },
   careers: {
-    title: "Careers",
-    lead: "Mock job board — no real positions are listed.",
+    title: "Карьера",
+    lead: "Демонстрационный раздел вакансий: реальных предложений о работе здесь нет.",
   },
   press: {
-    title: "Press",
-    lead: "Press resources placeholder for the demo.",
+    title: "Пресс-центр",
+    lead: "Демонстрационный раздел с материалами для прессы.",
   },
   privacy: {
-    title: "Privacy policy",
-    lead: "This demo does not collect personal data. Placeholder policy text.",
+    title: "Политика конфиденциальности",
+    lead: "Эта демоверсия не собирает персональные данные. Текст политики приведён для примера.",
   },
   "cookie-policy": {
-    title: "Cookie policy",
-    lead: "The demo only stores your preferences locally. Placeholder text.",
+    title: "Политика использования cookie",
+    lead: "Демоверсия хранит только ваши настройки — локально, в браузере. Текст приведён для примера.",
   },
   terms: {
-    title: "Terms & conditions",
-    lead: "Placeholder terms for the educational demo.",
+    title: "Пользовательское соглашение",
+    lead: "Демонстрационные условия использования учебного проекта.",
   },
   "sales-conditions": {
-    title: "Sales conditions",
-    lead: "Placeholder sales conditions. No real purchases are processed.",
+    title: "Условия продажи",
+    lead: "Демонстрационные условия продажи. Реальные заказы не оформляются и не оплачиваются.",
   },
   social: {
-    title: "Follow us",
-    lead: "Social links are placeholders in this demo and do not point anywhere real.",
+    title: "Мы в соцсетях",
+    lead: "Ссылки на соцсети в этой демоверсии условные и не ведут на реальные страницы.",
   },
 };
 

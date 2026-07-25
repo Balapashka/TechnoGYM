@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useLocaleStore } from "@/store/locale-store";
 import { useTranslation } from "@/i18n/useTranslation";
+import { useHydrated } from "@/lib/use-hydrated";
 
 /** Bottom cookie-consent banner. Shows until the user accepts or declines. */
 export function CookieBanner() {
@@ -11,8 +11,7 @@ export function CookieBanner() {
   const declineCookies = useLocaleStore((s) => s.declineCookies);
   const t = useTranslation();
 
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
 
   if (!mounted || cookieAccepted !== null) return null;
 

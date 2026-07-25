@@ -1,29 +1,30 @@
 import { z } from "zod";
+import { BASE_CURRENCY } from "@/lib/format";
 
 export const checkoutSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Enter a valid email"),
-  fullName: z.string().min(2, "Enter your full name"),
-  address: z.string().min(5, "Enter your address"),
-  city: z.string().min(2, "Enter your city"),
+  email: z.string().min(1, "Укажите email").email("Введите корректный email"),
+  fullName: z.string().min(2, "Укажите имя и фамилию"),
+  address: z.string().min(5, "Укажите адрес"),
+  city: z.string().min(2, "Укажите город"),
   postalCode: z
     .string()
-    .min(3, "Enter a postal code")
-    .max(12, "Postal code is too long"),
-  country: z.string().min(2, "Select a country"),
+    .min(3, "Укажите почтовый индекс")
+    .max(12, "Слишком длинный индекс"),
+  country: z.string().min(2, "Выберите страну"),
   // Fake card details — demo only, never sent anywhere or stored.
-  cardName: z.string().min(2, "Name on card is required"),
+  cardName: z.string().min(2, "Укажите имя на карте"),
   cardNumber: z
     .string()
     .transform((s) => s.replace(/\s+/g, ""))
     .pipe(
       z
         .string()
-        .regex(/^\d{16}$/, "Enter the 16-digit card number"),
+        .regex(/^\d{16}$/, "Введите 16 цифр номера карты"),
     ),
   cardExpiry: z
     .string()
-    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Use MM/YY"),
-  cardCvc: z.string().regex(/^\d{3,4}$/, "3–4 digit code"),
+    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Формат ММ/ГГ"),
+  cardCvc: z.string().regex(/^\d{3,4}$/, "3–4 цифры"),
 });
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
@@ -39,8 +40,8 @@ export const checkoutItemSchema = z.object({
 
 export const checkoutPayloadSchema = z.object({
   customer: checkoutSchema,
-  items: z.array(checkoutItemSchema).min(1, "Cart is empty"),
-  currency: z.string().default("EUR"),
+  items: z.array(checkoutItemSchema).min(1, "Корзина пуста"),
+  currency: z.string().default(BASE_CURRENCY),
 });
 
 export type CheckoutPayload = z.infer<typeof checkoutPayloadSchema>;

@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { Gallery } from "@/components/shop/Gallery";
 import { AddToCart } from "@/components/shop/AddToCart";
 import { CategoryName } from "@/components/shop/CategoryName";
+import { ProductOrigin } from "@/components/shop/ProductOrigin";
 import { getProductBySlug } from "@/lib/catalog";
+import { BreadcrumbHome, ProductSpecs } from "./ProductDetailText";
 
 export async function generateMetadata({
   params,
@@ -12,7 +14,11 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
-  return { title: product ? `${product.name} — SPORT LINER` : "Product" };
+  return {
+    title: product
+      ? `${product.name} — SPORT LINER`
+      : "Товар не найден — SPORT LINER",
+  };
 }
 
 export default async function ProductPage({
@@ -27,9 +33,7 @@ export default async function ProductPage({
   return (
     <main className="container-page flex-1 py-8">
       <nav className="mb-6 text-xs text-ink-soft">
-        <Link href="/" className="hover:text-ink">
-          Home
-        </Link>
+        <BreadcrumbHome />
         {" / "}
         <Link
           href={`/category/${product.categorySlug}`}
@@ -58,6 +62,11 @@ export default async function ProductPage({
             <h1 className="text-3xl font-black uppercase tracking-tight md:text-4xl">
               {product.name}
             </h1>
+            <ProductOrigin
+              brand={product.brand}
+              originCountry={product.originCountry}
+              className="mt-2"
+            />
           </div>
 
           <p className="text-ink-soft">{product.description}</p>
@@ -72,6 +81,11 @@ export default async function ProductPage({
               ))}
             </ul>
           )}
+
+          <ProductSpecs
+            brand={product.brand}
+            originCountry={product.originCountry}
+          />
 
           <AddToCart product={product} />
         </div>

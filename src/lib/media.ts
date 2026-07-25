@@ -13,11 +13,11 @@ export type MediaSlot = {
 type MediaConfig = Record<string, MediaSlot>;
 
 // Drop the documentation key before exposing slots.
-const { $comment: _comment, ...slots } = mediaConfig as unknown as MediaConfig & {
-  $comment?: string;
-};
+const slots = Object.fromEntries(
+  Object.entries(mediaConfig).filter(([key]) => key !== "$comment"),
+);
 
-export const media = slots as MediaConfig;
+export const media = slots as unknown as MediaConfig;
 
 export type MediaSlotName = keyof typeof media;
 

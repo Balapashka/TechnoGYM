@@ -121,6 +121,8 @@ export interface Translation {
     viewDetails: string;
     from: string;
     perMonth: string;
+    /** "12 500 ₽ / мес · 36 мес." — takes {amount} and {months}. */
+    installment: string;
     outOfStock: string;
     inStock: string;
     add: string;
@@ -132,6 +134,125 @@ export interface Translation {
     checkout: string;
     emptyCart: string;
     cartSummary: string;
+    brand: string;
+    origin: string;
+    configuration: string;
+    standardConfig: string;
+    goToCart: string;
+    addedToYourCart: string;
+    details: string;
+    specs: string;
+    home: string;
+    notFound: string;
+    viewImage: string;
+    compare: string;
+    clearAll: string;
+    removeFromCompare: string;
+  };
+
+  // Landing / marketing chrome
+  landing: {
+    whatThisMeans: string;
+    supportEveryBody: string;
+    everyLevelWelcome: string;
+    trainYourWay: string;
+    story: string;
+    spec: string;
+    previous: string;
+    next: string;
+    youBelongHere: string;
+    noJudgement: string;
+    collectionsCount: string;
+    exploreTheRange: string;
+    collectionsLead: string;
+    shop: string;
+  };
+
+  // Newsletter form
+  newsletter: {
+    go: string;
+    thanks: string;
+  };
+
+  // Generic info pages
+  info: {
+    demoNote: string;
+    placeholderHeading: string;
+    placeholderBody: string;
+    anotherHeading: string;
+    anotherBody: string;
+  };
+
+  // For-business page
+  business: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    writeUs: string;
+    company: string;
+    yourName: string;
+    message: string;
+    send: string;
+    sent: string;
+    sentBody: string;
+    errCompany: string;
+    errName: string;
+    errEmail: string;
+    errMessage: string;
+    benefitPricing: string;
+    benefitPricingBody: string;
+    benefitService: string;
+    benefitServiceBody: string;
+    benefitContact: string;
+    benefitContactBody: string;
+  };
+
+  // Account area
+  account: {
+    title: string;
+    greeting: string;
+    guest: string;
+    adminDashboard: string;
+    orderHistory: string;
+    noOrders: string;
+    startShopping: string;
+    orderStatus: Record<string, string>;
+  };
+
+  // Admin console
+  admin: {
+    products: string;
+    categories: string;
+    overview: string;
+    newProduct: string;
+    name: string;
+    slug: string;
+    description: string;
+    price: string;
+    category: string;
+    badgeOptional: string;
+    featuresPerLine: string;
+    inStock: string;
+    outOfStock: string;
+    saving: string;
+    saveChanges: string;
+    createProduct: string;
+    cancel: string;
+    edit: string;
+    delete: string;
+    rename: string;
+    add: string;
+    newCategoryName: string;
+    newName: string;
+    confirmDelete: string;
+    productCountShort: string;
+    actions: string;
+    stock: string;
+    errSaveProduct: string;
+    errDeleteProduct: string;
+    errCreateCategory: string;
+    errGeneric: string;
+    editProduct: string;
   };
 
   // Country/Locale modal + switcher
@@ -141,6 +262,20 @@ export interface Translation {
     pickRegion: string;
     language: string;
     country: string;
+  };
+
+  /**
+   * Messages for API failures, keyed by HTTP status. The API answers in
+   * English (it is a machine interface); the UI localizes by status.
+   */
+  errors: {
+    invalidData: string;
+    invalidCredentials: string;
+    forbidden: string;
+    conflict: string;
+    notFound: string;
+    server: string;
+    network: string;
   };
 
   // Cookie banner
@@ -164,6 +299,18 @@ export interface Translation {
     haveAccount: string;
     signInWithGoogle: string;
     orContinueWithEmail: string;
+    welcomeBack: string;
+    registerLead: string;
+    forgotLead: string;
+    resetLead: string;
+    confirmPassword: string;
+    resetToken: string;
+    passwordUpdated: string;
+    passwordUpdatedBody: string;
+    demoToken: string;
+    continueToReset: string;
+    demoShopper: string;
+    demoAdmin: string;
   };
 
   // Checkout
@@ -273,14 +420,14 @@ export const translations: Record<Locale, Translation> = {
       rowers: "Гребные тренажёры",
       benches: "Скамьи",
       accessories: "Аксессуары",
-      explore: "Обзор",
+      explore: "Каталог",
       products: "Товары",
       support: "Поддержка",
       company: "Компания",
       about: "О нас",
       sustainability: "Устойчивое развитие",
       careers: "Карьера",
-      press: "Пресса",
+      press: "Пресс-центр",
       contact: "Контакты",
       customerSupport: "Поддержка клиентов",
       shipping: "Доставка",
@@ -298,11 +445,11 @@ export const translations: Record<Locale, Translation> = {
       strength: "Силовые тренажёры",
       "free-weights": "Свободные веса",
       benches: "Скамьи",
-      racks: "Стойки и рамы",
-      "cardio-accessories": "Кардиоаксессуары",
+      racks: "Стойки и силовые рамы",
+      "cardio-accessories": "Аксессуары для кардио",
       recovery: "Восстановление",
-      apparel: "Одежда",
-      nutrition: "Питание",
+      apparel: "Спортивная одежда",
+      nutrition: "Спортивное питание",
     },
     catalog: {
       eyebrow: "Каталог",
@@ -332,6 +479,7 @@ export const translations: Record<Locale, Translation> = {
       viewDetails: "Подробнее",
       from: "от",
       perMonth: "/ месяц",
+      installment: "{amount} / мес · {months} мес.",
       outOfStock: "Нет в наличии",
       inStock: "В наличии",
       add: "Добавить",
@@ -343,6 +491,125 @@ export const translations: Record<Locale, Translation> = {
       checkout: "Перейти к оформлению",
       emptyCart: "Ваша корзина пуста",
       cartSummary: "Сумма заказа",
+      brand: "Бренд",
+      origin: "Страна производства",
+      configuration: "Комплектация",
+      standardConfig: "Стандартная комплектация",
+      goToCart: "Перейти в корзину",
+      addedToYourCart: "Товар добавлен в корзину.",
+      details: "Подробнее",
+      specs: "Характеристики",
+      home: "Главная",
+      notFound: "Товар не найден",
+      viewImage: "Показать изображение {number}",
+      compare: "Сравнение",
+      clearAll: "Очистить всё",
+      removeFromCompare: "Убрать {name} из сравнения",
+    },
+    landing: {
+      whatThisMeans: "Что это значит",
+      supportEveryBody: "Мы поддерживаем каждого",
+      everyLevelWelcome: "Любой уровень подготовки",
+      trainYourWay: "Тренируйтесь по-своему — дома",
+      story: "История {number}",
+      spec: "Характеристики",
+      previous: "Предыдущий слайд",
+      next: "Следующий слайд",
+      youBelongHere: "Вам здесь рады",
+      noJudgement: "Без осуждения",
+      collectionsCount: "{count} коллекций",
+      exploreTheRange: "Весь ассортимент",
+      collectionsLead:
+        "{categories} тематических коллекций, {products}. Нажмите на любую плитку, чтобы перейти к подборке.",
+      shop: "Смотреть",
+    },
+    newsletter: {
+      go: "Отправить",
+      thanks: "Спасибо за подписку!",
+    },
+    info: {
+      demoNote:
+        "Это демонстрационная страница: содержимое приведено для примера.",
+      placeholderHeading: "Раздел-заготовка",
+      placeholderBody:
+        "Демонстрационный текст. Замените его реальным содержимым, когда потребуется.",
+      anotherHeading: "Ещё один раздел",
+      anotherBody:
+        "Ещё немного демонстрационного текста для наполнения макета.",
+    },
+    business: {
+      eyebrow: "Для бизнеса",
+      title: "Оснастите своё пространство",
+      lead: "Отели, студии, офисы и клубы — расскажите о задаче, и наша команда свяжется с вами. (Демонстрационная форма: заявка никуда не отправляется.)",
+      writeUs: "Напишите нам",
+      company: "Компания",
+      yourName: "Ваше имя",
+      message: "Сообщение",
+      send: "Отправить заявку",
+      sent: "Заявка отправлена ✓",
+      sentBody:
+        "Спасибо, {name}. Это демоверсия, поэтому письмо никуда не уходит — но сценарий отрабатывает полностью.",
+      errCompany: "Укажите название компании",
+      errName: "Укажите ваше имя",
+      errEmail: "Введите корректный email",
+      errMessage: "Расскажите подробнее — не менее 10 символов",
+      benefitPricing: "Оптовые цены",
+      benefitPricingBody: "Прогрессивные скидки для проектов любого масштаба.",
+      benefitService: "Монтаж и сервис",
+      benefitServiceBody:
+        "Демонстрационные тарифы на установку, поддержку и обслуживание.",
+      benefitContact: "Единая точка контакта",
+      benefitContactBody:
+        "Персональный менеджер — от первого письма до поставки.",
+    },
+    account: {
+      title: "Личный кабинет",
+      greeting: "Здравствуйте, {name}",
+      guest: "гость",
+      adminDashboard: "Панель администратора",
+      orderHistory: "История заказов",
+      noOrders: "Заказов пока нет.",
+      startShopping: "Перейти к покупкам",
+      orderStatus: {
+        PENDING: "В обработке",
+        PAID: "Оплачен",
+        SHIPPED: "Отправлен",
+        CANCELLED: "Отменён",
+      },
+    },
+    admin: {
+      products: "Товары",
+      categories: "Категории",
+      overview: "Обзор",
+      newProduct: "+ Новый товар",
+      name: "Название",
+      slug: "Адрес страницы (slug)",
+      description: "Описание",
+      price: "Цена (₽)",
+      category: "Категория",
+      badgeOptional: "Метка (необязательно)",
+      featuresPerLine: "Характеристики (по одной в строке)",
+      inStock: "В наличии",
+      outOfStock: "Нет в наличии",
+      saving: "Сохранение…",
+      saveChanges: "Сохранить изменения",
+      createProduct: "Создать товар",
+      cancel: "Отмена",
+      edit: "Редактировать",
+      delete: "Удалить",
+      rename: "Переименовать",
+      add: "Добавить",
+      newCategoryName: "Название новой категории",
+      newName: "Новое название",
+      confirmDelete: "Удалить «{name}»?",
+      productCountShort: "{count} товаров",
+      actions: "Действия",
+      stock: "Наличие",
+      errSaveProduct: "Не удалось сохранить товар",
+      errDeleteProduct: "Не удалось удалить товар",
+      errCreateCategory: "Не удалось создать категорию",
+      errGeneric: "Не удалось выполнить операцию",
+      editProduct: "Редактирование «{name}»",
     },
     locale: {
       chooseCountry: "Выберите вашу страну",
@@ -350,6 +617,15 @@ export const translations: Record<Locale, Translation> = {
       pickRegion: "Выберите регион для установки валюты.",
       language: "Язык",
       country: "Страна",
+    },
+    errors: {
+      invalidData: "Проверьте правильность заполнения полей.",
+      invalidCredentials: "Неверный email или пароль.",
+      forbidden: "Недостаточно прав для этого действия.",
+      conflict: "Такая запись уже существует.",
+      notFound: "Запись не найдена.",
+      server: "Ошибка сервера. Попробуйте позже.",
+      network: "Не удалось связаться с сервером. Проверьте соединение.",
     },
     cookie: {
       message:
@@ -370,6 +646,19 @@ export const translations: Record<Locale, Translation> = {
       haveAccount: "Уже есть аккаунт?",
       signInWithGoogle: "Войти через Google",
       orContinueWithEmail: "Или продолжить с email",
+      welcomeBack: "С возвращением. Войдите, чтобы продолжить.",
+      registerLead:
+        "Зарегистрируйтесь в демомагазине, чтобы отслеживать заказы и оформлять покупки быстрее.",
+      forgotLead: "Укажите email, чтобы получить код для сброса пароля.",
+      resetLead: "Вставьте код сброса и задайте новый пароль.",
+      confirmPassword: "Подтвердите пароль",
+      resetToken: "Код сброса",
+      passwordUpdated: "Пароль обновлён",
+      passwordUpdatedBody: "Пароль изменён. Теперь вы можете войти.",
+      demoToken: "Демонстрационный код",
+      continueToReset: "Перейти к созданию нового пароля →",
+      demoShopper: "Покупатель",
+      demoAdmin: "Администратор",
     },
     checkout: {
       checkout: "Оформление заказа",
@@ -532,6 +821,7 @@ export const translations: Record<Locale, Translation> = {
       viewDetails: "View details",
       from: "from",
       perMonth: "/ month",
+      installment: "{amount} / mo · {months} months",
       outOfStock: "Out of stock",
       inStock: "In stock",
       add: "Add",
@@ -543,6 +833,120 @@ export const translations: Record<Locale, Translation> = {
       checkout: "Checkout",
       emptyCart: "Your cart is empty",
       cartSummary: "Cart summary",
+      brand: "Brand",
+      origin: "Country of origin",
+      configuration: "Configuration",
+      standardConfig: "Standard configuration",
+      goToCart: "Go to cart",
+      addedToYourCart: "Added to your cart.",
+      details: "Details",
+      specs: "Specifications",
+      home: "Home",
+      notFound: "Product not found",
+      viewImage: "View image {number}",
+      compare: "Compare",
+      clearAll: "Clear all",
+      removeFromCompare: "Remove {name} from comparison",
+    },
+    landing: {
+      whatThisMeans: "What this means",
+      supportEveryBody: "We support every body",
+      everyLevelWelcome: "Every level is welcome",
+      trainYourWay: "Train your way, at home",
+      story: "Story {number}",
+      spec: "Spec",
+      previous: "Previous slide",
+      next: "Next slide",
+      youBelongHere: "You belong here",
+      noJudgement: "No judgement",
+      collectionsCount: "{count} collections",
+      exploreTheRange: "Explore the range",
+      collectionsLead:
+        "{categories} themed collections, {products}. Tap any tile to browse.",
+      shop: "Shop",
+    },
+    newsletter: {
+      go: "Go",
+      thanks: "Thanks for subscribing!",
+    },
+    info: {
+      demoNote: "This is an educational demo page with generic placeholder content.",
+      placeholderHeading: "Placeholder section",
+      placeholderBody: "Generic demo copy. Replace with real content when needed.",
+      anotherHeading: "Another section",
+      anotherBody: "More generic demo copy to fill the layout.",
+    },
+    business: {
+      eyebrow: "For business",
+      title: "Outfit your space",
+      lead: "Hotels, studios, offices and clubs — tell us what you need and our team will write back. (Demo form: nothing is actually sent.)",
+      writeUs: "Write us a letter",
+      company: "Company",
+      yourName: "Your name",
+      message: "Message",
+      send: "Send letter",
+      sent: "Letter sent ✓",
+      sentBody:
+        "Thanks, {name}. This is a demo, so no email actually leaves your machine — but the flow works.",
+      errCompany: "Enter your company",
+      errName: "Enter your name",
+      errEmail: "Enter a valid email",
+      errMessage: "Tell us a little more (min 10 chars)",
+      benefitPricing: "Volume pricing",
+      benefitPricingBody: "Tiered rates for fit-outs of any size.",
+      benefitService: "Install & service",
+      benefitServiceBody: "Generic demo support, setup and maintenance plans.",
+      benefitContact: "One point of contact",
+      benefitContactBody: "A named account manager from first letter to delivery.",
+    },
+    account: {
+      title: "My account",
+      greeting: "Hi, {name}",
+      guest: "there",
+      adminDashboard: "Admin dashboard",
+      orderHistory: "Order history",
+      noOrders: "No orders yet.",
+      startShopping: "Start shopping",
+      orderStatus: {
+        PENDING: "Pending",
+        PAID: "Paid",
+        SHIPPED: "Shipped",
+        CANCELLED: "Cancelled",
+      },
+    },
+    admin: {
+      products: "Products",
+      categories: "Categories",
+      overview: "Overview",
+      newProduct: "+ New product",
+      name: "Name",
+      slug: "Slug (URL)",
+      description: "Description",
+      price: "Price (₽)",
+      category: "Category",
+      badgeOptional: "Badge (optional)",
+      featuresPerLine: "Features (one per line)",
+      inStock: "In stock",
+      outOfStock: "Out of stock",
+      saving: "Saving…",
+      saveChanges: "Save changes",
+      createProduct: "Create product",
+      cancel: "Cancel",
+      edit: "Edit",
+      delete: "Delete",
+      rename: "Rename",
+      add: "Add",
+      newCategoryName: "New category name",
+      newName: "New name",
+      confirmDelete: "Delete “{name}”?",
+      productCountShort: "{count} products",
+      actions: "Actions",
+      stock: "Stock",
+      errSaveProduct: "Could not save the product",
+      errDeleteProduct: "Could not delete the product",
+      errCreateCategory: "Could not create category",
+      errGeneric: "Failed",
+      editProduct: "Edit “{name}”",
     },
     locale: {
       chooseCountry: "Choose your country",
@@ -550,6 +954,15 @@ export const translations: Record<Locale, Translation> = {
       pickRegion: "Pick a region to set the currency.",
       language: "Language",
       country: "Country",
+    },
+    errors: {
+      invalidData: "Please check the values you entered.",
+      invalidCredentials: "Invalid email or password.",
+      forbidden: "You do not have permission for this action.",
+      conflict: "That record already exists.",
+      notFound: "Record not found.",
+      server: "Server error. Please try again later.",
+      network: "Could not reach the server. Check your connection.",
     },
     cookie: {
       message:
@@ -570,6 +983,19 @@ export const translations: Record<Locale, Translation> = {
       haveAccount: "Already have an account?",
       signInWithGoogle: "Sign in with Google",
       orContinueWithEmail: "Or continue with email",
+      welcomeBack: "Welcome back. Sign in to continue.",
+      registerLead:
+        "Join the demo store to track orders and check out faster.",
+      forgotLead: "Enter your email to generate a reset token.",
+      resetLead: "Paste your reset token and choose a new password.",
+      confirmPassword: "Confirm password",
+      resetToken: "Reset token",
+      passwordUpdated: "Password updated",
+      passwordUpdatedBody: "Your password has been changed. You can now sign in.",
+      demoToken: "Demo token",
+      continueToReset: "Continue to set a new password →",
+      demoShopper: "Shopper",
+      demoAdmin: "Admin",
     },
     checkout: {
       checkout: "Checkout",
@@ -652,6 +1078,45 @@ export function categoryName(
   fallback?: string,
 ): string {
   return translations[locale].categories[slug] ?? fallback ?? slug;
+}
+
+/**
+ * Dictionary key for an API failure, chosen by HTTP status. The API replies in
+ * English for logs and tooling; the storefront never renders that text.
+ */
+export function errorKeyForStatus(status: number): string {
+  if (status === 400 || status === 422) return "errors.invalidData";
+  if (status === 401) return "errors.invalidCredentials";
+  if (status === 403) return "errors.forbidden";
+  if (status === 404) return "errors.notFound";
+  if (status === 409) return "errors.conflict";
+  if (status >= 500) return "errors.server";
+  return "errors.server";
+}
+
+/**
+ * "5 товаров" with the correct Russian declension (1 товар / 2 товара /
+ * 5 товаров). A plain "{count} товаров" string is wrong for most counts.
+ */
+export function formatProductCount(locale: Locale, count: number): string {
+  if (locale !== "ru") return `${count} ${count === 1 ? "product" : "products"}`;
+
+  const mod100 = Math.abs(count) % 100;
+  const mod10 = mod100 % 10;
+  const form =
+    mod100 >= 11 && mod100 <= 14
+      ? "товаров"
+      : mod10 === 1
+        ? "товар"
+        : mod10 >= 2 && mod10 <= 4
+          ? "товара"
+          : "товаров";
+  return `${count} ${form}`;
+}
+
+/** Localized order status, falling back to the raw enum value. */
+export function orderStatusLabel(locale: Locale, status: string): string {
+  return translations[locale].account.orderStatus[status] ?? status;
 }
 
 /** Interpolate variables in translation strings (e.g., {country}) */

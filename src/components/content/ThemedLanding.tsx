@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export type Tile = { title: string; text: string };
 export type Section = { heading: string; body: string };
@@ -24,6 +25,8 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 /** Reusable long themed page: hero, horizontal tile rail, alternating blocks. */
 export function ThemedLanding({ content }: { content: LandingContent }) {
+  const t = useTranslation();
+
   return (
     <div className="flex-1">
       {/* Hero band */}
@@ -61,13 +64,13 @@ export function ThemedLanding({ content }: { content: LandingContent }) {
       <section className="border-b border-stone py-12">
         <div className="container-page mb-6">
           <h2 className="text-xs font-bold uppercase tracking-widest text-ink-soft">
-            What this means
+            {t("landing.whatThisMeans")}
           </h2>
         </div>
         <div className="flex snap-x gap-5 overflow-x-auto px-4 pb-4 md:px-8">
-          {content.tiles.map((t, i) => (
+          {content.tiles.map((tile, i) => (
             <motion.article
-              key={t.title}
+              key={tile.title}
               initial={{ opacity: 0, x: 60 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-40px" }}
@@ -78,8 +81,8 @@ export function ThemedLanding({ content }: { content: LandingContent }) {
               <span className="text-3xl font-black text-stone">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <h3 className="mt-3 text-xl font-black uppercase">{t.title}</h3>
-              <p className="mt-2 text-sm text-ink-soft">{t.text}</p>
+              <h3 className="mt-3 text-xl font-black uppercase">{tile.title}</h3>
+              <p className="mt-2 text-sm text-ink-soft">{tile.text}</p>
             </motion.article>
           ))}
         </div>
@@ -111,13 +114,13 @@ export function ThemedLanding({ content }: { content: LandingContent }) {
         <div className="container-page text-center">
           <Stagger className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-3">
             {[
-              "We support every body",
-              "Every level is welcome",
-              "Train your way, at home",
-            ].map((line) => (
-              <StaggerItem key={line}>
+              "landing.supportEveryBody",
+              "landing.everyLevelWelcome",
+              "landing.trainYourWay",
+            ].map((key) => (
+              <StaggerItem key={key}>
                 <p className="rounded-2xl border border-white/15 px-4 py-8 text-lg font-bold uppercase">
-                  {line}
+                  {t(key)}
                 </p>
               </StaggerItem>
             ))}

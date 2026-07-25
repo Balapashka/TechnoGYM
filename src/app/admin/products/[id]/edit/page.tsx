@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getCategories } from "@/lib/catalog";
 import { unpackList } from "@/lib/json";
 import { ProductForm } from "@/components/admin/ProductForm";
+import { AdminHeading } from "@/components/admin/AdminHeading";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export default async function EditProductPage({
 
   return (
     <div>
-      <h2 className="mb-6 text-xl font-black uppercase">Edit “{product.name}”</h2>
+      <AdminHeading tKey="admin.editProduct" vars={{ name: product.name }} />
       <ProductForm
         categories={categories}
         initial={{
@@ -28,7 +29,9 @@ export default async function EditProductPage({
           name: product.name,
           slug: product.slug,
           description: product.description,
-          priceEuros: product.priceCents / 100,
+          priceRub: product.priceCents / 100,
+          brand: product.brand,
+          originCountry: product.originCountry,
           categoryId: product.categoryId,
           badge: product.badge ?? "",
           features: unpackList(product.features).join("\n"),

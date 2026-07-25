@@ -1,6 +1,9 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProductRow } from "@/components/admin/ProductRow";
+import {
+  ProductsToolbar,
+  ProductsTableHead,
+} from "@/components/admin/ProductsTableChrome";
 
 export const dynamic = "force-dynamic";
 
@@ -13,27 +16,11 @@ export default async function AdminProductsPage() {
 
   return (
     <div>
-      <div className="mb-5 flex items-center justify-between">
-        <p className="text-sm text-ink-soft">{products.length} products</p>
-        <Link
-          href="/admin/products/new"
-          className="hover-lift rounded-full bg-accent px-5 py-2.5 text-xs font-bold uppercase text-ink"
-        >
-          + New product
-        </Link>
-      </div>
+      <ProductsToolbar count={products.length} />
 
       <div className="overflow-hidden rounded-2xl border border-stone">
         <table className="w-full text-left text-sm">
-          <thead className="bg-mist text-xs uppercase tracking-wide text-ink-soft">
-            <tr>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Category</th>
-              <th className="px-4 py-3">Price</th>
-              <th className="px-4 py-3">Stock</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
+          <ProductsTableHead />
           <tbody>
             {products.map((p) => (
               <ProductRow

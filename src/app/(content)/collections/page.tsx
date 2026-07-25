@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { formatPrice } from "@/lib/format";
 import { CategoryName } from "@/components/shop/CategoryName";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { Reveal } from "@/components/motion/Reveal";
+import { CollectionsIntro } from "./CollectionsIntro";
+import {
+  CollectionCount,
+  CollectionPriceFrom,
+  CollectionShopLabel,
+} from "./CollectionTileMeta";
 
-export const metadata: Metadata = { title: "Collections — SPORT LINER" };
+export const metadata: Metadata = { title: "Коллекции — SPORT LINER" };
 export const dynamic = "force-dynamic";
 
 /** Tiled overview of every category with product counts and price-from. */
@@ -23,6 +28,8 @@ export default async function CollectionsPage() {
     },
   });
 
+  const total = categories.reduce((n, c) => n + c._count.products, 0);
+
   // Vary tile sizes for a masonry-like rhythm.
   const span = (i: number) =>
     i % 5 === 0 ? "sm:col-span-2 sm:row-span-2" : "";
@@ -30,16 +37,7 @@ export default async function CollectionsPage() {
   return (
     <div className="container-page flex-1 py-12">
       <Reveal>
-        <p className="text-xs font-bold uppercase tracking-widest text-ink-soft">
-          Explore the range
-        </p>
-        <h1 className="mb-3 text-4xl font-black uppercase md:text-5xl">
-          Collections
-        </h1>
-        <p className="max-w-xl text-ink-soft">
-          Twelve themed collections, {categories.reduce((n, c) => n + c._count.products, 0)}{" "}
-          demo products. Tap any tile to browse.
-        </p>
+        <CollectionsIntro total={total} categories={categories.length} />
       </Reveal>
 
       <Stagger className="mt-10 grid auto-rows-[12rem] grid-cols-2 gap-4 lg:grid-cols-4">
@@ -53,26 +51,19 @@ export default async function CollectionsPage() {
                 {String(i + 1).padStart(2, "0")}
               </span>
               <div className="relative">
-                <p className="text-xs font-bold uppercase tracking-widest text-ink-soft">
-                  {c._count.products} products
-                </p>
+                <CollectionCount count={c._count.products} />
               </div>
               <div className="relative">
                 <h2 className="text-2xl font-black uppercase leading-tight">
                   <CategoryName slug={c.slug} fallback={c.name} />
                 </h2>
                 {c.products[0] && (
-                  <p className="mt-1 text-sm text-ink-soft">
-                    From{" "}
-                    {formatPrice(c.products[0].priceCents, c.products[0].currency)}
-                  </p>
+                  <CollectionPriceFrom
+                    cents={c.products[0].priceCents}
+                    currency={c.products[0].currency}
+                  />
                 )}
-                <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold uppercase">
-                  Shop
-                  <span className="transition-transform duration-300 group-hover:translate-x-1">
-                    →
-                  </span>
-                </span>
+                <CollectionShopLabel />
               </div>
             </Link>
           </StaggerItem>

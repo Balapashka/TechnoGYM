@@ -81,7 +81,14 @@ export const useCartStore = create<CartState>()(
         }),
       clear: () => set({ items: [] }),
     }),
-    { name: "movigym-cart" },
+    {
+      name: "movigym-cart",
+      // v2 = the rouble catalog. A cart persisted against the previous EUR
+      // catalog holds product ids that no longer exist, so checkout would fail
+      // on a foreign-key error. Drop those lines instead of restoring them.
+      version: 2,
+      migrate: () => ({ items: [] }),
+    },
   ),
 );
 

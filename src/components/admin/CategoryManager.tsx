@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { field } from "@/components/auth/AuthCard";
+import { useTranslation } from "@/i18n/useTranslation";
+import { errorKeyForStatus, formatProductCount } from "@/i18n/translations";
 
 type Cat = { id: string; name: string; slug: string; count: number };
 
@@ -14,6 +16,7 @@ function slugify(s: string) {
 /** Inline CRUD for categories: add at top, rename or delete each row. */
 export function CategoryManager({ categories }: { categories: Cat[] }) {
   const router = useRouter();
+  const t = useTranslation();
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -29,13 +32,12 @@ export function CategoryManager({ categories }: { categories: Cat[] }) {
       setName("");
       router.refresh();
     } else {
-      const j = await res.json().catch(() => ({}));
-      setError(j.error ?? "Could not create category");
+      setError(t(errorKeyForStatus(res.status)));
     }
   }
 
   async function rename(c: Cat) {
-    const next = prompt("New name", c.name);
+    const next = prompt(t("admin.newName"), c.name);
     if (!next || next.trim().length < 2) return;
     const res = await fetch(`/api/admin/categories/${c.id}`, {
       method: "PUT",
@@ -43,16 +45,16 @@ export function CategoryManager({ categories }: { categories: Cat[] }) {
       body: JSON.stringify({ name: next.trim(), slug: slugify(next) }),
     });
     if (res.ok) router.refresh();
-    else alert((await res.json().catch(() => ({}))).error ?? "Failed");
+    else alert(t(errorKeyForStatus(res.status)));
   }
 
   async function remove(c: Cat) {
-    if (!confirm(`Delete "${c.name}"?`)) return;
+    if (!confirm(t("admin.confirmDelete", { name: c.name }))) return;
     const res = await fetch(`/api/admin/categories/${c.id}`, {
       method: "DELETE",
     });
     if (res.ok) router.refresh();
-    else alert((await res.json().catch(() => ({}))).error ?? "Failed");
+    else alert(t(errorKeyForStatus(res.status)));
   }
 
   return (
@@ -60,7 +62,7 @@ export function CategoryManager({ categories }: { categories: Cat[] }) {
       <div className="mb-6 flex gap-3">
         <input
           className={field}
-          placeholder="New category name"
+          placeholder={t("admin.newCategoryName")}
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && create()}
@@ -69,7 +71,7 @@ export function CategoryManager({ categories }: { categories: Cat[] }) {
           onClick={create}
           className="hover-lift whitespace-nowrap rounded-full bg-accent px-6 text-sm font-bold uppercase text-ink"
         >
-          Add
+          {t("admin.add")}
         </button>
       </div>
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
@@ -89,7 +91,7 @@ export function CategoryManager({ categories }: { categories: Cat[] }) {
               <div>
                 <span className="font-semibold">{c.name}</span>
                 <span className="ml-2 text-xs text-ink-soft">
-                  /{c.slug} · {c.count} products
+                  /{c.slug} · {formatProductCount(t.locale, c.count)}
                 </span>
               </div>
               <div className="flex gap-4 text-sm">
@@ -97,13 +99,13 @@ export function CategoryManager({ categories }: { categories: Cat[] }) {
                   onClick={() => rename(c)}
                   className="font-bold underline hover:text-ink-soft"
                 >
-                  Rename
+                  {t("admin.rename")}
                 </button>
                 <button
                   onClick={() => remove(c)}
                   className="font-bold text-red-600 underline"
                 >
-                  Delete
+                  {t("admin.delete")}
                 </button>
               </div>
             </motion.li>

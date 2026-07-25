@@ -7,10 +7,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@/schemas/login";
 import { AuthCard, field, fieldError } from "@/components/auth/AuthCard";
+import { useTranslation } from "@/i18n/useTranslation";
+import { errorKeyForStatus } from "@/i18n/translations";
 
 /** Login form. Verifies via /api/auth/login and starts a session. */
 export function LoginForm() {
   const router = useRouter();
+  const t = useTranslation();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -31,29 +34,34 @@ export function LoginForm() {
       router.push(json.role === "ADMIN" ? "/admin" : "/account");
       router.refresh();
     } else {
-      setServerError(json.error ?? "Login failed");
+      setServerError(t(errorKeyForStatus(res.status)));
     }
   });
 
   return (
-    <AuthCard title="Login" subtitle="Welcome back. Sign in to continue.">
+    <AuthCard
+      title={t("auth.signIn")}
+      subtitle={t("auth.welcomeBack")}
+    >
       <div className="mb-4 space-y-2 rounded-lg bg-mist p-3 text-xs text-ink-soft">
         <p>
-          Shopper — <strong>demo@movigym.test</strong> / <strong>demo1234</strong>
+          {t("auth.demoShopper")} — <strong>demo@movigym.test</strong> / <strong>demo1234</strong>
         </p>
         <p>
-          Admin — <strong>admin@movigym.test</strong> / <strong>admin1234</strong>
+          {t("auth.demoAdmin")} — <strong>admin@movigym.test</strong> / <strong>admin1234</strong>
         </p>
       </div>
       <form onSubmit={onSubmit} noValidate className="space-y-4">
         <div>
-          <label className="mb-1 block text-xs font-bold uppercase">Email</label>
+          <label className="mb-1 block text-xs font-bold uppercase">
+            {t("auth.email")}
+          </label>
           <input className={field} type="email" {...register("email")} />
           {errors.email && <p className={fieldError}>{errors.email.message}</p>}
         </div>
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
-            Password
+            {t("auth.password")}
           </label>
           <input className={field} type="password" {...register("password")} />
           {errors.password && (
@@ -68,15 +76,15 @@ export function LoginForm() {
           disabled={isSubmitting}
           className="hover-lift w-full rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase text-ink hover:bg-accent-strong disabled:opacity-50"
         >
-          {isSubmitting ? "Signing in…" : "Sign in"}
+          {isSubmitting ? t("common.loading") : t("auth.signIn")}
         </button>
 
         <div className="flex justify-between text-sm text-ink-soft">
           <Link href="/forgot-password" className="underline hover:text-ink">
-            Forgot password?
+            {t("auth.forgotPassword")}
           </Link>
           <Link href="/register" className="font-bold text-ink underline">
-            Create account
+            {t("auth.signUp")}
           </Link>
         </div>
       </form>

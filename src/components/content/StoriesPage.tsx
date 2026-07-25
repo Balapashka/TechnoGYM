@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import { landings } from "@/lib/landings";
+import { useTranslation } from "@/i18n/useTranslation";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const c = landings.stories;
 
 /** Stories: warm gradient hero + vertical timeline of alternating cards. */
 export function StoriesPage() {
+  const t = useTranslation();
+
   return (
     <div className="flex-1">
       <section className={`relative overflow-hidden ${c.gradient} text-paper`}>
@@ -44,11 +47,11 @@ export function StoriesPage() {
           className="absolute left-4 top-20 hidden h-[calc(100%-10rem)] w-px origin-top bg-stone md:left-1/2 md:block"
         />
         <ul className="space-y-12">
-          {c.tiles.map((t, i) => {
+          {c.tiles.map((tile, i) => {
             const left = i % 2 === 0;
             return (
               <li
-                key={t.title}
+                key={tile.title}
                 className={`relative md:flex ${left ? "md:justify-start" : "md:justify-end"}`}
               >
                 <motion.div
@@ -61,10 +64,12 @@ export function StoriesPage() {
                   <span className="absolute -left-1.5 top-6 hidden h-3 w-3 rounded-full bg-accent ring-4 ring-paper md:left-auto md:right-[-1.6rem] md:block" />
                   <div className="rounded-2xl border border-stone bg-paper p-6 shadow-sm">
                     <span className="text-xs font-bold uppercase tracking-widest text-ink-soft">
-                      Story {String(i + 1).padStart(2, "0")}
+                      {t("landing.story", {
+                        number: String(i + 1).padStart(2, "0"),
+                      })}
                     </span>
-                    <h3 className="mt-1 text-xl font-black uppercase">{t.title}</h3>
-                    <p className="mt-2 text-sm text-ink-soft">{t.text}</p>
+                    <h3 className="mt-1 text-xl font-black uppercase">{tile.title}</h3>
+                    <p className="mt-2 text-sm text-ink-soft">{tile.text}</p>
                   </div>
                 </motion.div>
               </li>

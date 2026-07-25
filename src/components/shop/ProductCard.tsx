@@ -1,10 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/Badge";
-import { Price } from "@/components/ui/Price";
-import { formatInstallment } from "@/lib/format";
+import { Price, Installment } from "@/components/ui/Price";
 import { categoryColor } from "@/lib/category-color";
 import { QuickViewButton } from "./QuickViewButton";
+import { ProductOrigin } from "./ProductOrigin";
 import type { ProductDTO } from "@/lib/catalog";
 
 /** Product card used in carousels and the catalog grid. */
@@ -24,24 +24,28 @@ export function ProductCard({ product }: { product: ProductDTO }) {
           alt={product.name}
           fill
           sizes="(max-width: 768px) 50vw, 25vw"
-          className="object-contain p-6 transition-transform duration-300 group-hover:scale-105"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <QuickViewButton product={product} />
       </div>
       <div className="flex flex-1 flex-col gap-1 p-4">
+        <ProductOrigin
+          brand={product.brand}
+          originCountry={product.originCountry}
+        />
         <h3 className="text-sm font-bold uppercase tracking-wide">
           {product.name}
         </h3>
         <Price
           cents={product.priceCents}
           currency={product.currency}
-          prefix="From"
-          className="text-sm"
+          className="mt-auto text-sm"
         />
-        <p className="mt-1 text-xs text-ink-soft">
-          {formatInstallment(product.priceCents, 36, product.currency)}/mo · 36
-          months
-        </p>
+        <Installment
+          cents={product.priceCents}
+          currency={product.currency}
+          className="text-xs text-ink-soft"
+        />
       </div>
     </Link>
   );

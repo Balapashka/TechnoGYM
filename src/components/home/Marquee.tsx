@@ -1,22 +1,28 @@
 "use client";
 
 import { motion } from "motion/react";
+import { categoryName } from "@/i18n/translations";
+import { useTranslation } from "@/i18n/useTranslation";
 
-const WORDS = [
-  "Treadmills",
-  "Indoor Bikes",
-  "Rowers",
-  "Strength",
-  "Recovery",
-  "Free Weights",
-  "Ellipticals",
-  "Apparel",
-  "Nutrition",
+/** Seeded category slugs shown in the band (see prisma/seed.ts). */
+const SLUGS = [
+  "treadmills",
+  "bikes",
+  "rowers",
+  "strength",
+  "recovery",
+  "free-weights",
+  "ellipticals",
+  "apparel",
+  "nutrition",
 ];
 
 /** Infinite scrolling keyword band — a continuous "moving system" accent. */
 export function Marquee() {
-  const row = [...WORDS, ...WORDS];
+  const t = useTranslation();
+  const words = SLUGS.map((slug) => categoryName(t.locale, slug));
+  const row = [...words, ...words];
+
   return (
     <div className="overflow-hidden border-y border-ink bg-accent py-4">
       <motion.div

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useMotionValue, type Variants } from "motion/react";
+import { useTranslation } from "@/i18n/useTranslation";
 
 const slide: Variants = {
   enter: (d: number) => ({ opacity: 0, x: d * 80, scale: 1.05 }),
@@ -12,6 +13,7 @@ const slide: Variants = {
 
 /** Product image gallery: parallax-on-hover active frame + thumbnail strip. */
 export function Gallery({ images, name }: { images: string[]; name: string }) {
+  const t = useTranslation();
   const safe = images.length ? images : ["/placeholders/gallery-1600x1200.svg"];
   const [active, setActive] = useState(0);
   const [dir, setDir] = useState(1);
@@ -88,7 +90,7 @@ export function Gallery({ images, name }: { images: string[]; name: string }) {
             <button
               key={`${src}-${i}`}
               onClick={() => select(i)}
-              aria-label={`View image ${i + 1}`}
+              aria-label={t("product.viewImage", { number: i + 1 })}
               aria-current={i === active}
               className={`hover-lift relative h-20 w-20 overflow-hidden rounded-xl border bg-mist ${
                 i === active ? "border-ink ring-2 ring-accent" : "border-stone"

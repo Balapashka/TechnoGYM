@@ -1,5 +1,6 @@
 import { getCategories } from "@/lib/catalog";
 import { ProductForm } from "@/components/admin/ProductForm";
+import { AdminHeading } from "@/components/admin/AdminHeading";
 
 export const dynamic = "force-dynamic";
 
@@ -7,7 +8,7 @@ export default async function NewProductPage() {
   const categories = await getCategories();
   return (
     <div>
-      <h2 className="mb-6 text-xl font-black uppercase">New product</h2>
+      <AdminHeading tKey="admin.createProduct" />
       <ProductForm categories={categories} />
     </div>
   );

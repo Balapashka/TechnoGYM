@@ -8,10 +8,23 @@
 
 import { useMemo } from "react";
 import { useLocaleStore } from "@/store/locale-store";
-import { translations, type Locale, getTranslation, interpolate } from "./translations";
+import { useHydrated } from "@/lib/use-hydrated";
+import {
+  DEFAULT_LOCALE,
+  translations,
+  type Locale,
+  getTranslation,
+  interpolate,
+} from "./translations";
 
 export function useTranslation() {
-  const locale: Locale = useLocaleStore((s) => s.language);
+  const stored = useLocaleStore((s) => s.language);
+  const hydrated = useHydrated();
+
+  // The store is localStorage-backed, so on the server — and on the first
+  // client render — it must resolve to the default locale, or every translated
+  // string becomes a hydration mismatch for a visitor who picked English.
+  const locale: Locale = hydrated ? stored : DEFAULT_LOCALE;
 
   const t = useMemo(() => {
     function translate(keyPath: string): string;

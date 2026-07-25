@@ -2,37 +2,49 @@
 
 import useEmblaCarousel from "embla-carousel-react";
 import { ProductCard } from "@/components/shop/ProductCard";
+import { useTranslation } from "@/i18n/useTranslation";
 import type { ProductDTO } from "@/lib/catalog";
 
-/** Horizontally scrollable row of product cards. */
+/**
+ * Horizontally scrollable row of product cards.
+ *
+ * Pass `titleKey` (a dictionary path) so the heading follows the language
+ * switch; `title` stays available for callers with an already-resolved string.
+ */
 export function ProductCarousel({
   title,
+  titleKey,
   products,
 }: {
-  title: string;
+  title?: string;
+  titleKey?: string;
   products: ProductDTO[];
 }) {
+  const t = useTranslation();
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
     dragFree: true,
   });
 
+  const heading = titleKey ? t(titleKey) : (title ?? "");
+
+
   return (
     <section className="container-page py-12">
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-2xl font-black uppercase tracking-tight md:text-3xl">
-          {title}
+          {heading}
         </h2>
         <div className="hidden gap-2 md:flex">
           <button
-            aria-label="Previous"
+            aria-label={t("landing.previous")}
             onClick={() => emblaApi?.scrollPrev()}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-ink"
           >
             ‹
           </button>
           <button
-            aria-label="Next"
+            aria-label={t("landing.next")}
             onClick={() => emblaApi?.scrollNext()}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-ink"
           >

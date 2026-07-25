@@ -25,8 +25,8 @@ export const shopColumns: MegaColumn[] = [
     title: "Strength",
     links: [
       { key: "nav.strengthStations", label: "Strength stations", href: "/category/strength" },
-      { key: "nav.benches", label: "Benches", href: "/category/strength" },
-      { key: "nav.accessories", label: "Accessories", href: "/category/accessories" },
+      { key: "nav.benches", label: "Benches", href: "/category/benches" },
+      { key: "nav.accessories", label: "Accessories", href: "/category/cardio-accessories" },
     ],
   },
   {
@@ -60,7 +60,7 @@ export const footerColumns: MegaColumn[] = [
       { key: "nav.ellipticals", label: "Ellipticals", href: "/category/ellipticals" },
       { key: "nav.rowers", label: "Rowers", href: "/category/rowers" },
       { key: "nav.strength", label: "Strength", href: "/category/strength" },
-      { key: "nav.accessories", label: "Accessories", href: "/category/accessories" },
+      { key: "nav.accessories", label: "Accessories", href: "/category/cardio-accessories" },
     ],
   },
   {
