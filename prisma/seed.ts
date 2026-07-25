@@ -5,50 +5,38 @@ import { CATEGORY_IMAGES, FALLBACK_IMAGES } from "./seed-images";
 const prisma = new PrismaClient();
 
 /**
- * Catalog generator for the SPORT LINER demo store.
+ * Catalog generator for the SPORT LINER store.
  *
- * Products are generated, but the surrounding data is real: manufacturer names
- * are actual fitness-equipment brands, `originCountry` is that brand's home
- * country, prices are in roubles at plausible CIS retail levels, and the photos
- * are real Unsplash gym imagery.
+ * The assortment mirrors the real sourcing model: Chinese equipment by
+ * UNIX Fit is stocked at the Moscow warehouse (in stock), Italian equipment
+ * by Technogym and Panatta is imported to order. Price bands per brand are
+ * calibrated to actual RU retail levels (UNIX Fit bands follow unixfit.ru).
  *
- * The model designations (e.g. "TF-720") are invented so nothing here can be
- * mistaken for a genuine product listing — this is an educational demo.
+ * The model designations (e.g. "TF-720") are invented so the catalog cannot
+ * be mistaken for the manufacturers' official listings.
  */
 
 /** Manufacturer -> country of origin (Russian), as shown on product cards. */
 const BRAND_ORIGIN: Record<string, string> = {
+  "UNIX Fit": "Китай",
   Technogym: "Италия",
   Panatta: "Италия",
-  "Life Fitness": "США",
-  "Hammer Strength": "США",
-  Precor: "США",
-  Cybex: "США",
-  Concept2: "США",
-  "Body-Solid": "США",
-  "Rogue Fitness": "США",
-  NordicTrack: "США",
-  Hyperice: "США",
-  Therabody: "США",
-  "Optimum Nutrition": "США",
-  "Under Armour": "США",
-  Matrix: "Тайвань",
-  "Spirit Fitness": "Тайвань",
-  Kettler: "Германия",
-  Weider: "Германия",
-  Blackroll: "Германия",
-  Adidas: "Германия",
-  Eleiko: "Швеция",
-  "BH Fitness": "Испания",
-  Tunturi: "Финляндия",
-  "Scitec Nutrition": "Венгрия",
-  Impulse: "Китай",
-  "DHZ Fitness": "Китай",
-  "Bronze Gym": "Китай",
-  "Oxygen Fitness": "Китай",
-  "Clear Fit": "Китай",
-  Aerofit: "Россия",
-  Maxler: "Германия",
+};
+
+/**
+ * Chinese equipment is stocked in Moscow; Italian brands ship to order.
+ * Availability is derived from the origin, not rolled at random.
+ */
+const STOCKED_ORIGIN = "Китай";
+
+type BrandSeed = {
+  /** Key of BRAND_ORIGIN. */
+  name: string;
+  /** Base models per brand; each gets the three trim tiers. */
+  models: number;
+  /** Price band in roubles for this brand within the category. */
+  priceFrom: number;
+  priceTo: number;
 };
 
 type CategorySeed = {
@@ -56,13 +44,10 @@ type CategorySeed = {
   name: string;
   /** Russian product noun used as the start of every product name. */
   noun: string;
-  /** Brands sold in this category (keys of BRAND_ORIGIN). */
-  brands: string[];
+  brands: BrandSeed[];
   /** Model-code prefixes, combined with a number: "TF-720". */
   codes: string[];
   features: string[];
-  priceFrom: number; // roubles
-  priceTo: number; // roubles
 };
 
 const categories: CategorySeed[] = [
@@ -70,7 +55,10 @@ const categories: CategorySeed[] = [
     slug: "treadmills",
     name: "Беговые дорожки",
     noun: "Беговая дорожка",
-    brands: ["Technogym", "Matrix", "Life Fitness", "Precor", "NordicTrack", "Spirit Fitness", "Bronze Gym", "Oxygen Fitness"],
+    brands: [
+      { name: "UNIX Fit", models: 4, priceFrom: 12000, priceTo: 297000 },
+      { name: "Technogym", models: 2, priceFrom: 850000, priceTo: 2900000 },
+    ],
     codes: ["TF", "T", "RUN", "TR", "EXC"],
     features: [
       "Амортизация бегового полотна",
@@ -82,14 +70,15 @@ const categories: CategorySeed[] = [
       "Складная рама",
       "Поддержка Bluetooth и приложений",
     ],
-    priceFrom: 120000,
-    priceTo: 890000,
   },
   {
     slug: "bikes",
     name: "Велотренажёры",
     noun: "Велотренажёр",
-    brands: ["Technogym", "Matrix", "Life Fitness", "Kettler", "BH Fitness", "Spirit Fitness", "Bronze Gym", "Clear Fit"],
+    brands: [
+      { name: "UNIX Fit", models: 4, priceFrom: 27000, priceTo: 99000 },
+      { name: "Technogym", models: 2, priceFrom: 590000, priceTo: 1900000 },
+    ],
     codes: ["BK", "IC", "SPIN", "U", "R"],
     features: [
       "Магнитная система нагрузки",
@@ -100,14 +89,15 @@ const categories: CategorySeed[] = [
       "Консоль с показателями мощности",
       "Транспортировочные ролики",
     ],
-    priceFrom: 55000,
-    priceTo: 520000,
   },
   {
     slug: "ellipticals",
     name: "Эллиптические тренажёры",
     noun: "Эллиптический тренажёр",
-    brands: ["Technogym", "Matrix", "Precor", "Life Fitness", "Tunturi", "Spirit Fitness", "Oxygen Fitness", "Aerofit"],
+    brands: [
+      { name: "UNIX Fit", models: 3, priceFrom: 32000, priceTo: 125000 },
+      { name: "Technogym", models: 2, priceFrom: 740000, priceTo: 2200000 },
+    ],
     codes: ["EL", "CX", "E", "XT", "ELL"],
     features: [
       "Длина шага 51 см",
@@ -118,14 +108,15 @@ const categories: CategorySeed[] = [
       "Бесшумный ход",
       "Программы тренировок в консоли",
     ],
-    priceFrom: 90000,
-    priceTo: 640000,
   },
   {
     slug: "rowers",
     name: "Гребные тренажёры",
     noun: "Гребной тренажёр",
-    brands: ["Concept2", "Technogym", "Matrix", "Life Fitness", "Kettler", "Aerofit", "Clear Fit"],
+    brands: [
+      { name: "UNIX Fit", models: 3, priceFrom: 27000, priceTo: 92000 },
+      { name: "Technogym", models: 1, priceFrom: 520000, priceTo: 950000 },
+    ],
     codes: ["RW", "ROW", "WR", "R"],
     features: [
       "Воздушное сопротивление",
@@ -135,14 +126,16 @@ const categories: CategorySeed[] = [
       "Эргономичное сиденье на рельсе",
       "Регулируемая подножка",
     ],
-    priceFrom: 75000,
-    priceTo: 460000,
   },
   {
     slug: "strength",
     name: "Силовые тренажёры",
     noun: "Силовой тренажёр",
-    brands: ["Technogym", "Hammer Strength", "Panatta", "Cybex", "Life Fitness", "Matrix", "Impulse", "DHZ Fitness"],
+    brands: [
+      { name: "UNIX Fit", models: 4, priceFrom: 148000, priceTo: 322000 },
+      { name: "Technogym", models: 3, priceFrom: 690000, priceTo: 1800000 },
+      { name: "Panatta", models: 3, priceFrom: 540000, priceTo: 1600000 },
+    ],
     codes: ["ST", "MG", "PL", "SL", "HS"],
     features: [
       "Грузоблок 100 кг",
@@ -152,14 +145,16 @@ const categories: CategorySeed[] = [
       "Регулировка сиденья под рост",
       "Порошковое покрытие рамы",
     ],
-    priceFrom: 160000,
-    priceTo: 1250000,
   },
   {
     slug: "free-weights",
     name: "Свободные веса",
     noun: "Набор весов",
-    brands: ["Eleiko", "Rogue Fitness", "Body-Solid", "Technogym", "Bronze Gym", "Aerofit", "Impulse"],
+    brands: [
+      { name: "UNIX Fit", models: 3, priceFrom: 3000, priceTo: 68000 },
+      { name: "Technogym", models: 2, priceFrom: 24000, priceTo: 350000 },
+      { name: "Panatta", models: 2, priceFrom: 42000, priceTo: 420000 },
+    ],
     codes: ["FW", "DB", "KB", "BB", "PL"],
     features: [
       "Обрезиненное покрытие",
@@ -169,14 +164,16 @@ const categories: CategorySeed[] = [
       "Не повреждает напольное покрытие",
       "Точность массы ±1%",
     ],
-    priceFrom: 6000,
-    priceTo: 190000,
   },
   {
     slug: "benches",
     name: "Скамьи",
     noun: "Скамья",
-    brands: ["Body-Solid", "Rogue Fitness", "Technogym", "Panatta", "Impulse", "Bronze Gym", "Aerofit"],
+    brands: [
+      { name: "UNIX Fit", models: 3, priceFrom: 12000, priceTo: 64000 },
+      { name: "Technogym", models: 2, priceFrom: 118000, priceTo: 350000 },
+      { name: "Panatta", models: 2, priceFrom: 92000, priceTo: 310000 },
+    ],
     codes: ["BN", "FID", "AB", "OB"],
     features: [
       "Регулировка спинки в 7 положениях",
@@ -186,14 +183,15 @@ const categories: CategorySeed[] = [
       "Максимальная нагрузка 300 кг",
       "Нескользящая обивка",
     ],
-    priceFrom: 15000,
-    priceTo: 145000,
   },
   {
     slug: "racks",
     name: "Стойки и силовые рамы",
     noun: "Силовая рама",
-    brands: ["Rogue Fitness", "Eleiko", "Body-Solid", "Panatta", "Impulse", "DHZ Fitness", "Aerofit"],
+    brands: [
+      { name: "UNIX Fit", models: 3, priceFrom: 148000, priceTo: 322000 },
+      { name: "Panatta", models: 2, priceFrom: 260000, priceTo: 920000 },
+    ],
     codes: ["RK", "PR", "SQ", "HR"],
     features: [
       "Профиль 75×75 мм",
@@ -203,14 +201,15 @@ const categories: CategorySeed[] = [
       "J-крюки с полимерной вставкой",
       "Анкерное крепление к полу",
     ],
-    priceFrom: 45000,
-    priceTo: 390000,
   },
   {
     slug: "cardio-accessories",
     name: "Аксессуары для кардио",
     noun: "Аксессуар",
-    brands: ["Rogue Fitness", "Body-Solid", "Bronze Gym", "Clear Fit", "Impulse", "Aerofit"],
+    brands: [
+      { name: "UNIX Fit", models: 4, priceFrom: 1500, priceTo: 32000 },
+      { name: "Technogym", models: 2, priceFrom: 8000, priceTo: 120000 },
+    ],
     codes: ["CA", "AX", "JR", "SL"],
     features: [
       "Компактное хранение",
@@ -219,14 +218,15 @@ const categories: CategorySeed[] = [
       "Нескользящее покрытие",
       "Сумка для переноски в комплекте",
     ],
-    priceFrom: 1500,
-    priceTo: 28000,
   },
   {
     slug: "recovery",
     name: "Восстановление",
     noun: "Средство восстановления",
-    brands: ["Therabody", "Hyperice", "Blackroll", "Technogym", "Bronze Gym"],
+    brands: [
+      { name: "UNIX Fit", models: 3, priceFrom: 49000, priceTo: 299000 },
+      { name: "Technogym", models: 2, priceFrom: 15000, priceTo: 155000 },
+    ],
     codes: ["RC", "MG", "FR", "PT"],
     features: [
       "Глубокая проработка мышц",
@@ -235,89 +235,16 @@ const categories: CategorySeed[] = [
       "Тихий двигатель",
       "Кейс для поездок",
     ],
-    priceFrom: 2500,
-    priceTo: 75000,
-  },
-  {
-    slug: "apparel",
-    name: "Спортивная одежда",
-    noun: "Комплект одежды",
-    brands: ["Adidas", "Under Armour", "Kettler", "Technogym"],
-    codes: ["AP", "TR", "FT"],
-    features: [
-      "Дышащая ткань",
-      "Отведение влаги",
-      "Эластичность в четырёх направлениях",
-      "Плоские швы",
-      "Светоотражающие элементы",
-    ],
-    priceFrom: 2500,
-    priceTo: 24000,
-  },
-  {
-    slug: "nutrition",
-    name: "Спортивное питание",
-    noun: "Спортивное питание",
-    brands: ["Optimum Nutrition", "Weider", "Maxler", "Scitec Nutrition"],
-    codes: ["NT", "PR", "WH", "AM"],
-    features: [
-      "Без добавленного сахара",
-      "Легко размешивается",
-      "24 г белка в порции",
-      "Вегетарианская линейка",
-      "30 порций в упаковке",
-    ],
-    priceFrom: 1500,
-    priceTo: 16000,
   },
 ];
-
-/**
- * Where a brand sits in the category's price band: 0 = entry, 1 = flagship.
- * Without this the price is a blind draw and a budget OEM brand can outprice
- * Technogym in the same listing.
- */
-const BRAND_TIER: Record<string, number> = {
-  Technogym: 0.95,
-  Panatta: 0.85,
-  "Hammer Strength": 0.85,
-  Eleiko: 0.9,
-  Cybex: 0.8,
-  Precor: 0.8,
-  "Life Fitness": 0.78,
-  Concept2: 0.7,
-  "Rogue Fitness": 0.7,
-  Therabody: 0.7,
-  Hyperice: 0.65,
-  Matrix: 0.6,
-  Kettler: 0.5,
-  "BH Fitness": 0.45,
-  Tunturi: 0.45,
-  "Spirit Fitness": 0.45,
-  NordicTrack: 0.5,
-  "Body-Solid": 0.45,
-  Blackroll: 0.4,
-  "Under Armour": 0.4,
-  Adidas: 0.4,
-  "Optimum Nutrition": 0.45,
-  "Scitec Nutrition": 0.35,
-  Weider: 0.35,
-  Maxler: 0.3,
-  Impulse: 0.3,
-  "DHZ Fitness": 0.3,
-  Aerofit: 0.28,
-  "Bronze Gym": 0.25,
-  "Oxygen Fitness": 0.2,
-  "Clear Fit": 0.15,
-};
 
 const TIERS = [
   { suffix: "", label: "Base", priceMult: 1 },
-  { suffix: " Pro", label: "Pro", priceMult: 1.45 },
-  { suffix: " Elite", label: "Elite", priceMult: 1.9 },
+  { suffix: " Pro", label: "Pro", priceMult: 1.2 },
+  { suffix: " Elite", label: "Elite", priceMult: 1.42 },
 ];
 
-const BADGES = ["Хит продаж", "Новинка", "Выгодная цена", "Топ выбор", "Под заказ"];
+const BADGES = ["Хит продаж", "Новинка", "Выгодная цена", "Топ выбор"];
 
 /** Deterministic PRNG so the generated catalog is stable across reseeds. */
 function rng(seed: number) {
@@ -374,62 +301,68 @@ function buildProducts(cat: CategorySeed, seed: number): GeneratedProduct[] {
 
   let i = 0;
   for (const brand of cat.brands) {
-    for (const tier of TIERS) {
-      const code = cat.codes[i % cat.codes.length];
-      const model = `${code}-${100 + ((i * 37) % 800)}`;
-      const name = `${cat.noun} ${brand} ${model}${tier.suffix}`;
-      const origin = BRAND_ORIGIN[brand] ?? "";
+    const origin = BRAND_ORIGIN[brand.name] ?? "";
+    const inStock = origin === STOCKED_ORIGIN;
+    const span = brand.priceTo - brand.priceFrom;
 
-      // Anchor the price on where the brand sits in the band, jitter it a
-      // little, apply the model tier, then clamp back inside [from, to].
-      const span = cat.priceTo - cat.priceFrom;
-      const position = (BRAND_TIER[brand] ?? 0.5) * 0.55 + rand() * 0.12;
-      const base = cat.priceFrom + span * position;
-      const priceRub = tidyPrice(
-        Math.min(cat.priceTo, Math.max(cat.priceFrom, base * tier.priceMult)),
-      );
+    for (let m = 0; m < brand.models; m++) {
+      for (const tier of TIERS) {
+        const code = cat.codes[i % cat.codes.length];
+        const model = `${code}-${100 + ((i * 37) % 800)}`;
+        const name = `${cat.noun} ${brand.name} ${model}${tier.suffix}`;
 
-      const features = shuffle(cat.features, rand).slice(
-        0,
-        4 + Math.floor(rand() * 2),
-      );
+        // The model index walks the brand's own band from entry to flagship;
+        // the trim tier lifts the price within it, clamped back to the band.
+        const position = (m + 0.2 + rand() * 0.4) / brand.models;
+        const base = brand.priceFrom + span * position * 0.7;
+        const priceRub = tidyPrice(
+          Math.min(brand.priceTo, Math.max(brand.priceFrom, base * tier.priceMult)),
+        );
 
-      // Rotate through the category's photos so the grid does not repeat.
-      const main = pool[i % pool.length];
-      const gallery = [
-        pool[(i + 1) % pool.length],
-        pool[(i + 2) % pool.length],
-      ];
+        const features = shuffle(cat.features, rand).slice(
+          0,
+          4 + Math.floor(rand() * 2),
+        );
 
-      out.push({
-        slug: slugify(`${brand}-${model}-${tier.label}-${cat.slug}`),
-        name,
-        description:
-          `${name}. Производитель — ${brand}, страна производства — ${origin}. ` +
-          `Ключевые особенности: ${features
-            .slice(0, 3)
-            .map((f) => f.toLowerCase())
-            .join(", ")}. ` +
-          `Демонстрационная карточка товара: характеристики и цена приведены для примера.`,
-        priceCents: priceRub * 100,
-        badge: i % 5 === 0 ? BADGES[(i / 5) % BADGES.length] : null,
-        brand,
-        originCountry: origin,
-        inStock: rand() > 0.12,
-        images: [main, ...gallery],
-        features,
-        variants:
-          tier.label === "Base"
-            ? [{ name: "Стандартная комплектация", priceDeltaCents: 0 }]
-            : [
-                { name: "Стандартная комплектация", priceDeltaCents: 0 },
-                {
-                  name: "Расширенная комплектация",
-                  priceDeltaCents: Math.round((priceRub * 0.12) / 100) * 100 * 100,
-                },
-              ],
-      });
-      i += 1;
+        // Rotate through the category's photos so the grid does not repeat.
+        const main = pool[i % pool.length];
+        const gallery = [
+          pool[(i + 1) % pool.length],
+          pool[(i + 2) % pool.length],
+        ];
+
+        out.push({
+          slug: slugify(`${brand.name}-${model}-${tier.label}-${cat.slug}`),
+          name,
+          description:
+            `${name}. Производитель — ${brand.name}, страна производства — ${origin}. ` +
+            `Ключевые особенности: ${features
+              .slice(0, 3)
+              .map((f) => f.toLowerCase())
+              .join(", ")}. ` +
+            (inStock
+              ? "В наличии на складе в Москве."
+              : "Поставка под заказ из Италии."),
+          priceCents: priceRub * 100,
+          badge: i % 5 === 0 ? BADGES[(i / 5) % BADGES.length] : null,
+          brand: brand.name,
+          originCountry: origin,
+          inStock,
+          images: [main, ...gallery],
+          features,
+          variants:
+            tier.label === "Base"
+              ? [{ name: "Стандартная комплектация", priceDeltaCents: 0 }]
+              : [
+                  { name: "Стандартная комплектация", priceDeltaCents: 0 },
+                  {
+                    name: "Расширенная комплектация",
+                    priceDeltaCents: Math.round((priceRub * 0.12) / 100) * 100 * 100,
+                  },
+                ],
+        });
+        i += 1;
+      }
     }
   }
   return out;

@@ -14,8 +14,6 @@ const COLORS: Record<string, string> = {
   racks: "bg-zinc-200",
   "cardio-accessories": "bg-violet-100",
   recovery: "bg-teal-100",
-  apparel: "bg-fuchsia-100",
-  nutrition: "bg-yellow-100",
 };
 
 export function categoryColor(slug: string): string {

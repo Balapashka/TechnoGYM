@@ -4,6 +4,7 @@ import { Gallery } from "@/components/shop/Gallery";
 import { AddToCart } from "@/components/shop/AddToCart";
 import { CategoryName } from "@/components/shop/CategoryName";
 import { ProductOrigin } from "@/components/shop/ProductOrigin";
+import { Availability } from "@/components/shop/Availability";
 import { getProductBySlug } from "@/lib/catalog";
 import { BreadcrumbHome, ProductSpecs } from "./ProductDetailText";
 
@@ -67,6 +68,7 @@ export default async function ProductPage({
               originCountry={product.originCountry}
               className="mt-2"
             />
+            <Availability inStock={product.inStock} className="mt-3" />
           </div>
 
           <p className="text-ink-soft">{product.description}</p>

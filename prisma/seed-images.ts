@@ -77,20 +77,6 @@ export const CATEGORY_IMAGES: Record<string, string[]> = {
     "https://images.unsplash.com/photo-1683758507025-6e74ad3ca1e5?auto=format&fit=crop&w=1200&q=80",
     "https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=1200&q=80",
   ],
-  "apparel": [
-    "https://images.unsplash.com/photo-1523381294911-8d3cead13475?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1606902965551-dce093cda6e7?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1645810798586-08e892108d67?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1614367674345-f414b2be3e5b?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1549476464-37392f717541?auto=format&fit=crop&w=1200&q=80",
-  ],
-  "nutrition": [
-    "https://images.unsplash.com/photo-1693996045899-7cf0ac0229c7?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1693996045300-521e9d08cabc?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1704650312191-005ab02786f5?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1595348020949-87cdfbb44174?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1558017487-06bf9f82613a?auto=format&fit=crop&w=1200&q=80",
-  ],
 };
 
 /** Used when a category has no dedicated photography. */

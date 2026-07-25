@@ -51,9 +51,12 @@ columns, so `Product.images` and `Product.features` are JSON **strings** in the 
 through `packList`/`unpackList` in `src/lib/json.ts` rather than `JSON.parse` inline. If you add a
 list-shaped product field, follow the same pattern and extend `toDTO`.
 
-**Catalog data.** `prisma/seed.ts` generates ~237 products across 12 categories from real
-manufacturer names (`brand`) with their home country (`originCountry`, in Russian) — model codes
-and prices are invented, so nothing is a genuine product listing. Product photography comes from
+**Catalog data.** `prisma/seed.ts` generates ~180 products across 10 equipment categories,
+mirroring the real sourcing model: `UNIX Fit` (Китай) is stocked in Moscow (`inStock: true`),
+`Technogym`/`Panatta` (Италия) are imported to order (`inStock: false` = "Под заказ", still
+purchasable). Availability derives from `originCountry`, never at random. Per-brand price bands
+are calibrated to actual RU retail levels (UNIX Fit follows unixfit.ru); model codes are invented
+so the catalog is not the manufacturers' official listing. Product photography comes from
 `prisma/seed-images.ts`, a slug → verified `images.unsplash.com` URL map (the host is whitelisted
 in `next.config.ts`). `brand`/`originCountry` are non-null with an `""` default so the column could
 be added without a data migration; the UI (`ProductOrigin`) hides an empty value, and the admin

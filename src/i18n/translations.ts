@@ -123,7 +123,7 @@ export interface Translation {
     perMonth: string;
     /** "12 500 ₽ / мес · 36 мес." — takes {amount} and {months}. */
     installment: string;
-    outOfStock: string;
+    madeToOrder: string;
     inStock: string;
     add: string;
     remove: string;
@@ -448,8 +448,6 @@ export const translations: Record<Locale, Translation> = {
       racks: "Стойки и силовые рамы",
       "cardio-accessories": "Аксессуары для кардио",
       recovery: "Восстановление",
-      apparel: "Спортивная одежда",
-      nutrition: "Спортивное питание",
     },
     catalog: {
       eyebrow: "Каталог",
@@ -480,8 +478,8 @@ export const translations: Record<Locale, Translation> = {
       from: "от",
       perMonth: "/ месяц",
       installment: "{amount} / мес · {months} мес.",
-      outOfStock: "Нет в наличии",
-      inStock: "В наличии",
+      madeToOrder: "Под заказ",
+      inStock: "В наличии в Москве",
       add: "Добавить",
       remove: "Удалить",
       quantity: "Количество",
@@ -791,8 +789,6 @@ export const translations: Record<Locale, Translation> = {
       racks: "Racks & Cages",
       "cardio-accessories": "Cardio Accessories",
       recovery: "Recovery",
-      apparel: "Apparel",
-      nutrition: "Nutrition",
     },
     catalog: {
       eyebrow: "Catalog",
@@ -822,8 +818,8 @@ export const translations: Record<Locale, Translation> = {
       from: "from",
       perMonth: "/ month",
       installment: "{amount} / mo · {months} months",
-      outOfStock: "Out of stock",
-      inStock: "In stock",
+      madeToOrder: "Made to order",
+      inStock: "In stock in Moscow",
       add: "Add",
       remove: "Remove",
       quantity: "Quantity",

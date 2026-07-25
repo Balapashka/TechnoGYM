@@ -5,6 +5,7 @@ import { Price, Installment } from "@/components/ui/Price";
 import { categoryColor } from "@/lib/category-color";
 import { QuickViewButton } from "./QuickViewButton";
 import { ProductOrigin } from "./ProductOrigin";
+import { Availability } from "./Availability";
 import type { ProductDTO } from "@/lib/catalog";
 
 /** Product card used in carousels and the catalog grid. */
@@ -44,6 +45,7 @@ export function ProductCard({ product }: { product: ProductDTO }) {
           currency={product.currency}
           className="text-xs text-ink-soft"
         />
+        <Availability inStock={product.inStock} className="mt-1" />
       </div>
     </Link>
   );
