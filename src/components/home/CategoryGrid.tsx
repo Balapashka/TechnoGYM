@@ -1,16 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { getMedia } from "@/lib/media";
+import { Media } from "@/components/ui/Media";
 import { useTranslation } from "@/i18n/useTranslation";
 import { categoryName } from "@/i18n/translations";
 
-type CategoryTile = { slug: string; name: string };
+type CategoryTile = { slug: string; name: string; image: string | null };
 
 /** "Shop by category" grid of image tiles. */
 export function CategoryGrid({ categories }: { categories: CategoryTile[] }) {
-  const tile = getMedia("categoryTile");
   const t = useTranslation();
 
   return (
@@ -27,12 +25,11 @@ export function CategoryGrid({ categories }: { categories: CategoryTile[] }) {
               href={`/category/${c.slug}`}
               className="group relative aspect-[4/5] overflow-hidden bg-mist"
             >
-              <Image
-                src={tile.src ?? tile.placeholder}
+              <Media
+                src={c.image}
                 alt={label}
-                fill
                 sizes="(max-width: 768px) 50vw, 25vw"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                imgClassName="transition-transform duration-300 group-hover:scale-105"
               />
               <span className="absolute bottom-4 left-4 z-10 bg-accent px-2 py-1 text-sm font-black uppercase text-ink">
                 {label}

@@ -7,7 +7,8 @@
     "aspect": "16:9",
     "placeholder": "/placeholders/hero-1920x1080.svg",
     "src": null,
-    "note": "Homepage hero background video (mp4, 1920x1080). null -> poster placeholder."
+    "poster": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1920&q=80",
+    "note": "Homepage hero background video (mp4, 1920x1080). While src is null the poster photo is shown; poster doubles as the video poster frame."
   },
   "categoryTile": {
     "type": "image",

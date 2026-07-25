@@ -1,8 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="LIFESTYLE 16:9 placeholder">
-  <rect width="100%" height="100%" fill="#e4e4e4"/>
-  <rect x="2" y="2" width="1596" height="896" fill="none" stroke="#bdbdbd" stroke-width="2" stroke-dasharray="12 8"/>
-  <g fill="#7a7a7a" font-family="Arial, sans-serif" text-anchor="middle">
-    <text x="50%" y="46%" font-size="72" font-weight="bold">LIFESTYLE 16:9</text>
-    <text x="50%" y="58%" font-size="50">1600 x 900</text>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2f2f2"/>
+      <stop offset="1" stop-color="#e4e4e4"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect x="0" y="894" width="1600" height="6" fill="#ffed00"/>
 </svg>

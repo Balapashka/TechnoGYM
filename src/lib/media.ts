@@ -7,6 +7,8 @@ export type MediaSlot = {
   aspect: string;
   placeholder: string;
   src: string | null;
+  /** Still image shown while `src` is missing and as the video poster. */
+  poster?: string | null;
   note: string;
 };
 

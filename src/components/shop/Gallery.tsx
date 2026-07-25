@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import { motion, AnimatePresence, useMotionValue, type Variants } from "motion/react";
+import { Media } from "@/components/ui/Media";
+import { getMedia } from "@/lib/media";
 import { useTranslation } from "@/i18n/useTranslation";
 
 const slide: Variants = {
@@ -14,7 +15,7 @@ const slide: Variants = {
 /** Product image gallery: parallax-on-hover active frame + thumbnail strip. */
 export function Gallery({ images, name }: { images: string[]; name: string }) {
   const t = useTranslation();
-  const safe = images.length ? images : ["/placeholders/gallery-1600x1200.svg"];
+  const safe = images.length ? images : [getMedia("productGallery").placeholder];
   const [active, setActive] = useState(0);
   const [dir, setDir] = useState(1);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -58,13 +59,13 @@ export function Gallery({ images, name }: { images: string[]; name: string }) {
             className="absolute inset-0"
           >
             <motion.div style={{ x: px, y: py }} className="absolute inset-0">
-              <Image
+              <Media
                 src={safe[active]}
                 alt={name}
-                fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                className="scale-110 object-contain p-8"
+                fit="contain"
+                imgClassName="scale-110 p-8"
               />
             </motion.div>
           </motion.div>
@@ -96,12 +97,12 @@ export function Gallery({ images, name }: { images: string[]; name: string }) {
                 i === active ? "border-ink ring-2 ring-accent" : "border-stone"
               }`}
             >
-              <Image
+              <Media
                 src={src}
                 alt=""
-                fill
                 sizes="80px"
-                className="object-contain p-2"
+                fit="contain"
+                imgClassName="p-2"
               />
             </button>
           ))}

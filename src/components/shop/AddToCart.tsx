@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart-store";
 import { useCartUiStore } from "@/store/cart-ui-store";
+import { resolveMediaSrc } from "@/lib/media";
 import { formatPriceIn, formatInstallmentIn } from "@/lib/format";
 import { useDisplayCountry } from "@/store/locale-store";
 import { useTranslation } from "@/i18n/useTranslation";
@@ -46,7 +47,7 @@ export function AddToCart({ product }: { product: ProductDTO }) {
       productId: product.id,
       slug: product.slug,
       name: product.name,
-      image: product.images[0] ?? "/placeholders/product-1000x1000.svg",
+      image: product.images[0] ?? resolveMediaSrc("productCard"),
       variantId: variant.id === "default" ? null : variant.id,
       variantName: variant.name,
       unitPriceCents,

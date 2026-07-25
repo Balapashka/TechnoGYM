@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { Media } from "@/components/ui/Media";
 import { Badge } from "@/components/ui/Badge";
 import { Price, Installment } from "@/components/ui/Price";
 import { categoryColor } from "@/lib/category-color";
@@ -9,7 +9,6 @@ import type { ProductDTO } from "@/lib/catalog";
 
 /** Product card used in carousels and the catalog grid. */
 export function ProductCard({ product }: { product: ProductDTO }) {
-  const image = product.images[0] ?? "/placeholders/product-1000x1000.svg";
   return (
     <Link
       href={`/product/${product.slug}`}
@@ -19,12 +18,11 @@ export function ProductCard({ product }: { product: ProductDTO }) {
         {product.badge && (
           <Badge className="absolute left-3 top-3 z-10">{product.badge}</Badge>
         )}
-        <Image
-          src={image}
+        <Media
+          src={product.images[0] ?? null}
           alt={product.name}
-          fill
           sizes="(max-width: 768px) 50vw, 25vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          imgClassName="transition-transform duration-300 group-hover:scale-105"
         />
         <QuickViewButton product={product} />
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { Media } from "@/components/ui/Media";
 import {
   useCartStore,
   cartCount,
@@ -55,12 +55,12 @@ export function CartView() {
               className="flex gap-4 py-4"
             >
               <div className="relative h-24 w-24 shrink-0 bg-mist">
-                <Image
+                <Media
                   src={item.image}
                   alt={item.name}
-                  fill
                   sizes="96px"
-                  className="object-contain p-2"
+                  fit="contain"
+                  imgClassName="p-2"
                 />
               </div>
               <div className="flex flex-1 flex-col">

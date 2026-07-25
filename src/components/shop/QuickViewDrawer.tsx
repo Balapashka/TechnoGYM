@@ -1,8 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { Media } from "@/components/ui/Media";
+import { resolveMediaSrc } from "@/lib/media";
 import { motion, AnimatePresence } from "motion/react";
 import { useQuickViewStore } from "@/store/quickview-store";
 import { useCartStore } from "@/store/cart-store";
@@ -32,7 +33,7 @@ export function QuickViewDrawer() {
       productId: product.id,
       slug: product.slug,
       name: product.name,
-      image: product.images[0] ?? "/placeholders/product-1000x1000.svg",
+      image: product.images[0] ?? resolveMediaSrc("productCard"),
       variantId: null,
       variantName: product.variants[0]?.name ?? t("product.standardConfig"),
       unitPriceCents: product.priceCents,
@@ -86,12 +87,12 @@ export function QuickViewDrawer() {
                   {product.badge}
                 </span>
               )}
-              <Image
-                src={product.images[0] ?? "/placeholders/product-1000x1000.svg"}
+              <Media
+                src={product.images[0] ?? null}
                 alt={product.name}
-                fill
                 sizes="28rem"
-                className="object-contain p-8"
+                fit="contain"
+                imgClassName="p-8"
               />
             </motion.div>
 

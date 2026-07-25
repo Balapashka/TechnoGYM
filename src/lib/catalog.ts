@@ -64,11 +64,34 @@ const include = {
   variants: { select: { id: true, name: true, priceDeltaCents: true } },
 } as const;
 
-export async function getCategories() {
-  return prisma.category.findMany({
+export type CategoryDTO = {
+  id: string;
+  slug: string;
+  name: string;
+  /** Representative photo: first image of the category's oldest product. */
+  image: string | null;
+};
+
+export async function getCategories(): Promise<CategoryDTO[]> {
+  const rows = await prisma.category.findMany({
     orderBy: { name: "asc" },
-    select: { id: true, slug: true, name: true },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      products: {
+        orderBy: { createdAt: "asc" },
+        take: 1,
+        select: { images: true },
+      },
+    },
   });
+  return rows.map((c) => ({
+    id: c.id,
+    slug: c.slug,
+    name: c.name,
+    image: unpackList(c.products[0]?.images)[0] ?? null,
+  }));
 }
 
 export async function getAllProducts(): Promise<ProductDTO[]> {

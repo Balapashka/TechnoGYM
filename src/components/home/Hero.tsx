@@ -1,10 +1,11 @@
-import Image from "next/image";
 import { getMedia, hasRealAsset } from "@/lib/media";
+import { Media } from "@/components/ui/Media";
 import { HeroIntro } from "./HeroIntro";
 
 /**
  * Full-bleed hero. Shows the real background video when an asset is configured
- * in config/media.json, otherwise falls back to the poster placeholder.
+ * in config/media.json, otherwise the poster photo; with neither, the section's
+ * own dark surface carries the composition.
  */
 export function Hero() {
   const hero = getMedia("hero");
@@ -20,18 +21,20 @@ export function Hero() {
           loop
           playsInline
           src={hero.src!}
-          poster={hero.placeholder}
+          poster={hero.poster ?? undefined}
         />
       ) : (
-        <Image
-          src={hero.placeholder}
-          // Decorative background: the accessible hero copy lives in HeroIntro.
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover opacity-70"
-        />
+        hero.poster && (
+          <Media
+            src={hero.poster}
+            // Decorative background: the accessible hero copy lives in HeroIntro.
+            alt=""
+            priority
+            sizes="100vw"
+            imgClassName="opacity-70"
+            fallbackClassName="bg-transparent"
+          />
+        )
       )}
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />

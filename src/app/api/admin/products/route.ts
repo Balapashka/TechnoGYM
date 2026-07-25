@@ -3,10 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { productSchema } from "@/schemas/product";
 import { packList } from "@/lib/json";
+import { resolveMediaSrc } from "@/lib/media";
 import { BASE_CURRENCY } from "@/lib/format";
-
-const PRODUCT_IMG = "/placeholders/product-1000x1000.svg";
-const GALLERY_IMG = "/placeholders/gallery-1600x1200.svg";
 
 function featuresToList(raw?: string): string[] {
   return (raw ?? "")
@@ -50,7 +48,11 @@ export async function POST(request: Request) {
       currency: BASE_CURRENCY,
       brand: parsed.data.brand,
       originCountry: parsed.data.originCountry,
-      images: packList([PRODUCT_IMG, GALLERY_IMG, GALLERY_IMG]),
+      images: packList([
+        resolveMediaSrc("productCard"),
+        resolveMediaSrc("productGallery"),
+        resolveMediaSrc("productGallery"),
+      ]),
       features: packList(featuresToList(parsed.data.features)),
       badge: parsed.data.badge || null,
       inStock: parsed.data.inStock,

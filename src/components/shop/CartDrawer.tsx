@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Media } from "@/components/ui/Media";
 import { motion, AnimatePresence } from "motion/react";
 import { useCartStore, cartTotalCents, lineKey } from "@/store/cart-store";
 import { useCartUiStore } from "@/store/cart-ui-store";
@@ -84,12 +84,12 @@ export function CartDrawer() {
                         className="flex gap-3 border-b border-stone pb-4"
                       >
                         <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-mist">
-                          <Image
+                          <Media
                             src={i.image}
                             alt={i.name}
-                            fill
                             sizes="5rem"
-                            className="object-contain p-2"
+                            fit="contain"
+                            imgClassName="p-2"
                           />
                         </div>
                         <div className="flex flex-1 flex-col">
