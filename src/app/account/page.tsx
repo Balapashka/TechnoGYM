@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { formatPrice } from "@/lib/format";
 import { Reveal } from "@/components/motion/Reveal";
 
-export const metadata: Metadata = { title: "My account — Movigym" };
+export const metadata: Metadata = { title: "My account — SPORT LINER" };
 export const dynamic = "force-dynamic";
 
 const statusStyle: Record<string, string> = {

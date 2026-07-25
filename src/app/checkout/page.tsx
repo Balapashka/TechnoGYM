@@ -1,6 +1,6 @@
 import { CheckoutForm } from "./CheckoutForm";
 
-export const metadata = { title: "Checkout — Movigym" };
+export const metadata = { title: "Checkout — SPORT LINER" };
 
 export default function CheckoutPage() {
   return (

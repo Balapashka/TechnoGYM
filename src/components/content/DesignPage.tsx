@@ -99,7 +99,7 @@ export function DesignPage() {
           </motion.p>
         </div>
         <p className="hidden text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 [writing-mode:vertical-rl] md:block">
-          {c.eyebrow} — Movigym
+          {c.eyebrow} — SPORT LINER
         </p>
       </section>
 

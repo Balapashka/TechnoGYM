@@ -12,7 +12,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
-  return { title: product ? `${product.name} — Movigym` : "Product" };
+  return { title: product ? `${product.name} — SPORT LINER` : "Product" };
 }
 
 export default async function ProductPage({

@@ -13,7 +13,7 @@ export async function generateMetadata({
 }) {
   const { page } = await params;
   const content = getInfoPage(page);
-  return { title: content ? `${content.title} — Movigym` : "Not found" };
+  return { title: content ? `${content.title} — SPORT LINER` : "Not found" };
 }
 
 export default async function ContentPage({

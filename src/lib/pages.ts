@@ -61,7 +61,7 @@ export const infoPages: Record<string, InfoContent> = {
   },
   about: {
     title: "About",
-    lead: "Movigym is a fictional brand created for an educational demo.",
+    lead: "SPORT LINER is the demo brand used for this educational project.",
   },
   sustainability: {
     title: "Sustainability",

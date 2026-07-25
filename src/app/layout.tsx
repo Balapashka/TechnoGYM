@@ -14,7 +14,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Movigym — Demo Fitness Store",
+  title: "SPORT LINER — Demo Fitness Store",
   description:
     "Educational e-commerce demo. Generic content, placeholder media, mock products.",
 };

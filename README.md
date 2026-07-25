@@ -1,9 +1,9 @@
-# Movigym — Demo Fitness Store
+# SPORT LINER — Demo Fitness Store
 
-> ⚠️ **Educational demo only.** This is a fictional store ("Movigym") built to
+> ⚠️ **Educational demo only.** This store ("SPORT LINER") was built to
 > practice modern e-commerce architecture and UX patterns. All text is generic,
-> all images are placeholders, and all products/prices are mock data. It is not
-> affiliated with any real brand.
+> all products/prices are mock data, and every image except the logo is a
+> placeholder.
 
 A full-stack e-commerce demo: homepage with hero + carousels, category listing
 with filters and product comparison, product detail pages with variants, a
@@ -124,7 +124,7 @@ placeholder). Use the **exact** dimensions below for a clean swap:
 | `productCard`    | image        | 1000 × 1000 | 1:1    | Product image in carousels and the catalog |
 | `productGallery` | image        | 1600 × 1200 | 4:3    | Product detail gallery frames              |
 | `lifestyle`      | image        | 1600 × 900  | 16:9   | Lifestyle banner blocks                    |
-| `logo`           | image        | 200 × 40    | 5:1    | Brand logo in header/footer                |
+| `logo`           | image        | 696 × 221   | ~3.1:1 | Brand logo in header/footer (real asset)   |
 
 Example (`config/media.json`):
 

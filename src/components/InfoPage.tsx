@@ -7,7 +7,7 @@ export function InfoPage({ content }: { content: InfoContent }) {
       <div className="border-b border-stone bg-mist">
         <div className="container-page py-14">
           <p className="text-xs uppercase tracking-wide text-ink-soft">
-            Movigym
+            SPORT LINER
           </p>
           <h1 className="text-4xl font-black uppercase tracking-tight md:text-5xl">
             {content.title}

@@ -326,7 +326,7 @@ export const translations: Record<Locale, Translation> = {
       subscribeButton: "Подписаться",
       socialLinks: "Мы в соцсетях",
       legalDisclaimer:
-        "Movigym — вымышленный магазин. Образовательная демо-версия — общий контент, медиа-заглушки, тестовые товары.",
+        "SPORT LINER — демонстрационный магазин. Образовательная демо-версия — общий контент, медиа-заглушки, тестовые товары.",
     },
     product: {
       viewDetails: "Подробнее",
@@ -526,7 +526,7 @@ export const translations: Record<Locale, Translation> = {
       subscribeButton: "Subscribe",
       socialLinks: "Follow us",
       legalDisclaimer:
-        "Movigym is a fictional store. Educational demo only — generic content, placeholder media, mock products.",
+        "SPORT LINER is a demo store. Educational demo only — generic content, placeholder media, mock products.",
     },
     product: {
       viewDetails: "View details",

@@ -1,6 +1,6 @@
 import { LoginForm } from "./LoginForm";
 
-export const metadata = { title: "Login — Movigym" };
+export const metadata = { title: "Login — SPORT LINER" };
 
 export default function LoginPage() {
   return (

@@ -4,9 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-"Movigym" — an educational, fictional e-commerce demo (Next.js 16 App Router, React 19,
-TypeScript, Tailwind v4, Prisma + SQLite, Zustand, Zod, Vitest). All products, copy and media
-are mock/placeholder by design — keep new content generic and unbranded.
+"SPORT LINER" — an educational e-commerce demo (Next.js 16 App Router, React 19, TypeScript,
+Tailwind v4, Prisma + SQLite, Zustand, Zod, Vitest). All products, copy and media are
+mock/placeholder by design; the logo is the only real asset. The brand name lives in
+`src/lib/brand.ts` — internal identifiers (`movigym_session` cookie, `movigym-cart` /
+`movigym-locale` storage keys, `@movigym.test` demo accounts) deliberately keep the old name so
+existing sessions and the documented credentials keep working.
 
 ## Commands
 

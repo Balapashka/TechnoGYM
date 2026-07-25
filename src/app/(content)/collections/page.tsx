@@ -6,7 +6,7 @@ import { CategoryName } from "@/components/shop/CategoryName";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { Reveal } from "@/components/motion/Reveal";
 
-export const metadata: Metadata = { title: "Collections — Movigym" };
+export const metadata: Metadata = { title: "Collections — SPORT LINER" };
 export const dynamic = "force-dynamic";
 
 /** Tiled overview of every category with product counts and price-from. */

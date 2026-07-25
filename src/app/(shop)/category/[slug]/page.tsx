@@ -14,7 +14,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const title = slug === "all" ? "All products" : titleize(slug);
-  return { title: `${title} — Movigym` };
+  return { title: `${title} — SPORT LINER` };
 }
 
 function titleize(slug: string) {

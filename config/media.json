@@ -47,11 +47,11 @@
   },
   "logo": {
     "type": "image",
-    "width": 200,
-    "height": 40,
-    "aspect": "5:1",
+    "width": 696,
+    "height": 221,
+    "aspect": "3.15:1",
     "placeholder": "/placeholders/logo-200x40.svg",
-    "src": null,
-    "note": "Brand logo (svg or png) in header/footer."
+    "src": "/sportliner-logo.png",
+    "note": "Brand logo in header/footer. SPORT LINER wordmark, cropped from public/sportliner-logo.jpg; the black background is part of the artwork."
   }
 }
