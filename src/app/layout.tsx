@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CookieBanner } from "@/components/layout/CookieBanner";
 import { CountryModal } from "@/components/layout/CountryModal";
+import { MotionProvider } from "@/components/layout/MotionProvider";
 import { QuickViewDrawer } from "@/components/shop/QuickViewDrawer";
 import { CartDrawer } from "@/components/shop/CartDrawer";
 
@@ -29,13 +30,15 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${inter.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-paper text-ink antialiased">
-        <Header />
-        {children}
-        <Footer />
-        <CookieBanner />
-        <CountryModal />
-        <QuickViewDrawer />
-        <CartDrawer />
+        <MotionProvider>
+          <Header />
+          {children}
+          <Footer />
+          <CookieBanner />
+          <CountryModal />
+          <QuickViewDrawer />
+          <CartDrawer />
+        </MotionProvider>
       </body>
     </html>
   );

@@ -107,26 +107,15 @@ body {
   scrollbar-width: none;
 }
 
-/* Animated "wave" gradient band — themed scroll progress indicator. */
-@keyframes wave-slide {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: 200% 0;
-  }
-}
+/* Accent gradient band — themed scroll progress indicator. Static: an
+   infinite background-position animation repaints every frame on the CPU. */
 .wave-track {
   background-image: linear-gradient(
     100deg,
     var(--color-accent) 0%,
-    #fff7a0 25%,
-    var(--color-accent-strong) 50%,
-    #fff7a0 75%,
-    var(--color-accent) 100%
+    #fff7a0 50%,
+    var(--color-accent-strong) 100%
   );
-  background-size: 200% 100%;
-  animation: wave-slide 3s linear infinite;
 }
 
 /* Themed range slider: filled track (set via --fill inline) + accent thumb. */

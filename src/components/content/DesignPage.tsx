@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import { motion, useScroll } from "motion/react";
 import { landings } from "@/lib/landings";
@@ -13,64 +13,20 @@ const c = landings.design;
 export function DesignPage() {
   const t = useTranslation();
   const railRef = useRef<HTMLDivElement>(null);
+  // MotionValue: the progress bar follows the scroll position off the React
+  // render path — no state updates, no re-renders per scrolled pixel.
   const { scrollXProgress } = useScroll({ container: railRef });
-  const drag = useRef({ active: false, x: 0, left: 0 });
-  const rafRef = useRef<number | null>(null);
 
-  const onPointerDown = (e: React.PointerEvent) => {
+  /** Advance the native scroll by one panel; snap does the precise landing. */
+  const scrollByPanel = (dir: 1 | -1) => {
     const el = railRef.current;
     if (!el) return;
-    e.preventDefault();
-    drag.current = { active: true, x: e.clientX, left: el.scrollLeft };
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    el.setPointerCapture(e.pointerId);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollBy({
+      left: dir * el.clientWidth * 0.8,
+      behavior: reduced ? "auto" : "smooth",
+    });
   };
-
-  const onPointerMove = (e: React.PointerEvent) => {
-    const el = railRef.current;
-    if (!el || !drag.current.active) return;
-    e.preventDefault();
-    const target = drag.current.left - (e.clientX - drag.current.x);
-    const maxScroll = el.scrollWidth - el.clientWidth;
-    const clamped = Math.max(0, Math.min(target, maxScroll));
-
-    const animate = () => {
-      const current = el.scrollLeft;
-      const diff = clamped - current;
-      if (Math.abs(diff) < 0.5) {
-        el.scrollLeft = clamped;
-        return;
-      }
-      el.scrollLeft = current + diff * 0.25;
-      rafRef.current = requestAnimationFrame(animate);
-    };
-    if (!rafRef.current) {
-      rafRef.current = requestAnimationFrame(animate);
-    }
-  };
-
-  const onPointerUp = () => {
-    drag.current.active = false;
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-  };
-
-  const onWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const el = railRef.current;
-    if (!el) return;
-    el.scrollLeft += e.deltaY;
-  };
-
-  const onContextMenu = (e: React.MouseEvent) => e.preventDefault();
-
-  useEffect(() => {
-    const el = railRef.current;
-    if (!el) return;
-    el.style.touchAction = "none";
-  }, []);
 
   return (
     <div className="flex-1 bg-zinc-950 text-zinc-100">
@@ -105,23 +61,27 @@ export function DesignPage() {
         </p>
       </section>
 
-      {/* Horizontal panels — drag with the mouse or scroll */}
+      {/* Horizontal panels — native scroll-snap rail (trackpad, touch, wheel
+          tilt, keyboard arrows when focused, or the buttons below). */}
       <section
         ref={railRef}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-        onWheel={onWheel}
-        onContextMenu={onContextMenu}
-        className="no-scrollbar flex snap-x gap-6 overflow-x-auto px-4 pb-6 select-none md:px-8"
+        tabIndex={0}
+        role="region"
+        aria-label={c.eyebrow}
+        // Arrows page between panels: the native 40px key-step is smaller
+        // than a panel, so mandatory snap would roll it back to the same one.
+        onKeyDown={(e) => {
+          if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+          e.preventDefault();
+          scrollByPanel(e.key === "ArrowRight" ? 1 : -1);
+        }}
+        className="no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto overscroll-x-contain px-4 pb-6 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent md:px-8"
       >
         {c.tiles.map((tile, i) => (
           <motion.article
             key={tile.title}
-            style={{ pointerEvents: "none" }}
-            initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
-            whileInView={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-30px" }}
             transition={{ duration: 0.6, ease }}
             className="flex min-w-[80%] snap-center flex-col justify-between rounded-3xl border border-zinc-800 bg-zinc-900 p-10 md:min-w-[34rem]"
@@ -142,13 +102,31 @@ export function DesignPage() {
         ))}
       </section>
 
-      {/* Themed wave progress indicator tied to the rail's scroll position */}
-      <div className="container-page pb-12">
-        <div className="relative h-1.5 overflow-hidden rounded-full bg-zinc-800">
+      {/* Progress indicator tied to the rail's scroll position + arrows */}
+      <div className="container-page flex items-center gap-6 pb-12">
+        <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
           <motion.div
             style={{ scaleX: scrollXProgress }}
             className="wave-track absolute inset-0 origin-left rounded-full"
           />
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => scrollByPanel(-1)}
+            aria-label={t("landing.previous")}
+            className="hover-lift grid h-10 w-10 place-items-center rounded-full border border-zinc-700 text-zinc-300 transition-colors hover:border-zinc-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            ←
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollByPanel(1)}
+            aria-label={t("landing.next")}
+            className="hover-lift grid h-10 w-10 place-items-center rounded-full border border-zinc-700 text-zinc-300 transition-colors hover:border-zinc-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            →
+          </button>
         </div>
       </div>
 
