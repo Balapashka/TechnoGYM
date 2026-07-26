@@ -26,7 +26,11 @@
       "Bash(grep -oE '<a[^>]*aria-label=\"SPORT LINER\"[^>]*>.{0,260}')",
       "Bash(curl -s -o /dev/null -w \"sportliner-logo.png -> %{http_code} %{content_type} %{size_download}b\\\\n\" http://localhost:3111/sportliner-logo.png)",
       "Bash(curl -s -o /dev/null -w \"optimized -> %{http_code} %{content_type} %{size_download}b\\\\n\" \"http://localhost:3111/_next/image?url=%2Fsportliner-logo.png&w=750&q=75\")",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(echo \"exit=$?\")",
+      "Read(//private/tmp/**)",
+      "Bash(sed -i '' 's|/далее\\\\|next/i|/Следующий\\\\|Next/i|' measure-design-after.mjs)",
+      "Bash(node measure-design-after.mjs)"
     ]
   }
 }
