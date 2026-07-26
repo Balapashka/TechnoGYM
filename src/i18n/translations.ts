@@ -51,6 +51,9 @@ export interface Translation {
 
   // Navigation
   nav: {
+    openMenu: string;
+    closeMenu: string;
+    menu: string;
     shop: string;
     collections: string;
     wellness: string;
@@ -416,6 +419,9 @@ export const translations: Record<Locale, Translation> = {
       forBusiness: "Для бизнеса",
     },
     nav: {
+      openMenu: "Открыть меню",
+      closeMenu: "Закрыть меню",
+      menu: "Меню",
       shop: "Магазин",
       collections: "Коллекции",
       wellness: "Здоровье",
@@ -767,6 +773,9 @@ export const translations: Record<Locale, Translation> = {
       forBusiness: "For business",
     },
     nav: {
+      openMenu: "Open menu",
+      closeMenu: "Close menu",
+      menu: "Menu",
       shop: "Shop",
       collections: "Collections",
       wellness: "Wellness",
