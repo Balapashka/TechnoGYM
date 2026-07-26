@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
+import { Media } from "@/components/ui/Media";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { useTranslation } from "@/i18n/useTranslation";
 
-export type Tile = { title: string; text: string };
-export type Section = { heading: string; body: string };
+/** `image: null` = asset not sourced yet: the block renders without a photo
+ *  (never as an empty grey area) until a real one lands in the data layer. */
+export type Tile = { title: string; text: string; image?: string | null };
+export type Section = { heading: string; body: string; image?: string | null };
 
 export type LandingContent = {
   eyebrow: string;
@@ -67,7 +70,7 @@ export function ThemedLanding({ content }: { content: LandingContent }) {
             {t("landing.whatThisMeans")}
           </h2>
         </div>
-        <div className="flex snap-x gap-5 overflow-x-auto px-4 pb-4 md:px-8">
+        <div className="no-scrollbar flex snap-x gap-5 overflow-x-auto overscroll-x-contain px-4 pb-4 md:px-8">
           {content.tiles.map((tile, i) => (
             <motion.article
               key={tile.title}
@@ -78,6 +81,15 @@ export function ThemedLanding({ content }: { content: LandingContent }) {
               whileHover={{ y: -6 }}
               className="min-w-[18rem] max-w-[18rem] shrink-0 snap-start rounded-2xl border border-stone bg-gradient-to-br from-mist to-paper p-6"
             >
+              {tile.image && (
+                <Media
+                  src={tile.image}
+                  alt={tile.title}
+                  aspect="3/2"
+                  sizes="18rem"
+                  className="mb-4 rounded-xl"
+                />
+              )}
               <span className="text-3xl font-black text-stone">
                 {String(i + 1).padStart(2, "0")}
               </span>
@@ -88,23 +100,39 @@ export function ThemedLanding({ content }: { content: LandingContent }) {
         </div>
       </section>
 
-      {/* Alternating reveal blocks for length + rhythm */}
-      <section className="container-page space-y-16 py-16">
+      {/* Alternating reveal blocks for length + rhythm. overflow-x-clip:
+          Reveal slides content in from x:±40, which must not widen the page. */}
+      <section className="container-page space-y-16 overflow-x-clip py-16">
         {content.sections.map((s, i) => (
           <Reveal key={s.heading} direction={i % 2 === 0 ? "left" : "right"}>
-            <div
-              className={`grid items-center gap-8 md:grid-cols-2 ${
-                i % 2 === 1 ? "md:[&>*:first-child]:order-2" : ""
-              }`}
-            >
-              <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-stone to-mist" />
-              <div>
+            {s.image ? (
+              <div
+                className={`grid items-center gap-8 md:grid-cols-2 ${
+                  i % 2 === 1 ? "md:[&>*:first-child]:order-2" : ""
+                }`}
+              >
+                <Media
+                  src={s.image}
+                  alt={s.heading}
+                  aspect="4/3"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="rounded-2xl"
+                />
+                <div>
+                  <h3 className="text-2xl font-black uppercase md:text-3xl">
+                    {s.heading}
+                  </h3>
+                  <p className="mt-3 text-ink-soft">{s.body}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="mx-auto max-w-2xl">
                 <h3 className="text-2xl font-black uppercase md:text-3xl">
                   {s.heading}
                 </h3>
                 <p className="mt-3 text-ink-soft">{s.body}</p>
               </div>
-            </div>
+            )}
           </Reveal>
         ))}
       </section>
