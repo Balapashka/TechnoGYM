@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { BASE_CURRENCY } from "@/lib/format";
 import { expiryInFuture, luhnValid } from "@/lib/card";
+import { CITY_PATTERN, CITY_ERROR_MESSAGE, normalizeCity } from "@/lib/city";
 
 /**
  * Countries a checkout can ship to — must stay in sync with `COUNTRIES` in
@@ -51,11 +52,17 @@ export const checkoutSchema = z
         "Укажите имя и фамилию через пробел",
       ),
     address: z.string().trim().min(5, "Адрес — минимум 5 символов"),
+    // Double spaces are collapsed and the first letter capitalized before
+    // validation, so " москва " parses to "Москва".
     city: z
       .string()
-      .trim()
-      .min(2, "Укажите город")
-      .regex(NAME_PATTERN, "Только буквы, пробелы и дефис"),
+      .transform(normalizeCity)
+      .pipe(
+        z
+          .string()
+          .min(2, "Укажите город")
+          .regex(CITY_PATTERN, CITY_ERROR_MESSAGE),
+      ),
     postalCode: z.string().trim().min(1, "Укажите почтовый индекс"),
     country: z.enum(CHECKOUT_COUNTRY_CODES, { message: "Выберите страну" }),
     // Fake card details — demo only, never stored (see /api/checkout).

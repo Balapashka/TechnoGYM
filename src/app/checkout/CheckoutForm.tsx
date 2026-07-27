@@ -11,6 +11,7 @@ import {
   type CheckoutOutput,
 } from "@/schemas/checkout";
 import { formatCardNumber, formatExpiry, digitsOnly } from "@/lib/card";
+import { citiesForCountry, formatCityInput } from "@/lib/city";
 import { useCartStore, cartTotalCents } from "@/store/cart-store";
 import { BASE_CURRENCY, formatPriceIn } from "@/lib/format";
 import { COUNTRIES, useLocaleStore } from "@/store/locale-store";
@@ -35,6 +36,7 @@ export function CheckoutForm() {
     register,
     handleSubmit,
     control,
+    resetField,
     formState: { errors, isSubmitting },
   } = useForm<CheckoutInput, unknown, CheckoutOutput>({
     resolver: zodResolver(checkoutSchema),
@@ -45,6 +47,17 @@ export function CheckoutForm() {
 
   const selectedCountry = useWatch({ control, name: "country" });
   const postalRule = POSTAL_CODE_RULES[selectedCountry] ?? POSTAL_CODE_RULES.RU;
+
+  // Changing the country invalidates the city suggestions, so the field is
+  // cleared along with any error it was showing.
+  const countryField = register("country");
+  const countryProps = {
+    ...countryField,
+    onChange: (e: ChangeEvent<HTMLSelectElement>) => {
+      resetField("city", { defaultValue: "" });
+      return countryField.onChange(e);
+    },
+  };
 
   /** aria-invalid + link to the error message under the input. */
   const describe = (name: keyof CheckoutInput) =>
@@ -61,7 +74,7 @@ export function CheckoutForm() {
 
   // Masked inputs: rewrite the value in place, then let RHF's handler read it.
   const masked = (
-    name: "cardNumber" | "cardExpiry" | "cardCvc" | "cardName",
+    name: "cardNumber" | "cardExpiry" | "cardCvc" | "cardName" | "city",
     format: (value: string) => string,
   ) => {
     const reg = register(name);
@@ -200,9 +213,18 @@ export function CheckoutForm() {
             <input
               className={field}
               autoComplete="address-level2"
+              list="city-suggestions"
               {...describe("city")}
-              {...register("city")}
+              {...masked("city", formatCityInput)}
             />
+            {/* Native combobox: the browser filters options as the user types.
+                Suggestions follow the selected country; hand-typed cities are
+                fine too as long as they pass validation. */}
+            <datalist id="city-suggestions">
+              {citiesForCountry(selectedCountry).map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
             {fieldError("city")}
           </div>
           <div>
@@ -229,7 +251,7 @@ export function CheckoutForm() {
             className={field}
             autoComplete="country"
             {...describe("country")}
-            {...register("country")}
+            {...countryProps}
           >
             {COUNTRIES.map((c) => (
               <option key={c.code} value={c.code}>

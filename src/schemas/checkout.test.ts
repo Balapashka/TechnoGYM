@@ -65,8 +65,24 @@ describe("checkoutSchema", () => {
       expect(parseWith({ city: "М" }).success).toBe(false);
     });
 
+    it("rejects special characters", () => {
+      expect(parseWith({ city: "г. Москва" }).success).toBe(false);
+      expect(parseWith({ city: "Almaty@" }).success).toBe(false);
+      expect(parseWith({ city: "Ош;" }).success).toBe(false);
+    });
+
     it("accepts hyphenated city names", () => {
       expect(parseWith({ city: "Ростов-на-Дону" }).success).toBe(true);
+    });
+
+    it("accepts a hand-typed city outside the suggestion list", () => {
+      expect(parseWith({ city: "Верхний Уфалей" }).success).toBe(true);
+    });
+
+    it("normalizes spacing and capitalization in the output", () => {
+      const res = parseWith({ city: "  нижний   новгород " });
+      expect(res.success).toBe(true);
+      if (res.success) expect(res.data.city).toBe("Нижний новгород");
     });
   });
 
