@@ -164,6 +164,22 @@ export interface Translation {
     removeFromCompare: string;
   };
 
+  // Compare (floating bar + /compare page)
+  compare: {
+    title: string;
+    compareCta: string;
+    onlyDifferences: string;
+    empty: string;
+    emptyHint: string;
+    /** Toast when the list is full — takes {limit}. */
+    limitReached: string;
+    price: string;
+    availability: string;
+    category: string;
+    /** Card button label — takes {name}. */
+    addToCompare: string;
+  };
+
   // Landing / marketing chrome
   landing: {
     whatThisMeans: string;
@@ -531,6 +547,19 @@ export const translations: Record<Locale, Translation> = {
       clearAll: "Очистить всё",
       removeFromCompare: "Убрать {name} из сравнения",
     },
+    compare: {
+      title: "Сравнение товаров",
+      compareCta: "Сравнить товары",
+      onlyDifferences: "Показывать только различия",
+      empty: "Вы ещё не добавили товары к сравнению",
+      emptyHint:
+        "Отмечайте товары в каталоге кнопкой «Сравнить» — до 4 моделей рядом.",
+      limitReached: "Сравнить можно не более {limit} товаров",
+      price: "Цена",
+      availability: "Наличие",
+      category: "Категория",
+      addToCompare: "Добавить {name} к сравнению",
+    },
     landing: {
       whatThisMeans: "Что это значит",
       supportEveryBody: "Мы поддерживаем каждого",
@@ -883,6 +912,19 @@ export const translations: Record<Locale, Translation> = {
       compare: "Compare",
       clearAll: "Clear all",
       removeFromCompare: "Remove {name} from comparison",
+    },
+    compare: {
+      title: "Compare products",
+      compareCta: "Compare products",
+      onlyDifferences: "Show differences only",
+      empty: "You haven't added any products to compare yet",
+      emptyHint:
+        "Tick “Compare” on catalog products — up to 4 models side by side.",
+      limitReached: "You can compare up to {limit} products",
+      price: "Price",
+      availability: "Availability",
+      category: "Category",
+      addToCompare: "Add {name} to comparison",
     },
     landing: {
       whatThisMeans: "What this means",

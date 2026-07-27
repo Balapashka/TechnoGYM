@@ -30,7 +30,7 @@ export function BusinessLink() {
   return (
     <Link
       href="/business"
-      className="nav-underline hidden uppercase tracking-wide md:max-lg:inline xl:inline"
+      className="nav-underline hidden uppercase tracking-wide xl:inline"
     >
       {t("common.forBusiness")}
     </Link>

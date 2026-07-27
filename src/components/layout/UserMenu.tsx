@@ -21,13 +21,13 @@ export function UserMenu({ user }: { user: SessionUser | null }) {
 
   if (!user) {
     return (
-      <div className="hidden items-center gap-4 md:flex">
+      <div className="hidden items-center gap-4 lg:flex">
         <Link href="/login" className="uppercase tracking-wide hover:text-ink-soft">
           {t("common.login")}
         </Link>
         <Link
           href="/register"
-          className="hidden rounded-full bg-ink px-4 py-1.5 text-xs uppercase tracking-wide text-paper transition hover:bg-ink-soft md:max-lg:inline-block xl:inline-block"
+          className="hidden rounded-full bg-ink px-4 py-1.5 text-xs uppercase tracking-wide text-paper transition hover:bg-ink-soft xl:inline-block"
         >
           {t("common.join")}
         </Link>
@@ -36,7 +36,7 @@ export function UserMenu({ user }: { user: SessionUser | null }) {
   }
 
   return (
-    <div className="relative">
+    <div className="relative hidden lg:block">
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-2 uppercase tracking-wide hover:text-ink-soft"

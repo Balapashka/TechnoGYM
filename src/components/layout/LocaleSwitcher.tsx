@@ -5,7 +5,11 @@ import { useTranslation } from "@/i18n/useTranslation";
 import { LOCALES } from "@/i18n/translations";
 import { useHydrated } from "@/lib/use-hydrated";
 
-/** Header control: RU/EN language toggle plus the CIS country selector. */
+/**
+ * Header control: RU/EN language toggle plus the CIS country selector.
+ * Desktop (`lg+`) only — on mobile the same controls live in the drawer
+ * footer (see MobileMenu).
+ */
 export function LocaleSwitcher() {
   const language = useLocaleStore((s) => s.language);
   const setLanguage = useLocaleStore((s) => s.setLanguage);
@@ -19,7 +23,7 @@ export function LocaleSwitcher() {
   if (!mounted) return null;
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="hidden items-center gap-3 lg:flex">
       <div
         role="group"
         aria-label={t("locale.language")}
@@ -45,7 +49,7 @@ export function LocaleSwitcher() {
         aria-label={t("locale.country")}
         value={country.code}
         onChange={(e) => setCountry(e.target.value)}
-        className="hidden rounded-full border border-stone bg-paper px-3 py-1 text-xs font-semibold md:max-lg:block xl:block"
+        className="hidden rounded-full border border-stone bg-paper px-3 py-1 text-xs font-semibold xl:block"
       >
         {COUNTRIES.map((c) => (
           <option key={c.code} value={c.code}>

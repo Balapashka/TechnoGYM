@@ -8,6 +8,8 @@ import { CountryModal } from "@/components/layout/CountryModal";
 import { MotionProvider } from "@/components/layout/MotionProvider";
 import { QuickViewDrawer } from "@/components/shop/QuickViewDrawer";
 import { CartDrawer } from "@/components/shop/CartDrawer";
+import { CompareBar } from "@/components/shop/CompareBar";
+import { CompareToast } from "@/components/shop/CompareToast";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -38,6 +40,8 @@ export default function RootLayout({
           <CountryModal />
           <QuickViewDrawer />
           <CartDrawer />
+          <CompareBar />
+          <CompareToast />
         </MotionProvider>
       </body>
     </html>

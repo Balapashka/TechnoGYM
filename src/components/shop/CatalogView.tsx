@@ -3,8 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ProductCard } from "./ProductCard";
-import { CompareBar } from "./CompareBar";
-import { useCompareStore } from "@/store/compare-store";
 import type { FacetCounts, SortKey } from "@/lib/filter";
 import type { CatalogQuery } from "@/lib/catalog-url";
 import type { BrandOption, CountryOption } from "./CatalogShell";
@@ -38,12 +36,9 @@ type CatalogViewProps = {
 
 /** Catalog (PLP) view: faceted filters + sort on the left, grid on the right. */
 export function CatalogView(props: CatalogViewProps) {
-  const { products, visible, query, onChange } = props;
+  const { visible, query, onChange } = props;
   const t = useTranslation();
   const [sheetOpen, setSheetOpen] = useState(false);
-
-  const toggleCompare = useCompareStore((s) => s.toggle);
-  const compareIds = useCompareStore((s) => s.ids);
 
   useEffect(() => {
     if (!sheetOpen) return;
@@ -100,14 +95,6 @@ export function CatalogView(props: CatalogViewProps) {
                 className="flex flex-col"
               >
                 <ProductCard product={p} />
-                <label className="mt-2 flex items-center gap-2 px-4 text-xs text-ink-soft">
-                  <input
-                    type="checkbox"
-                    checked={compareIds.includes(p.id)}
-                    onChange={() => toggleCompare(p.id)}
-                  />
-                  {t("catalog.compare")}
-                </label>
               </motion.div>
             ))}
           </AnimatePresence>
@@ -135,8 +122,6 @@ export function CatalogView(props: CatalogViewProps) {
         resultCount={visible.length}
         {...props}
       />
-
-      <CompareBar products={products} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Price, Installment } from "@/components/ui/Price";
 import { categoryColor } from "@/lib/category-color";
 import { QuickViewButton } from "./QuickViewButton";
+import { CompareButton } from "./CompareButton";
 import { ProductOrigin } from "./ProductOrigin";
 import { Availability } from "./Availability";
 import type { ProductDTO } from "@/lib/catalog";
@@ -26,6 +27,7 @@ export function ProductCard({ product }: { product: ProductDTO }) {
           imgClassName="transition-transform duration-300 group-hover:scale-105"
         />
         <QuickViewButton product={product} />
+        <CompareButton product={product} />
       </div>
       <div className="flex flex-1 flex-col gap-1 p-4">
         <ProductOrigin

@@ -1,13 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState, type ChangeEvent } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { checkoutSchema, type CheckoutInput } from "@/schemas/checkout";
+import {
+  checkoutSchema,
+  POSTAL_CODE_RULES,
+  type CheckoutInput,
+  type CheckoutOutput,
+} from "@/schemas/checkout";
+import { formatCardNumber, formatExpiry, digitsOnly } from "@/lib/card";
 import { useCartStore, cartTotalCents } from "@/store/cart-store";
 import { BASE_CURRENCY, formatPriceIn } from "@/lib/format";
-import { useLocaleStore } from "@/store/locale-store";
+import { COUNTRIES, useLocaleStore } from "@/store/locale-store";
 import { useHydrated } from "@/lib/use-hydrated";
 import { useTranslation } from "@/i18n/useTranslation";
 
@@ -28,11 +34,45 @@ export function CheckoutForm() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
-  } = useForm<CheckoutInput>({
+  } = useForm<CheckoutInput, unknown, CheckoutOutput>({
     resolver: zodResolver(checkoutSchema),
-    defaultValues: { country: country.code },
+    // Validate on blur; a field with an error re-validates on every change.
+    mode: "onBlur",
+    defaultValues: { country: country.code as CheckoutInput["country"] },
   });
+
+  const selectedCountry = useWatch({ control, name: "country" });
+  const postalRule = POSTAL_CODE_RULES[selectedCountry] ?? POSTAL_CODE_RULES.RU;
+
+  /** aria-invalid + link to the error message under the input. */
+  const describe = (name: keyof CheckoutInput) =>
+    errors[name]
+      ? { "aria-invalid": true as const, "aria-describedby": `${name}-error` }
+      : {};
+
+  const fieldError = (name: keyof CheckoutInput) =>
+    errors[name] ? (
+      <p id={`${name}-error`} className="mt-1 text-xs text-red-600">
+        {errors[name]?.message}
+      </p>
+    ) : null;
+
+  // Masked inputs: rewrite the value in place, then let RHF's handler read it.
+  const masked = (
+    name: "cardNumber" | "cardExpiry" | "cardCvc" | "cardName",
+    format: (value: string) => string,
+  ) => {
+    const reg = register(name);
+    return {
+      ...reg,
+      onChange: (e: ChangeEvent<HTMLInputElement>) => {
+        e.target.value = format(e.target.value);
+        return reg.onChange(e);
+      },
+    };
+  };
 
   if (!mounted) return null;
 
@@ -105,7 +145,7 @@ export function CheckoutForm() {
   });
 
   const field =
-    "w-full rounded border border-stone px-3 py-2 text-sm focus:border-ink focus:outline-none";
+    "w-full rounded border border-stone px-3 py-2 text-sm focus:border-ink focus:outline-none aria-invalid:border-red-600";
 
   return (
     <div className="container-page grid flex-1 gap-10 py-10 lg:grid-cols-[1fr_22rem]">
@@ -116,32 +156,40 @@ export function CheckoutForm() {
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("checkout.email")}
           </label>
-          <input className={field} type="email" {...register("email")} />
-          {errors.email && (
-            <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
-          )}
+          <input
+            className={field}
+            type="email"
+            autoComplete="email"
+            {...describe("email")}
+            {...register("email")}
+          />
+          {fieldError("email")}
         </div>
 
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("checkout.fullName")}
           </label>
-          <input className={field} {...register("fullName")} />
-          {errors.fullName && (
-            <p className="mt-1 text-xs text-red-600">
-              {errors.fullName.message}
-            </p>
-          )}
+          <input
+            className={field}
+            autoComplete="name"
+            {...describe("fullName")}
+            {...register("fullName")}
+          />
+          {fieldError("fullName")}
         </div>
 
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("checkout.address")}
           </label>
-          <input className={field} {...register("address")} />
-          {errors.address && (
-            <p className="mt-1 text-xs text-red-600">{errors.address.message}</p>
-          )}
+          <input
+            className={field}
+            autoComplete="street-address"
+            {...describe("address")}
+            {...register("address")}
+          />
+          {fieldError("address")}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -149,21 +197,27 @@ export function CheckoutForm() {
             <label className="mb-1 block text-xs font-bold uppercase">
               {t("checkout.city")}
             </label>
-            <input className={field} {...register("city")} />
-            {errors.city && (
-              <p className="mt-1 text-xs text-red-600">{errors.city.message}</p>
-            )}
+            <input
+              className={field}
+              autoComplete="address-level2"
+              {...describe("city")}
+              {...register("city")}
+            />
+            {fieldError("city")}
           </div>
           <div>
             <label className="mb-1 block text-xs font-bold uppercase">
               {t("checkout.postalCode")}
             </label>
-            <input className={field} {...register("postalCode")} />
-            {errors.postalCode && (
-              <p className="mt-1 text-xs text-red-600">
-                {errors.postalCode.message}
-              </p>
-            )}
+            <input
+              className={field}
+              autoComplete="postal-code"
+              placeholder={postalRule.hint}
+              maxLength={7}
+              {...describe("postalCode")}
+              {...register("postalCode")}
+            />
+            {fieldError("postalCode")}
           </div>
         </div>
 
@@ -171,10 +225,19 @@ export function CheckoutForm() {
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("checkout.country")}
           </label>
-          <input className={field} {...register("country")} />
-          {errors.country && (
-            <p className="mt-1 text-xs text-red-600">{errors.country.message}</p>
-          )}
+          <select
+            className={field}
+            autoComplete="country"
+            {...describe("country")}
+            {...register("country")}
+          >
+            {COUNTRIES.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          {fieldError("country")}
         </div>
 
         <div className="rounded-xl border border-stone bg-mist/40 p-4">
@@ -189,12 +252,14 @@ export function CheckoutForm() {
               <label className="mb-1 block text-xs font-bold uppercase">
                 {t("checkout.nameOnCard")}
               </label>
-              <input className={field} {...register("cardName")} />
-              {errors.cardName && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.cardName.message}
-                </p>
-              )}
+              <input
+                className={`${field} uppercase`}
+                autoComplete="cc-name"
+                placeholder="IVAN PETROV"
+                {...describe("cardName")}
+                {...masked("cardName", (v) => v.toUpperCase())}
+              />
+              {fieldError("cardName")}
             </div>
             <div>
               <label className="mb-1 block text-xs font-bold uppercase">
@@ -203,14 +268,13 @@ export function CheckoutForm() {
               <input
                 className={field}
                 inputMode="numeric"
+                autoComplete="cc-number"
                 placeholder="4242 4242 4242 4242"
-                {...register("cardNumber")}
+                maxLength={19}
+                {...describe("cardNumber")}
+                {...masked("cardNumber", formatCardNumber)}
               />
-              {errors.cardNumber && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.cardNumber.message}
-                </p>
-              )}
+              {fieldError("cardNumber")}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -219,14 +283,14 @@ export function CheckoutForm() {
                 </label>
                 <input
                   className={field}
+                  inputMode="numeric"
+                  autoComplete="cc-exp"
                   placeholder="04/29"
-                  {...register("cardExpiry")}
+                  maxLength={5}
+                  {...describe("cardExpiry")}
+                  {...masked("cardExpiry", formatExpiry)}
                 />
-                {errors.cardExpiry && (
-                  <p className="mt-1 text-xs text-red-600">
-                    {errors.cardExpiry.message}
-                  </p>
-                )}
+                {fieldError("cardExpiry")}
               </div>
               <div>
                 <label className="mb-1 block text-xs font-bold uppercase">
@@ -235,14 +299,13 @@ export function CheckoutForm() {
                 <input
                   className={field}
                   inputMode="numeric"
+                  autoComplete="cc-csc"
                   placeholder="123"
-                  {...register("cardCvc")}
+                  maxLength={4}
+                  {...describe("cardCvc")}
+                  {...masked("cardCvc", (v) => digitsOnly(v).slice(0, 4))}
                 />
-                {errors.cardCvc && (
-                  <p className="mt-1 text-xs text-red-600">
-                    {errors.cardCvc.message}
-                  </p>
-                )}
+                {fieldError("cardCvc")}
               </div>
             </div>
           </div>
