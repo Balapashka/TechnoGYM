@@ -4,6 +4,7 @@ import {
   cartCount,
   cartTotalCents,
   lineKey,
+  MAX_LINE_QUANTITY,
   type CartItem,
 } from "./cart-store";
 
@@ -79,6 +80,18 @@ describe("cart-store", () => {
     ];
     expect(cartCount(items)).toBe(3);
     expect(cartTotalCents(items)).toBe(385000 * 2 + 397000);
+  });
+
+  it("caps a line at MAX_LINE_QUANTITY when adding", () => {
+    useCartStore.getState().addItem(base, MAX_LINE_QUANTITY);
+    useCartStore.getState().addItem(base, 10);
+    expect(useCartStore.getState().items[0].quantity).toBe(MAX_LINE_QUANTITY);
+  });
+
+  it("caps a line at MAX_LINE_QUANTITY when setting the quantity", () => {
+    useCartStore.getState().addItem(base);
+    useCartStore.getState().setQuantity("p1", null, 5000);
+    expect(useCartStore.getState().items[0].quantity).toBe(MAX_LINE_QUANTITY);
   });
 
   it("builds a stable line key", () => {

@@ -1,12 +1,24 @@
 services:
   app:
     build: .
-    container_name: movigym-demo
+    container_name: sportliner-demo
     ports:
       # Host port is configurable: set APP_PORT in .env (or the shell) if 3000
       # is already taken. Container port stays 3000.
       - "${APP_PORT:-3000}:3000"
     environment:
-      DATABASE_URL: "file:./dev.db"
-      NEXT_PUBLIC_BASE_URL: "http://localhost:3000"
+      # The SQLite file lives on the named volume below, NOT in the container
+      # layer, so orders and admin edits survive `docker compose down`.
+      DATABASE_URL: "file:/app/data/dev.db"
+      SITE_URL: "http://localhost:${APP_PORT:-3000}"
       PORT: "3000"
+      # Demo convenience: the password-reset token is returned in the API
+      # response because there is no mail server. Set to "false" (or remove)
+      # before putting this on a public URL — see README, "Before you deploy".
+      DEMO_EXPOSE_RESET_TOKEN: "true"
+    volumes:
+      - db-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  db-data:

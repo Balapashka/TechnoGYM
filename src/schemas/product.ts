@@ -15,6 +15,9 @@ export const productSchema = z.object({
   badge: z.string().max(20).optional().or(z.literal("")),
   features: z.string().optional().or(z.literal("")), // newline-separated
   inStock: z.boolean(),
+  // Made-to-order imports keep their price in the database but never show it
+  // in the storefront: the shopper gets a quote CTA instead.
+  priceOnRequest: z.boolean(),
 });
 
 export type ProductInput = z.infer<typeof productSchema>;

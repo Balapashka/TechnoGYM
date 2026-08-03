@@ -55,11 +55,14 @@ body {
 */
 
 /* Lift: every clickable "surface" (buttons, cards, tiles) shares this. */
+/* No `will-change: transform` here: it was promoting every card, tile and
+   button to its own compositor layer permanently — on a catalog page that is
+   dozens of layers held in memory for a hover that may never happen. The
+   browser promotes the element for the duration of the transition anyway. */
 .hover-lift {
   transition:
     transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform;
 }
 .hover-lift:hover {
   transform: translateY(-3px);

@@ -14,6 +14,7 @@ const make = (
   inStock = true,
   brand = "Technogym",
   originCountry = "Италия",
+  priceOnRequest = false,
 ): ProductDTO => ({
   id,
   slug: id,
@@ -27,6 +28,7 @@ const make = (
   inStock,
   brand,
   originCountry,
+  priceOnRequest,
   categorySlug: "c",
   categoryName: "C",
   variants: [],
@@ -43,6 +45,16 @@ const sourced = [
   make("cn2", "UNIX B", 90000, true, "UNIX Fit", "Китай"),
   make("it1", "TG A", 500000, false, "Technogym", "Италия"),
   make("it2", "PN A", 400000, false, "Panatta", "Италия"),
+];
+
+// Mirrors the real sourcing model: the Italian range is imported to order with
+// a hidden price, the Chinese range is stocked and priced. Origins are
+// interleaved so the featured sort has to reorder them.
+const quoted = [
+  make("cn1", "UNIX A", 20000, true, "UNIX Fit", "Китай"),
+  make("it1", "TG A", 500000, false, "Technogym", "Италия", true),
+  make("cn2", "UNIX B", 10000, true, "UNIX Fit", "Китай"),
+  make("it2", "PN A", 400000, false, "Panatta", "Италия", true),
 ];
 
 describe("filterProducts", () => {
@@ -149,5 +161,75 @@ describe("facetCounts", () => {
     const facets = facetCounts(sourced, { countries: ["Китай"] });
     expect(facets.brands["Technogym"]).toBeUndefined();
     expect(facets.brands["UNIX Fit"]).toBe(2);
+  });
+});
+
+describe("featured sort", () => {
+  it("leads with Italy and keeps the incoming order inside each group", () => {
+    const out = sortProducts(quoted, "featured");
+    expect(out.map((p) => p.id)).toEqual(["it1", "it2", "cn1", "cn2"]);
+  });
+
+  it("is the fallback for an unknown sort key", () => {
+    const out = sortProducts(quoted, "whatever" as never);
+    expect(out.map((p) => p.id)).toEqual(["it1", "it2", "cn1", "cn2"]);
+  });
+
+  it("puts unlisted origins after the priority ones", () => {
+    const out = sortProducts(
+      [make("de1", "Other", 1000, true, "Other", "Германия"), ...quoted],
+      "featured",
+    );
+    expect(out.map((p) => p.originCountry).at(-1)).toBe("Германия");
+  });
+
+  it("does not mutate the input", () => {
+    const before = quoted.map((p) => p.id);
+    sortProducts(quoted, "featured");
+    expect(quoted.map((p) => p.id)).toEqual(before);
+  });
+});
+
+describe("price-on-request products", () => {
+  it("sorts after the priced ones, ascending", () => {
+    const out = sortProducts(quoted, "price-asc");
+    expect(out.map((p) => p.priceOnRequest)).toEqual([
+      false,
+      false,
+      true,
+      true,
+    ]);
+    // The priced head is still ordered by price…
+    expect(out.slice(0, 2).map((p) => p.priceCents)).toEqual([10000, 20000]);
+  });
+
+  it("sorts after the priced ones, descending", () => {
+    const out = sortProducts(quoted, "price-desc");
+    expect(out.map((p) => p.priceOnRequest)).toEqual([
+      false,
+      false,
+      true,
+      true,
+    ]);
+    expect(out.slice(0, 2).map((p) => p.priceCents)).toEqual([20000, 10000]);
+  });
+
+  it("stays out of a max-price filter even when cheap", () => {
+    // A hidden price must never answer a price question, whatever the figure
+    // stored behind it.
+    const cheap = make("q1", "Quoted", 5000, false, "Technogym", "Италия", true);
+    const out = filterProducts([...quoted, cheap], { maxPriceCents: 1000000 });
+    expect(out.map((p) => p.id)).toEqual(["cn1", "cn2"]);
+  });
+
+  it("is kept when no price cap is set", () => {
+    const out = filterProducts(quoted, { countries: ["Италия"] });
+    expect(out.map((p) => p.id)).toEqual(["it1", "it2"]);
+  });
+
+  it("drops out of the facet counts under a price cap", () => {
+    const facets = facetCounts(quoted, { maxPriceCents: 1000000 });
+    expect(facets.countries).toEqual({ Китай: 2 });
+    expect(facets.brands).toEqual({ "UNIX Fit": 2 });
   });
 });

@@ -1,4 +1,5 @@
 import type { ProductDTO } from "@/lib/catalog";
+import { originRank } from "@/lib/countries";
 
 export type SortKey = "featured" | "price-asc" | "price-desc" | "name";
 
@@ -18,7 +19,13 @@ export function filterProducts(
 ): ProductDTO[] {
   return products.filter((p) => {
     if (inStockOnly && !p.inStock) return false;
-    if (maxPriceCents != null && p.priceCents > maxPriceCents) return false;
+    // A max-price filter only applies to products that actually show a price:
+    // matching "price on request" items against a hidden figure would produce
+    // results the visitor cannot explain.
+    if (maxPriceCents != null) {
+      if (p.priceOnRequest) return false;
+      if (p.priceCents > maxPriceCents) return false;
+    }
     if (countries?.length && !countries.includes(p.originCountry)) return false;
     if (brands?.length && !brands.includes(p.brand)) return false;
     return true;
@@ -54,7 +61,16 @@ export function facetCounts(
   return { countries, brands };
 }
 
-/** Return a new sorted array (does not mutate the input). */
+/** Products without a public price sort after the priced ones. */
+const quotedLast = (p: ProductDTO) => (p.priceOnRequest ? 1 : 0);
+
+/**
+ * Return a new sorted array (does not mutate the input).
+ *
+ * `featured` is the default the storefront opens on: it leads with the
+ * priority sourcing country (see ORIGIN_PRIORITY in src/lib/countries.ts) and
+ * keeps the incoming order inside each group — `Array.sort` is stable.
+ */
 export function sortProducts(
   products: ProductDTO[],
   sort: SortKey,
@@ -62,14 +78,20 @@ export function sortProducts(
   const copy = [...products];
   switch (sort) {
     case "price-asc":
-      return copy.sort((a, b) => a.priceCents - b.priceCents);
+      return copy.sort(
+        (a, b) => quotedLast(a) - quotedLast(b) || a.priceCents - b.priceCents,
+      );
     case "price-desc":
-      return copy.sort((a, b) => b.priceCents - a.priceCents);
+      return copy.sort(
+        (a, b) => quotedLast(a) - quotedLast(b) || b.priceCents - a.priceCents,
+      );
     case "name":
       return copy.sort((a, b) => a.name.localeCompare(b.name));
     case "featured":
     default:
-      return copy;
+      return copy.sort(
+        (a, b) => originRank(a.originCountry) - originRank(b.originCountry),
+      );
   }
 }
 

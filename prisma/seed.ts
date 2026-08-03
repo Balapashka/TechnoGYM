@@ -26,6 +26,10 @@ const BRAND_ORIGIN: Record<string, string> = {
 /**
  * Chinese equipment is stocked in Moscow; Italian brands ship to order.
  * Availability is derived from the origin, not rolled at random.
+ *
+ * The same split drives pricing: the stocked UNIX Fit range carries a public
+ * price, while the imported Technogym / Panatta range is quoted per order and
+ * shows "цена по запросу" instead (Product.priceOnRequest).
  */
 const STOCKED_ORIGIN = "Китай";
 
@@ -287,6 +291,7 @@ type GeneratedProduct = {
   brand: string;
   originCountry: string;
   inStock: boolean;
+  priceOnRequest: boolean;
   images: string[];
   features: string[];
   variants: { name: string; priceDeltaCents: number }[];
@@ -348,6 +353,8 @@ function buildProducts(cat: CategorySeed, seed: number): GeneratedProduct[] {
           brand: brand.name,
           originCountry: origin,
           inStock,
+          // Imported-to-order equipment is quoted individually.
+          priceOnRequest: !inStock,
           images: [main, ...gallery],
           features,
           variants:
@@ -407,6 +414,7 @@ async function main() {
           brand: p.brand,
           originCountry: p.originCountry,
           inStock: p.inStock,
+          priceOnRequest: p.priceOnRequest,
           categoryId: category.id,
           variants: { create: p.variants },
         },

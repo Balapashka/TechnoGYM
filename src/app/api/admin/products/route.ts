@@ -56,6 +56,7 @@ export async function POST(request: Request) {
       features: packList(featuresToList(parsed.data.features)),
       badge: parsed.data.badge || null,
       inStock: parsed.data.inStock,
+      priceOnRequest: parsed.data.priceOnRequest,
       categoryId: parsed.data.categoryId,
       variants: { create: [{ name: "Standard", priceDeltaCents: 0 }] },
     },

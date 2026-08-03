@@ -20,7 +20,10 @@ export default async function CollectionsPage() {
     orderBy: { name: "asc" },
     include: {
       _count: { select: { products: true } },
+      // Cheapest product with a *visible* price: quote-only imports must not
+      // leak their amount through the "от …" tile label.
       products: {
+        where: { priceOnRequest: false },
         orderBy: { priceCents: "asc" },
         take: 1,
         select: { priceCents: true, currency: true },
@@ -57,12 +60,16 @@ export default async function CollectionsPage() {
                 <h2 className="text-2xl font-black uppercase leading-tight">
                   <CategoryName slug={c.slug} fallback={c.name} />
                 </h2>
-                {c.products[0] && (
-                  <CollectionPriceFrom
-                    cents={c.products[0].priceCents}
-                    currency={c.products[0].currency}
-                  />
-                )}
+                <CollectionPriceFrom
+                  price={
+                    c.products[0]
+                      ? {
+                          cents: c.products[0].priceCents,
+                          currency: c.products[0].currency,
+                        }
+                      : null
+                  }
+                />
                 <CollectionShopLabel />
               </div>
             </Link>

@@ -57,6 +57,12 @@ export const useCompareStore = create<CompareState>()(
     {
       name: "movigym-compare",
       partialize: (s) => ({ items: s.items }),
+      // v1 = quote-only products. Snapshots stored before `priceOnRequest`
+      // existed lack the flag, so /compare would read it as falsy and print
+      // the price the catalog now hides. The snapshots are cheap to rebuild —
+      // drop them rather than trying to patch them.
+      version: 1,
+      migrate: () => ({ items: [] }),
     },
   ),
 );

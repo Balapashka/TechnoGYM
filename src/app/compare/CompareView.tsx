@@ -9,7 +9,8 @@ import { useDisplayCountry } from "@/store/locale-store";
 import { formatPriceIn } from "@/lib/format";
 import { categoryName } from "@/i18n/translations";
 import { Media } from "@/components/ui/Media";
-import { Price } from "@/components/ui/Price";
+import { PriceOrRequest } from "@/components/ui/Price";
+import { RequestPriceButton } from "@/components/shop/RequestPriceButton";
 import { Availability } from "@/components/shop/Availability";
 import { cn } from "@/lib/cn";
 import type { ProductDTO } from "@/lib/catalog";
@@ -56,8 +57,25 @@ export function CompareView() {
     {
       key: "price",
       label: t("compare.price"),
-      value: (p) => formatPriceIn(p.priceCents, p.currency, country),
-      render: (p) => <Price cents={p.priceCents} currency={p.currency} />,
+      // Quote-only products compare on the label, not on the hidden amount, so
+      // "only differences" never singles one out by a price nobody can see.
+      value: (p) =>
+        p.priceOnRequest
+          ? t("product.priceOnRequest")
+          : formatPriceIn(p.priceCents, p.currency, country),
+      render: (p) => (
+        <>
+          <PriceOrRequest product={p} />
+          {/* Without this the column shows a hidden price and no way to ask
+              for it — the whole point of the comparison is to act on it. */}
+          {p.priceOnRequest && (
+            <RequestPriceButton
+              product={p}
+              className="mt-2 rounded-full border border-ink px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide transition-colors hover:bg-ink hover:text-paper"
+            />
+          )}
+        </>
+      ),
     },
     {
       key: "brand",

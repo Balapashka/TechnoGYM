@@ -36,6 +36,7 @@ export default async function EditProductPage({
           badge: product.badge ?? "",
           features: unpackList(product.features).join("\n"),
           inStock: product.inStock,
+          priceOnRequest: product.priceOnRequest,
         }}
       />
     </div>

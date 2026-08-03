@@ -1,45 +1,40 @@
-```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-dist/
-build/
-target/
+# Dependencies
+node_modules/
+
+# Next.js build output
 .next/
+out/
 next-env.d.ts
 tsconfig.tsbuildinfo
 
-# Dependencies
-node_modules/
-venv/
-.venv/
+# Environment files — `.env.example` is the tracked template and must stay in
+# the repo, so it is re-included after the wildcard.
 .env
 .env.local
 .env.*
+!.env.example
+
+# Prisma: `prisma/dev.db` IS tracked on purpose (pre-seeded catalog, so a fresh
+# clone runs without seeding). Only the transient sidecar files are ignored.
+prisma/*.db-journal
+prisma/*.db-wal
+prisma/*.db-shm
+
+# Test coverage
+coverage/
 
 # Logs and temp files
 *.log
+npm-debug.log*
 *.tmp
-*.swp
-
-# Editors
-.vscode/
-.idea/
 *.swp
 *.swo
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Python specific
-.mypy_cache/
-.pytest_cache/
+# Editors and local tool settings
+.vscode/
+.idea/
+.claude/settings.local.json
 
 # System files
 .DS_Store
 Thumbs.db
-```

@@ -7,6 +7,14 @@ import { prisma } from "@/lib/prisma";
 export const SESSION_COOKIE = "movigym_session";
 const SESSION_DAYS = 7;
 
+/**
+ * Mark the session cookie `Secure`. Off by default because the demo is served
+ * over plain HTTP (`http://localhost:3000`) and a Secure cookie would not be
+ * sent back, breaking login. Set `SESSION_COOKIE_SECURE=true` when the app is
+ * served over HTTPS.
+ */
+const secureCookie = process.env.SESSION_COOKIE_SECURE === "true";
+
 export type SessionUser = {
   id: string;
   email: string;
@@ -24,6 +32,7 @@ export async function createSession(userId: string): Promise<void> {
   jar.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
+    secure: secureCookie,
     path: "/",
     expires: expiresAt,
   });

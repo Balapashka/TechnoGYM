@@ -22,3 +22,17 @@ export function countryCode(originCountry: string): string | null {
 export function originFromCode(code: string): string | null {
   return ORIGIN_BY_CODE[code] ?? null;
 }
+
+/**
+ * Order in which sourcing countries lead the storefront. The catalog opens on
+ * Italy (the imported-to-order Technogym / Panatta range) and follows with
+ * China (the stocked UNIX Fit range) — change this array to change that order
+ * everywhere: default catalog sort, homepage carousels and collections.
+ */
+export const ORIGIN_PRIORITY: readonly string[] = ["Италия", "Китай"];
+
+/** Sort rank of an origin; unlisted origins go last. Lower sorts first. */
+export function originRank(originCountry: string): number {
+  const index = ORIGIN_PRIORITY.indexOf(originCountry);
+  return index === -1 ? ORIGIN_PRIORITY.length : index;
+}

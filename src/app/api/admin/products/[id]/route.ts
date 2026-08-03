@@ -53,6 +53,7 @@ export async function PUT(request: Request, { params }: Ctx) {
       originCountry: parsed.data.originCountry,
       badge: parsed.data.badge || null,
       inStock: parsed.data.inStock,
+      priceOnRequest: parsed.data.priceOnRequest,
       categoryId: parsed.data.categoryId,
       features: packList(featuresToList(parsed.data.features)),
     },

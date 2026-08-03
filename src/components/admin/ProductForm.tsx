@@ -23,6 +23,7 @@ export type ProductFormValues = {
   badge: string;
   features: string;
   inStock: boolean;
+  priceOnRequest: boolean;
 };
 
 /** Create or edit a product. Posts to /api/admin/products[/:id]. */
@@ -55,6 +56,7 @@ export function ProductForm({
       badge: initial?.badge ?? "",
       features: initial?.features ?? "",
       inStock: initial?.inStock ?? true,
+      priceOnRequest: initial?.priceOnRequest ?? false,
     },
   });
 
@@ -173,9 +175,22 @@ export function ProductForm({
         <textarea rows={4} className={field} {...register("features")} />
       </div>
 
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" {...register("inStock")} /> {t("admin.inStock")}
-      </label>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" {...register("inStock")} /> {t("admin.inStock")}
+        </label>
+        <div>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" {...register("priceOnRequest")} />{" "}
+            {t("admin.priceOnRequest")}
+          </label>
+          {/* The price is still stored, it is simply replaced in the
+              storefront by the quote label and its CTA. */}
+          <p className="mt-1 pl-6 text-xs text-ink-soft">
+            {t("product.priceOnRequest")} → {t("product.requestPrice")}
+          </p>
+        </div>
+      </div>
 
       {serverError && <p className="text-sm text-red-600">{serverError}</p>}
 

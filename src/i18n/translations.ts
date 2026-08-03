@@ -118,6 +118,14 @@ export interface Translation {
     emptyTitle: string;
     /** Mobile filter sheet CTA — takes {count} (already declined). */
     show: string;
+    /** Origin filter option that clears the sourcing-country choice. */
+    allOrigins: string;
+    /** Grid paging button — takes {count}, the products still undrawn. */
+    showMore: string;
+    /** Grid paging status — takes {shown} and {total}. */
+    shownOf: string;
+    /** Grid paging status once every matching product is drawn. */
+    allShown: string;
   };
 
   // Footer
@@ -162,6 +170,24 @@ export interface Translation {
     compare: string;
     clearAll: string;
     removeFromCompare: string;
+    /**
+     * Made-to-order imports never show a price: the card, the PDP and the
+     * compare table render this label plus the quote CTA instead.
+     */
+    priceOnRequest: string;
+    requestPrice: string;
+    /** Quote modal subtitle. */
+    requestPriceLead: string;
+    requestName: string;
+    requestPhone: string;
+    requestEmail: string;
+    requestComment: string;
+    requestSubmit: string;
+    requestSent: string;
+    requestSentBody: string;
+    requestErrName: string;
+    requestErrPhone: string;
+    requestErrEmail: string;
   };
 
   // Compare (floating bar + /compare page)
@@ -283,6 +309,13 @@ export interface Translation {
     errCreateCategory: string;
     errGeneric: string;
     editProduct: string;
+    /** Product form toggle: hide the price and sell via a quote instead. */
+    priceOnRequest: string;
+    quoteRequests: string;
+    quoteNoRequests: string;
+    quoteProduct: string;
+    quoteContact: string;
+    quoteDate: string;
   };
 
   // Country/Locale modal + switcher
@@ -503,6 +536,10 @@ export const translations: Record<Locale, Translation> = {
       removeFilter: "Убрать фильтр: {name}",
       emptyTitle: "Ничего не найдено",
       show: "Показать {count}",
+      allOrigins: "Все страны",
+      showMore: "Показать ещё ({count})",
+      shownOf: "Показано {shown} из {total}",
+      allShown: "Показаны все товары",
       compare: "Сравнить",
       noMatches: "Нет товаров по выбранным фильтрам.",
     },
@@ -546,6 +583,21 @@ export const translations: Record<Locale, Translation> = {
       compare: "Сравнение",
       clearAll: "Очистить всё",
       removeFromCompare: "Убрать {name} из сравнения",
+      priceOnRequest: "Цена по запросу",
+      requestPrice: "Запросить цену",
+      requestPriceLead:
+        "Оставьте контакты — менеджер пришлёт цену и сроки поставки.",
+      requestName: "Ваше имя",
+      requestPhone: "Телефон",
+      requestEmail: "Email (необязательно)",
+      requestComment: "Комментарий",
+      requestSubmit: "Отправить заявку",
+      requestSent: "Заявка отправлена",
+      requestSentBody:
+        "Мы получили ваш запрос. Менеджер свяжется с вами в рабочее время и пришлёт цену и сроки поставки.",
+      requestErrName: "Укажите ваше имя",
+      requestErrPhone: "Укажите телефон для связи",
+      requestErrEmail: "Введите корректный email",
     },
     compare: {
       title: "Сравнение товаров",
@@ -664,6 +716,12 @@ export const translations: Record<Locale, Translation> = {
       errCreateCategory: "Не удалось создать категорию",
       errGeneric: "Не удалось выполнить операцию",
       editProduct: "Редактирование «{name}»",
+      priceOnRequest: "Цена по запросу",
+      quoteRequests: "Заявки на цену",
+      quoteNoRequests: "Заявок пока нет",
+      quoteProduct: "Товар",
+      quoteContact: "Контакт",
+      quoteDate: "Дата",
     },
     locale: {
       chooseCountry: "Выберите вашу страну",
@@ -870,6 +928,10 @@ export const translations: Record<Locale, Translation> = {
       removeFilter: "Remove filter: {name}",
       emptyTitle: "Nothing found",
       show: "Show {count}",
+      allOrigins: "All countries",
+      showMore: "Show more ({count})",
+      shownOf: "Showing {shown} of {total}",
+      allShown: "All products shown",
       compare: "Compare",
       noMatches: "No products match these filters.",
     },
@@ -912,6 +974,21 @@ export const translations: Record<Locale, Translation> = {
       compare: "Compare",
       clearAll: "Clear all",
       removeFromCompare: "Remove {name} from comparison",
+      priceOnRequest: "Price on request",
+      requestPrice: "Request a price",
+      requestPriceLead:
+        "Leave your contact details — a manager will send you the price and delivery times.",
+      requestName: "Your name",
+      requestPhone: "Phone",
+      requestEmail: "Email (optional)",
+      requestComment: "Comment",
+      requestSubmit: "Send request",
+      requestSent: "Request sent",
+      requestSentBody:
+        "We have received your request. A manager will get in touch during business hours with the price and delivery times.",
+      requestErrName: "Enter your name",
+      requestErrPhone: "Enter a phone number we can call",
+      requestErrEmail: "Enter a valid email",
     },
     compare: {
       title: "Compare products",
@@ -1025,6 +1102,12 @@ export const translations: Record<Locale, Translation> = {
       errCreateCategory: "Could not create category",
       errGeneric: "Failed",
       editProduct: "Edit “{name}”",
+      priceOnRequest: "Price on request",
+      quoteRequests: "Price requests",
+      quoteNoRequests: "No requests yet",
+      quoteProduct: "Product",
+      quoteContact: "Contact",
+      quoteDate: "Date",
     },
     locale: {
       chooseCountry: "Choose your country",

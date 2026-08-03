@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { checkoutPayloadSchema } from "@/schemas/checkout";
-import { buildOrder } from "@/lib/order";
+import { buildOrder, type CatalogEntry } from "@/lib/order";
 import { getCurrentUser } from "@/lib/auth";
 
 /** POST /api/checkout — validates the payload and persists an order. */
@@ -16,7 +16,38 @@ export async function POST(request: Request) {
     );
   }
 
-  const order = buildOrder(parsed.data);
+  // Re-read every line from the catalog: the request may claim any price, so
+  // names and prices must come from the database instead.
+  const ids = [...new Set(parsed.data.items.map((i) => i.productId))];
+  const products = await prisma.product.findMany({
+    where: { id: { in: ids } },
+    select: {
+      id: true,
+      name: true,
+      priceCents: true,
+      priceOnRequest: true,
+      variants: { select: { id: true, priceDeltaCents: true } },
+    },
+  });
+
+  const catalog = new Map<string, CatalogEntry>(
+    products.map((p) => [
+      p.id,
+      {
+        name: p.name,
+        priceCents: p.priceCents,
+        priceOnRequest: p.priceOnRequest,
+        variants: p.variants,
+      },
+    ]),
+  );
+
+  const built = buildOrder(parsed.data, catalog);
+  if (!built.ok) {
+    return NextResponse.json({ error: built.error }, { status: 409 });
+  }
+  const order = built.order;
+
   const user = await getCurrentUser();
 
   const created = await prisma.order.create({
@@ -39,5 +70,9 @@ export async function POST(request: Request) {
     select: { id: true, totalCents: true, currency: true },
   });
 
-  return NextResponse.json({ orderId: created.id, total: created.totalCents });
+  return NextResponse.json({
+    orderId: created.id,
+    total: created.totalCents,
+    currency: created.currency,
+  });
 }

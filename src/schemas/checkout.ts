@@ -104,13 +104,20 @@ export const checkoutSchema = z
 export type CheckoutInput = z.input<typeof checkoutSchema>;
 export type CheckoutOutput = z.output<typeof checkoutSchema>;
 
-/** A cart line as sent to the checkout endpoint. */
+/**
+ * A cart line as sent to the checkout endpoint.
+ *
+ * `name` and `unitPriceCents` are accepted for backwards compatibility but the
+ * server ignores them — `buildOrder` re-reads both from the catalog, so a
+ * tampered payload cannot change what an order costs.
+ */
 export const checkoutItemSchema = z.object({
   productId: z.string().min(1),
   variantId: z.string().nullable(),
   name: z.string().min(1),
   unitPriceCents: z.number().int().nonnegative(),
-  quantity: z.number().int().positive(),
+  // Upper bound mirrors MAX_LINE_QUANTITY in src/store/cart-store.ts.
+  quantity: z.number().int().positive().max(99),
 });
 
 export const checkoutPayloadSchema = z.object({

@@ -6,10 +6,13 @@ import { Footer } from "@/components/layout/Footer";
 import { CookieBanner } from "@/components/layout/CookieBanner";
 import { CountryModal } from "@/components/layout/CountryModal";
 import { MotionProvider } from "@/components/layout/MotionProvider";
+import { NavigationProgress } from "@/components/layout/NavigationProgress";
 import { QuickViewDrawer } from "@/components/shop/QuickViewDrawer";
+import { QuoteRequestModal } from "@/components/shop/QuoteRequestModal";
 import { CartDrawer } from "@/components/shop/CartDrawer";
 import { CompareBar } from "@/components/shop/CompareBar";
 import { CompareToast } from "@/components/shop/CompareToast";
+import { SITE_INDEXABLE, SITE_URL } from "@/lib/site";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -18,10 +21,26 @@ const inter = Inter({
   subsets: ["latin", "cyrillic"],
 });
 
+const title = "SPORT LINER — интернет-магазин тренажёров";
+const description =
+  "Демонстрационный интернет-магазин: кардио- и силовые тренажёры, свободные веса, аксессуары. Учебный проект — цены и характеристики приведены для примера.";
+
 export const metadata: Metadata = {
-  title: "SPORT LINER — интернет-магазин тренажёров",
-  description:
-    "Демонстрационный интернет-магазин: кардио- и силовые тренажёры, свободные веса, аксессуары. Учебный проект — цены и характеристики приведены для примера.",
+  metadataBase: new URL(SITE_URL),
+  title,
+  description,
+  // Mirrors robots.txt: the demo stays out of search results until the catalog
+  // holds real data (see SITE_INDEXABLE in src/lib/site.ts).
+  robots: SITE_INDEXABLE ? { index: true, follow: true } : { index: false, follow: false },
+  openGraph: {
+    type: "website",
+    siteName: "SPORT LINER",
+    locale: "ru_RU",
+    title,
+    description,
+    url: SITE_URL,
+  },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 export default function RootLayout({
@@ -32,6 +51,7 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${inter.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-paper text-ink antialiased">
+        <NavigationProgress />
         <MotionProvider>
           <Header />
           {children}
@@ -39,6 +59,7 @@ export default function RootLayout({
           <CookieBanner />
           <CountryModal />
           <QuickViewDrawer />
+          <QuoteRequestModal />
           <CartDrawer />
           <CompareBar />
           <CompareToast />

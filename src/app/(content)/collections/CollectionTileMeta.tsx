@@ -16,20 +16,24 @@ export function CollectionCount({ count }: { count: number }) {
   );
 }
 
-/** "от 12 500 ₽" — converted into the currency of the selected country. */
+/**
+ * "от 12 500 ₽" — converted into the currency of the selected country.
+ * `price` is null when the collection holds no product with a visible price
+ * (everything in it is quote-only); the line is then omitted entirely.
+ */
 export function CollectionPriceFrom({
-  cents,
-  currency,
+  price,
 }: {
-  cents: number;
-  currency: string;
+  price: { cents: number; currency: string } | null;
 }) {
   const t = useTranslation();
   const country = useDisplayCountry();
 
+  if (!price) return null;
+
   return (
     <p className="mt-1 text-sm text-ink-soft">
-      {t("product.from")} {formatPriceIn(cents, currency, country)}
+      {t("product.from")} {formatPriceIn(price.cents, price.currency, country)}
     </p>
   );
 }

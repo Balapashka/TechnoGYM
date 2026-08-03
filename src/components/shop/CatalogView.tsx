@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ProductCard } from "./ProductCard";
 import type { FacetCounts, SortKey } from "@/lib/filter";
-import type { CatalogQuery } from "@/lib/catalog-url";
+import { serializeCatalogQuery, type CatalogQuery } from "@/lib/catalog-url";
 import type { BrandOption, CountryOption } from "./CatalogShell";
 import type { ProductDTO } from "@/lib/catalog";
 import { useTranslation } from "@/i18n/useTranslation";
@@ -15,6 +15,14 @@ import {
 } from "@/i18n/translations";
 import { useDisplayCountry } from "@/store/locale-store";
 import { BASE_CURRENCY, formatPriceIn } from "@/lib/format";
+import { originRank } from "@/lib/countries";
+import {
+  PAGE_SIZE,
+  chunkLimit,
+  expandBy,
+  initialExpansion,
+  type Expansion,
+} from "@/lib/catalog-paging";
 import { cn } from "@/lib/cn";
 
 const SORT_OPTIONS: { key: SortKey; labelKey: string }[] = [
@@ -26,6 +34,11 @@ const SORT_OPTIONS: { key: SortKey; labelKey: string }[] = [
 
 type CatalogViewProps = {
   products: ProductDTO[];
+  /**
+   * The whole filtered + sorted listing. Every count (header, sidebar, sheet
+   * CTA) reads this, never the paged slice, so the visitor always sees how
+   * many products actually match.
+   */
   visible: ProductDTO[];
   query: CatalogQuery;
   facets: FacetCounts;
@@ -49,6 +62,45 @@ export function CatalogView(props: CatalogViewProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [sheetOpen]);
 
+  /* ── Grid paging ─────────────────────────────────────────────────────── */
+
+  // The serialized query is the identity of the current listing: two states
+  // that produce the same URL show the same products, so the expansion may
+  // survive; anything else starts again at the first chunk.
+  const queryKey = useMemo(() => serializeCatalogQuery(query), [query]);
+  const [expansion, setExpansion] = useState<Expansion>(() =>
+    initialExpansion(queryKey),
+  );
+
+  const limit = chunkLimit(expansion, queryKey);
+  const rendered = useMemo(() => visible.slice(0, limit), [visible, limit]);
+  const remaining = visible.length - rendered.length;
+
+  // Expanding appends a chunk *above* the control, pushing it several screens
+  // down: the button keeps focus but leaves the viewport, so a keyboard user
+  // ends up pressing something they cannot see. Bring the control back into
+  // view after each expansion, and when it disappears on the last chunk hand
+  // focus to the status line that replaces it.
+  const statusRef = useRef<HTMLParagraphElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
+  const expanded = useRef(false);
+  const focusStatus = useRef(false);
+
+  useEffect(() => {
+    if (!expanded.current) return;
+    expanded.current = false;
+    controlsRef.current?.scrollIntoView({ block: "nearest" });
+    if (!focusStatus.current) return;
+    focusStatus.current = false;
+    statusRef.current?.focus();
+  }, [limit]);
+
+  const showMore = () => {
+    expanded.current = true;
+    focusStatus.current = remaining <= PAGE_SIZE;
+    setExpansion(expandBy(queryKey, limit));
+  };
+
   const activeCount =
     query.countries.length +
     query.brands.length +
@@ -65,11 +117,11 @@ export function CatalogView(props: CatalogViewProps) {
       </aside>
 
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center gap-2 lg:hidden">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={() => setSheetOpen(true)}
-            className="hover-lift inline-flex items-center gap-2 rounded-full border border-stone bg-paper px-5 py-2.5 text-sm font-bold uppercase"
+            className="hover-lift inline-flex items-center gap-2 rounded-full border border-stone bg-paper px-5 py-2.5 text-sm font-bold uppercase lg:hidden"
           >
             {t("catalog.filters")}
             {activeCount > 0 && (
@@ -78,16 +130,21 @@ export function CatalogView(props: CatalogViewProps) {
               </span>
             )}
           </button>
+
+          <OriginSwitcher {...props} />
         </div>
 
         <ActiveChips {...props} onReset={resetAll} />
 
-        <motion.div layout className="grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-3">
+        {/* No `layout` on the grid or the cards: Motion's projection measures
+            every mounted card on each change, so the cost of one filter click
+            grew with how far the grid had been expanded — the opposite of what
+            paging is for. The enter/exit fade alone reads the same. */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-3">
           <AnimatePresence mode="popLayout">
-            {visible.map((p) => (
+            {rendered.map((p) => (
               <motion.div
                 key={p.id}
-                layout
                 initial={{ opacity: 0, scale: 0.94, y: 16 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.94 }}
@@ -113,7 +170,38 @@ export function CatalogView(props: CatalogViewProps) {
               </button>
             </div>
           )}
-        </motion.div>
+        </div>
+
+        {/* Only listings that are actually paged get the control. */}
+        {visible.length > PAGE_SIZE && (
+          <div ref={controlsRef} className="flex flex-col items-center gap-3 pt-4">
+            {/* No `aria-live` here: FilterControls already announces the match
+                count from the same actions, and two live regions saying the
+                same thing talk over each other — badly so while dragging the
+                price slider, which updates on every step. */}
+            <p
+              ref={statusRef}
+              tabIndex={-1}
+              className="rounded text-xs font-semibold uppercase tracking-wide text-ink-soft focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-strong"
+            >
+              {remaining > 0
+                ? t("catalog.shownOf", {
+                    shown: rendered.length,
+                    total: visible.length,
+                  })
+                : t("catalog.allShown")}
+            </p>
+            {remaining > 0 && (
+              <button
+                type="button"
+                onClick={showMore}
+                className="hover-lift inline-flex items-center rounded-full border border-stone bg-paper px-8 py-3.5 text-sm font-bold uppercase"
+              >
+                {t("catalog.showMore", { count: remaining })}
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <FilterSheet
@@ -126,17 +214,114 @@ export function CatalogView(props: CatalogViewProps) {
   );
 }
 
+/* ── Origin quick switcher (above the grid) ─────────────────────────────── */
+
+/**
+ * Country picks -> next query. Brand picks that no longer exist within the
+ * selection are pruned, so the URL never carries an invisible active filter.
+ */
+function withCountries(
+  countries: string[],
+  { query, products, countryOptions, brandOptions }: CatalogViewProps,
+): CatalogQuery {
+  const origins = new Set(
+    countryOptions.filter((c) => countries.includes(c.code)).map((c) => c.origin),
+  );
+  const reachable = new Set(
+    products
+      .filter((p) => !countries.length || origins.has(p.originCountry))
+      .map((p) => p.brand),
+  );
+  const brands = query.brands.filter((slug) =>
+    brandOptions.some((b) => b.slug === slug && reachable.has(b.name)),
+  );
+  return { ...query, countries, brands };
+}
+
+/**
+ * Segmented sourcing-country switcher. The storefront opens on the priority
+ * country (see ORIGIN_PRIORITY) and this is the one-tap way out of it, so it
+ * lives above the grid instead of inside the filter panel. It writes the same
+ * `query.countries` codes the sidebar checkboxes use — control, chips and URL
+ * therefore stay in sync — and counts come from the existing country facet.
+ */
+function OriginSwitcher(props: CatalogViewProps) {
+  const { query, products, countryOptions, onChange } = props;
+  const t = useTranslation();
+
+  const segments = useMemo(() => {
+    // Counted over the whole listing rather than the active facet on purpose:
+    // this is the primary way into the other origin, so a brand or price
+    // filter must never show it as empty — `withCountries` drops the filters
+    // that do not apply to the origin being switched to.
+    const countFor = (origin: string) =>
+      products.filter((p) => p.originCountry === origin).length;
+    return [
+      { code: null, label: t("catalog.allOrigins"), count: products.length },
+      ...[...countryOptions]
+        .sort((a, b) => originRank(a.origin) - originRank(b.origin))
+        .map((c) => ({
+          code: c.code,
+          label: countryLabel(t.locale, c.code, c.origin),
+          count: countFor(c.origin),
+        })),
+    ];
+  }, [products, countryOptions, t]);
+
+  // A multi-country pick (only reachable via the checkboxes) matches no
+  // segment; the chips above the grid stay the way to undo it.
+  const selected = query.countries.length === 1 ? query.countries[0] : null;
+  const hasSelection = query.countries.length > 0;
+
+  if (countryOptions.length < 2) return null;
+
+  return (
+    <div
+      role="group"
+      aria-label={t("product.origin")}
+      className="flex w-full gap-1 rounded-full border border-stone bg-mist p-1 sm:w-auto"
+    >
+      {segments.map((s) => {
+        const active = s.code === null ? !hasSelection : s.code === selected;
+        return (
+          <button
+            key={s.code ?? "all"}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(withCountries(s.code ? [s.code] : [], props))}
+            className={cn(
+              "relative flex-1 rounded-full px-3 py-2 text-[11px] font-bold uppercase transition-colors sm:flex-none sm:px-5 sm:text-xs",
+              !active && "text-ink-soft hover:text-ink",
+            )}
+          >
+            {active && (
+              <motion.span
+                layoutId="catalog-origin-pill"
+                transition={{ type: "spring", stiffness: 520, damping: 40 }}
+                className="absolute inset-0 rounded-full bg-ink"
+              />
+            )}
+            <span
+              className={cn(
+                "relative z-10 flex items-center justify-center gap-1.5 whitespace-nowrap",
+                active && "text-paper",
+              )}
+            >
+              {s.label}
+              <span className="tabular-nums opacity-60">{s.count}</span>
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ── Filter controls (shared by the sidebar and the mobile sheet) ───────── */
 
-function FilterControls({
-  products,
-  visible,
-  query,
-  facets,
-  countryOptions,
-  brandOptions,
-  onChange,
-}: CatalogViewProps) {
+function FilterControls(props: CatalogViewProps) {
+  const { products, visible, query, facets, countryOptions, brandOptions, onChange } =
+    props;
   const t = useTranslation();
   const country = useDisplayCountry();
   const [sortOpen, setSortOpen] = useState(false);
@@ -144,8 +329,15 @@ function FilterControls({
   // Every product in a listing shares one currency; fall back to the base one.
   const currency = products[0]?.currency ?? BASE_CURRENCY;
 
+  // Quote-only products are excluded: their price is hidden, so letting one set
+  // the ceiling would print it under the slider — and the max-price filter
+  // skips them anyway (see filterProducts).
   const priceCeiling = useMemo(
-    () => Math.max(...products.map((p) => p.priceCents), 0),
+    () =>
+      Math.max(
+        ...products.filter((p) => !p.priceOnRequest).map((p) => p.priceCents),
+        0,
+      ),
     [products],
   );
   const maxPriceCents = query.maxPriceRub != null ? query.maxPriceRub * 100 : null;
@@ -168,23 +360,7 @@ function FilterControls({
     const countries = query.countries.includes(code)
       ? query.countries.filter((c) => c !== code)
       : [...query.countries, code];
-
-    // Prune brand picks that no longer exist within the country selection,
-    // so the URL never carries an invisible active filter.
-    const origins = new Set(
-      countryOptions
-        .filter((c) => countries.includes(c.code))
-        .map((c) => c.origin),
-    );
-    const reachable = new Set(
-      products
-        .filter((p) => !countries.length || origins.has(p.originCountry))
-        .map((p) => p.brand),
-    );
-    const brands = query.brands.filter((slug) =>
-      brandOptions.some((b) => b.slug === slug && reachable.has(b.name)),
-    );
-    onChange({ ...query, countries, brands });
+    onChange(withCountries(countries, props));
   };
 
   const toggleBrand = (slug: string) => {

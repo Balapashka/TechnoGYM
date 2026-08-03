@@ -18,6 +18,14 @@ export function lineKey(productId: string, variantId: string | null): string {
   return `${productId}::${variantId ?? "_"}`;
 }
 
+/**
+ * Upper bound for a single cart line. Mirrored by `checkoutItemSchema`, so the
+ * quantity controls can never build a cart the checkout endpoint would reject.
+ */
+export const MAX_LINE_QUANTITY = 99;
+
+const clampQuantity = (n: number) => Math.min(n, MAX_LINE_QUANTITY);
+
 type CartState = {
   items: CartItem[];
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
@@ -44,12 +52,14 @@ export const useCartStore = create<CartState>()(
             return {
               items: state.items.map((i) =>
                 lineKey(i.productId, i.variantId) === key
-                  ? { ...i, quantity: i.quantity + quantity }
+                  ? { ...i, quantity: clampQuantity(i.quantity + quantity) }
                   : i,
               ),
             };
           }
-          return { items: [...state.items, { ...item, quantity }] };
+          return {
+            items: [...state.items, { ...item, quantity: clampQuantity(quantity) }],
+          };
         }),
       removeItem: (productId, variantId) =>
         set((state) => ({
@@ -74,7 +84,7 @@ export const useCartStore = create<CartState>()(
             items: state.items.map((i) =>
               lineKey(i.productId, i.variantId) ===
               lineKey(productId, variantId)
-                ? { ...i, quantity }
+                ? { ...i, quantity: clampQuantity(quantity) }
                 : i,
             ),
           };
@@ -86,7 +96,10 @@ export const useCartStore = create<CartState>()(
       // v2 = the rouble catalog. A cart persisted against the previous EUR
       // catalog holds product ids that no longer exist, so checkout would fail
       // on a foreign-key error. Drop those lines instead of restoring them.
-      version: 2,
+      // v3 = quote-only products. Carts saved before `priceOnRequest` may hold
+      // imported items that are no longer sold through the cart, at a price
+      // that is now hidden — checkout rejects them, so drop them here too.
+      version: 3,
       migrate: () => ({ items: [] }),
     },
   ),

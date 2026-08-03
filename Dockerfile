@@ -8,6 +8,10 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends openssl \
     && rm -rf /var/lib/apt/lists/*
 
+# `.env` is excluded from the build context, so give Prisma a datasource URL at
+# build time too — `prisma generate` and `next build` both resolve it.
+ENV DATABASE_URL="file:/app/data/dev.db"
+
 # Copy manifest + prisma schema first so the `postinstall` prisma generate works
 # and dependency installation stays cached.
 COPY package.json package-lock.json ./
@@ -22,9 +26,16 @@ FROM node:22-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
+# Database path on the mounted volume (see docker-compose.yml). Keeping the
+# SQLite file out of /app means `docker compose down` no longer wipes the data.
+ENV DATABASE_URL="file:/app/data/dev.db"
 
 RUN apt-get update && apt-get install -y --no-install-recommends openssl \
     && rm -rf /var/lib/apt/lists/*
+
+# Mount point for the database volume; created here so the app can write even
+# when the compose volume is absent (e.g. a plain `docker run`).
+RUN mkdir -p /app/data
 
 # Copy everything needed to run migrations, seed and `next start`.
 COPY --from=builder /app/node_modules ./node_modules

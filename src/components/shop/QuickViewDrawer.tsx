@@ -8,9 +8,9 @@ import { motion, AnimatePresence } from "motion/react";
 import { useQuickViewStore } from "@/store/quickview-store";
 import { useCartStore } from "@/store/cart-store";
 import { useCartUiStore } from "@/store/cart-ui-store";
-import { useDisplayCountry } from "@/store/locale-store";
+import { useQuoteStore } from "@/store/quote-store";
 import { useTranslation } from "@/i18n/useTranslation";
-import { formatPriceIn, formatInstallmentIn } from "@/lib/format";
+import { PriceOrRequest, ProductInstallment } from "@/components/ui/Price";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -23,12 +23,14 @@ export function QuickViewDrawer() {
   const close = useQuickViewStore((s) => s.close);
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartUiStore((s) => s.openCart);
-  const country = useDisplayCountry();
+  const openQuote = useQuoteStore((s) => s.open);
   const t = useTranslation();
   const [added, setAdded] = useState(false);
 
   const handleAdd = () => {
-    if (!product) return;
+    // Quote-only products are never purchasable — the CTA below is swapped, and
+    // this guard keeps a stale render from slipping one into the cart.
+    if (!product || product.priceOnRequest) return;
     addItem({
       productId: product.id,
       slug: product.slug,
@@ -42,6 +44,14 @@ export function QuickViewDrawer() {
     setAdded(true);
     close();
     openCart();
+  };
+
+  const handleRequestPrice = () => {
+    if (!product) return;
+    // Open before closing: both panels are fixed overlays on the same layer,
+    // and handing the product over first keeps the modal from flashing empty.
+    openQuote({ id: product.id, name: product.name });
+    close();
   };
 
   return (
@@ -126,28 +136,33 @@ export function QuickViewDrawer() {
 
               <div className="mt-auto space-y-3 border-t border-stone pt-4">
                 <div>
-                  <p className="text-2xl font-black">
-                    {formatPriceIn(product.priceCents, product.currency, country)}
-                  </p>
-                  <p className="text-xs text-ink-soft">
-                    {t("product.installment", {
-                      amount: formatInstallmentIn(
-                        product.priceCents,
-                        36,
-                        product.currency,
-                        country,
-                      ),
-                      months: 36,
-                    })}
-                  </p>
+                  <PriceOrRequest
+                    product={product}
+                    className="block text-2xl font-black"
+                  />
+                  <ProductInstallment
+                    product={product}
+                    className="block text-xs text-ink-soft"
+                  />
                 </div>
                 <div className="flex gap-3">
-                  <button
-                    onClick={handleAdd}
-                    className="hover-lift flex-1 rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase text-ink"
-                  >
-                    {added ? `${t("common.addedToCart")} ✓` : t("common.addToCart")}
-                  </button>
+                  {product.priceOnRequest ? (
+                    <button
+                      onClick={handleRequestPrice}
+                      className="hover-lift flex-1 rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase text-ink"
+                    >
+                      {t("product.requestPrice")}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleAdd}
+                      className="hover-lift flex-1 rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase text-ink"
+                    >
+                      {added
+                        ? `${t("common.addedToCart")} ✓`
+                        : t("common.addToCart")}
+                    </button>
+                  )}
                   <Link
                     href={`/product/${product.slug}`}
                     onClick={close}

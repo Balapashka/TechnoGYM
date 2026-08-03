@@ -4,9 +4,18 @@ import { prisma } from "@/lib/prisma";
 import { forgotSchema } from "@/schemas/auth";
 
 /**
+ * Whether to return the reset token in the response body.
+ *
+ * There is no mail server, so the demo shows the token on screen instead. That
+ * also means anyone who knows an email address could reset that account, so it
+ * is opt-in: set `DEMO_EXPOSE_RESET_TOKEN=true` for a local demo and leave it
+ * unset on any public deployment.
+ */
+const exposeToken = process.env.DEMO_EXPOSE_RESET_TOKEN === "true";
+
+/**
  * POST /api/auth/forgot-password — issue a reset token.
- * Demo only: since there is no mail server, the token is returned in the
- * response so the reset flow can be completed locally.
+ * The token is only echoed back when the demo flag above is enabled.
  */
 export async function POST(request: Request) {
   const json = await request.json().catch(() => null);
@@ -37,7 +46,15 @@ export async function POST(request: Request) {
     },
   });
 
-  // ...but for the demo we surface the token so it can be used offline.
+  // ...but for a local demo we surface the token so it can be used offline.
+  if (!exposeToken) {
+    return NextResponse.json({
+      ok: true,
+      token: null,
+      message: "Если такой email зарегистрирован, код для сброса создан.",
+    });
+  }
+
   return NextResponse.json({
     ok: true,
     token,

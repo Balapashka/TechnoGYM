@@ -62,6 +62,18 @@ in `next.config.ts`). `brand`/`originCountry` are non-null with an `""` default 
 be added without a data migration; the UI (`ProductOrigin`) hides an empty value, and the admin
 form requires one.
 
+**Two sales models in one catalog.** `Product.priceOnRequest` splits the storefront: the stocked
+UNIX Fit range (Китай) shows a price and sells through the cart, while the imported Technogym /
+Panatta range (Италия) hides its price behind "Цена по запросу" and sells through a `QuoteRequest`
+lead (`/api/quote-requests`, listed at `/admin/quote-requests`). The rule is enforced at three
+independent layers and all three must hold: `toDTO` zeroes `priceCents` so the figure never reaches
+the browser (RSC payload, `GET /api/products`, the persisted compare store); `PriceOrRequest` /
+`ProductInstallment` in `src/components/ui/Price.tsx` are the single render-time guard; and
+`buildOrder` refuses a quote-only line so a stale or hand-edited cart cannot buy one. The admin and
+`buildOrder` read Prisma directly, so both still see the real price. `ORIGIN_PRIORITY` in
+`src/lib/countries.ts` is the one place that decides which origin leads the catalog — it drives the
+default `featured` sort, `getFeaturedProducts` and the category listings.
+
 **Server/client split.** Pages under `src/app` are server components that fetch via `lib/catalog`
 and hand DTOs to client components (`CatalogView`, `ProductCard`, `AddToCart`, drawers…).
 `src/lib/auth.ts` is `import "server-only"` — never import it from a client component.
@@ -70,8 +82,12 @@ and hand DTOs to client components (`CatalogView`, `ProductCard`, `AddToCart`, d
 localStorage key `movigym-cart`); line identity is `lineKey(productId, variantId)` so the same
 product+variant merges. The `Cart`/`CartItem` Prisma models are vestigial — nothing writes them.
 Checkout POSTs the client cart to `/api/checkout`, which validates with `checkoutPayloadSchema`,
-builds the order via the pure `buildOrder()` (`src/lib/order.ts`) and persists an `Order` with
-price/name snapshots, always `PAID` (the fake card always succeeds).
+then **re-reads every line from the database** and passes that catalog to the pure `buildOrder()`
+(`src/lib/order.ts`). The `name`/`unitPriceCents` in the request are ignored — a tampered payload
+cannot change what an order costs — and `buildOrder` returns a `{ok:false, error}` result when a
+product or variant no longer exists (the route answers 409). Orders persist price/name snapshots in
+`BASE_CURRENCY`, always `PAID` (the fake card always succeeds). Line quantity is capped at
+`MAX_LINE_QUANTITY` (99) in `cart-store.ts`, mirrored by `checkoutItemSchema`.
 
 **Auth is a hand-rolled DB session**, no NextAuth, no middleware. `POST /api/auth/login` verifies
 a bcrypt hash and `createSession()` writes a `Session` row plus an httpOnly `movigym_session`
@@ -79,6 +95,15 @@ cookie (7 days). Authorization is enforced in two independent places and both mu
 together: `src/app/admin/layout.tsx` redirects non-ADMINs, and **each** `/api/admin/*` route
 handler re-checks `getCurrentUser()?.role !== "ADMIN"` and returns 403. A new admin API route
 without that check is unprotected.
+
+**Environment switches.** Behaviour that differs between the local demo and a public deployment is
+env-driven, never hardcoded (all listed in `.env.example`, table in `README.md`):
+`DEMO_EXPOSE_RESET_TOKEN` returns the password-reset token in the API response (no mail server —
+must be off publicly, or any email is an account takeover), `SESSION_COOKIE_SECURE` marks the
+session cookie `Secure` (must stay off on plain HTTP or login breaks), and `SITE_INDEXABLE` /
+`SITE_URL` drive `src/lib/site.ts`, which feeds `metadataBase`, `app/robots.ts` and `app/sitemap.ts`.
+Both metadata routes are `force-dynamic` on purpose: statically prerendered, they would bake the
+build-time env values in and silently ignore the deployment's settings.
 
 **Money and locale.** Prices are integer minor units everywhere (`priceCents` = kopeks,
 `priceDeltaCents`, `totalCents`); only `src/lib/format.ts` converts to display strings.

@@ -34,10 +34,16 @@ model Product {
   brand         String    @default("")
   /// Country of origin in Russian, e.g. "Италия".
   originCountry String    @default("")
+  /// Hide the price in the storefront and offer a quote request instead.
+  /// Imported-to-order equipment (Technogym, Panatta) is sold this way; the
+  /// stocked UNIX Fit range keeps its public price. `priceCents` stays filled
+  /// so admins and internal reports still see a figure.
+  priceOnRequest Boolean  @default(false)
   categoryId  String
   createdAt   DateTime    @default(now())
   cartItems   CartItem[]
   orderItems  OrderItem[]
+  quoteRequests QuoteRequest[]
   category    Category    @relation(fields: [categoryId], references: [id])
   variants    Variant[]
 }
@@ -115,6 +121,31 @@ model OrderItem {
   quantity     Int
   product      Product @relation(fields: [productId], references: [id])
   order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+/// Lead captured by the "Запросить цену" form on quote-only products
+/// (Product.priceOnRequest). This is the real sales channel for the imported
+/// range, which carries no public price.
+model QuoteRequest {
+  id        String             @id @default(cuid())
+  productId String?
+  /// Product name at the time of the request; kept if the product is removed.
+  productName String
+  name      String
+  phone     String
+  email     String?
+  comment   String?
+  status    QuoteRequestStatus @default(NEW)
+  createdAt DateTime           @default(now())
+  product   Product?           @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+}
+
+enum QuoteRequestStatus {
+  NEW
+  CONTACTED
+  CLOSED
 }
 
 enum OrderStatus {
