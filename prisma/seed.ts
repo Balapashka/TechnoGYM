@@ -384,6 +384,8 @@ async function main() {
   await prisma.variant.deleteMany();
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
+  await prisma.quoteRequest.deleteMany();
+  await prisma.subscriber.deleteMany();
   await prisma.session.deleteMany();
   await prisma.user.deleteMany();
 
@@ -423,26 +425,32 @@ async function main() {
     }
   }
 
-  // Admin account (manage catalog) + regular demo user (shopping flow).
-  await prisma.user.create({
-    data: {
-      email: "admin@movigym.test",
-      name: "Store Admin",
-      password: await bcrypt.hash("admin1234", 10),
-      role: "ADMIN",
-    },
-  });
-  await prisma.user.create({
-    data: {
-      email: "demo@movigym.test",
-      name: "Demo User",
-      password: await bcrypt.hash("demo1234", 10),
-      role: "USER",
-    },
-  });
+  // Test accounts with publicly documented passwords — only for a local demo
+  // (DEMO_ACCOUNTS=true). A live store gets its administrator from
+  // ADMIN_EMAIL / ADMIN_PASSWORD via scripts/create-admin.mjs instead.
+  const demoAccounts = process.env.DEMO_ACCOUNTS === "true";
+  if (demoAccounts) {
+    await prisma.user.create({
+      data: {
+        email: "admin@movigym.test",
+        name: "Администратор",
+        password: await bcrypt.hash("admin1234", 10),
+        role: "ADMIN",
+      },
+    });
+    await prisma.user.create({
+      data: {
+        email: "demo@movigym.test",
+        name: "Покупатель",
+        password: await bcrypt.hash("demo1234", 10),
+        role: "USER",
+      },
+    });
+  }
 
   console.log(
-    `Seeded ${categories.length} categories, ${productCount} products, 2 users (admin + demo).`,
+    `Seeded ${categories.length} categories, ${productCount} products` +
+      (demoAccounts ? ", 2 test accounts (admin + demo)." : "."),
   );
 }
 

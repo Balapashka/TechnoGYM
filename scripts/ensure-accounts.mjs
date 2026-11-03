@@ -1,4 +1,5 @@
-// Idempotently ensure the demo accounts exist on every startup.
+// Test accounts for a LOCAL DEMO ONLY (DEMO_ACCOUNTS=true, see
+// docker-entrypoint.sh). Idempotently ensures them on every startup.
 // This runs regardless of whether the catalog is already seeded, so login
 // works natively even on an old database volume that predates these accounts.
 // No settings or volume reset are needed.

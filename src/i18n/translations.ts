@@ -401,6 +401,30 @@ export interface Translation {
     intOff: string;
     intHint: string;
     testModeWarning: string;
+    import: string;
+    importLead: string;
+    downloadCatalog: string;
+    columnsTitle: string;
+    col_slug: string;
+    col_name: string;
+    col_category: string;
+    col_brand: string;
+    col_origin_country: string;
+    col_price_rub: string;
+    col_price_on_request: string;
+    col_in_stock: string;
+    col_badge: string;
+    col_description: string;
+    col_features: string;
+    col_images: string;
+    categorySlugs: string;
+    chooseFile: string;
+    deleteMissing: string;
+    checkFile: string;
+    applyImport: string;
+    importPreview: string;
+    importDone: string;
+    importErrors: string;
   };
 
   // Country/Locale modal + switcher
@@ -925,6 +949,30 @@ export const translations: Record<Locale, Translation> = {
       intOff: "не настроено",
       intHint: "Подключения настраиваются в файле .env на сервере — инструкция в ЗАПУСК-ПРОДАЖ.md.",
       testModeWarning: "Включён тестовый режим: на странице входа видны демо-пароли, коды сброса пароля показываются на экране. Отключите DEMO_ACCOUNTS и DEMO_EXPOSE_RESET_TOKEN перед запуском.",
+      import: "Импорт / экспорт",
+      importLead: "Чтобы заменить или обновить каталог: скачайте текущий каталог, отредактируйте его в Excel или Google Таблицах и загрузите обратно. Товары сопоставляются по колонке slug: совпавшие обновляются, новые создаются.",
+      downloadCatalog: "Скачать каталог (CSV)",
+      columnsTitle: "Колонки файла",
+      col_slug: "адрес страницы товара: латиница, цифры, дефис (обязательно)",
+      col_name: "название (обязательно)",
+      col_category: "категория — один из адресов ниже (обязательно)",
+      col_brand: "бренд",
+      col_origin_country: "страна производства, например «Италия» или «Китай»",
+      col_price_rub: "цена в рублях; можно пусто, если цена по запросу",
+      col_price_on_request: "да / нет — скрыть цену и показывать «Запросить цену»",
+      col_in_stock: "да / нет — в наличии или под заказ",
+      col_badge: "метка на карточке, например «Новинка»",
+      col_description: "описание",
+      col_features: "характеристики через «|»",
+      col_images: "ссылки на фото через «|»; пусто — фото не меняются",
+      categorySlugs: "Адреса категорий",
+      chooseFile: "Файл CSV",
+      deleteMissing: "Удалить товары, которых нет в файле (например, чтобы убрать демонстрационный каталог)",
+      checkFile: "Проверить файл",
+      applyImport: "Загрузить в каталог",
+      importPreview: "Будет создано: {created}, обновлено: {updated}, удалено: {deleted}.",
+      importDone: "Готово. Создано: {created}, обновлено: {updated}, удалено: {deleted}.",
+      importErrors: "Файл не загружен — исправьте ошибки:",
     },
     locale: {
       chooseCountry: "Выберите вашу страну",
@@ -1433,6 +1481,30 @@ export const translations: Record<Locale, Translation> = {
       intOff: "off",
       intHint: "Integrations are configured in the server's .env file — see ЗАПУСК-ПРОДАЖ.md.",
       testModeWarning: "Test mode is on: demo passwords are listed on the login page and reset codes are shown on screen. Turn off DEMO_ACCOUNTS and DEMO_EXPOSE_RESET_TOKEN before launch.",
+      import: "Import / export",
+      importLead: "To replace or update the catalog: download it, edit it in Excel or Google Sheets and upload it back. Products are matched by the slug column: matches are updated, new ones are created.",
+      downloadCatalog: "Download catalog (CSV)",
+      columnsTitle: "File columns",
+      col_slug: "product URL: latin letters, digits, hyphen (required)",
+      col_name: "name (required)",
+      col_category: "category — one of the slugs below (required)",
+      col_brand: "brand",
+      col_origin_country: "country of origin, e.g. Italy or China",
+      col_price_rub: "price in roubles; may be empty for price on request",
+      col_price_on_request: "yes / no — hide the price and show “Request a price”",
+      col_in_stock: "yes / no — in stock or made to order",
+      col_badge: "card badge, e.g. New",
+      col_description: "description",
+      col_features: "features separated by “|”",
+      col_images: "photo URLs separated by “|”; empty keeps current photos",
+      categorySlugs: "Category slugs",
+      chooseFile: "CSV file",
+      deleteMissing: "Delete products that are not in the file (e.g. to remove the sample catalog)",
+      checkFile: "Check file",
+      applyImport: "Import",
+      importPreview: "To create: {created}, update: {updated}, delete: {deleted}.",
+      importDone: "Done. Created: {created}, updated: {updated}, deleted: {deleted}.",
+      importErrors: "Nothing imported — fix these errors:",
     },
     locale: {
       chooseCountry: "Choose your country",

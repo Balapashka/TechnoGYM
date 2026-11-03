@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       inStock: parsed.data.inStock,
       priceOnRequest: parsed.data.priceOnRequest,
       categoryId: parsed.data.categoryId,
-      variants: { create: [{ name: "Standard", priceDeltaCents: 0 }] },
+      variants: { create: [{ name: "Стандартная комплектация", priceDeltaCents: 0 }] },
     },
     select: { id: true, slug: true },
   });

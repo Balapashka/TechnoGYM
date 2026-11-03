@@ -40,11 +40,12 @@ export function InfoPage({
       )}
 
       {content.sections.length > 0 && (
+        <div className="container-page py-12">
         <div
           className={
             content.legal
-              ? "container-page max-w-3xl space-y-8 py-12"
-              : "container-page grid gap-x-12 gap-y-8 py-12 md:grid-cols-2"
+              ? "max-w-3xl space-y-8"
+              : "grid gap-x-12 gap-y-8 md:grid-cols-2"
           }
         >
           {content.sections.map((s) => (
@@ -67,11 +68,12 @@ export function InfoPage({
             </section>
           ))}
         </div>
+        </div>
       )}
 
       {content.legal && requisites.length > 0 && (
-        <div className="container-page max-w-3xl pb-16">
-          <p className="rounded-xl bg-mist p-4 text-sm text-ink-soft">
+        <div className="container-page pb-16">
+          <p className="max-w-3xl rounded-xl bg-mist p-4 text-sm text-ink-soft">
             {requisites.join(" · ")}
           </p>
         </div>

@@ -19,6 +19,9 @@ COPY prisma ./prisma
 RUN npm ci
 
 COPY . .
+# Build-time setting (inlined into the browser bundle), see .env.example.
+ARG NEXT_PUBLIC_INSTALLMENT_MONTHS=0
+ENV NEXT_PUBLIC_INSTALLMENT_MONTHS=$NEXT_PUBLIC_INSTALLMENT_MONTHS
 RUN npm run build
 
 # ---- Runner: smaller image that runs migrations + the server ----
@@ -33,9 +36,9 @@ ENV DATABASE_URL="file:/app/data/dev.db"
 RUN apt-get update && apt-get install -y --no-install-recommends openssl \
     && rm -rf /var/lib/apt/lists/*
 
-# Mount point for the database volume; created here so the app can write even
-# when the compose volume is absent (e.g. a plain `docker run`).
-RUN mkdir -p /app/data
+# Mount point for the data volume (database, uploaded photos, backups);
+# created here so the app can write even without a volume (plain `docker run`).
+RUN mkdir -p /app/data/uploads /app/data/backups
 
 # Copy everything needed to run migrations, seed and `next start`.
 COPY --from=builder /app/node_modules ./node_modules

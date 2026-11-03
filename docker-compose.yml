@@ -1,24 +1,33 @@
+# Локальный запуск / просмотр: docker compose up --build  →  http://localhost:3000
+# Для боевого сервера с доменом и HTTPS используйте docker-compose.prod.yml.
 services:
   app:
-    build: .
-    container_name: sportliner-demo
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_INSTALLMENT_MONTHS: "${NEXT_PUBLIC_INSTALLMENT_MONTHS:-0}"
+    container_name: sportliner
     ports:
-      # Host port is configurable: set APP_PORT in .env (or the shell) if 3000
-      # is already taken. Container port stays 3000.
       - "${APP_PORT:-3000}:3000"
+    # All settings come from .env (see .env.example); the lines below only
+    # pin what must be fixed inside the container.
+    env_file:
+      - path: .env
+        required: false
     environment:
-      # The SQLite file lives on the named volume below, NOT in the container
-      # layer, so orders and admin edits survive `docker compose down`.
       DATABASE_URL: "file:/app/data/dev.db"
-      SITE_URL: "http://localhost:${APP_PORT:-3000}"
       PORT: "3000"
-      # Demo convenience: the password-reset token is returned in the API
-      # response because there is no mail server. Set to "false" (or remove)
-      # before putting this on a public URL — see README, "Before you deploy".
-      DEMO_EXPOSE_RESET_TOKEN: "true"
+      SITE_URL: "${SITE_URL:-http://localhost:3000}"
     volumes:
+      # Database, uploaded photos and backups survive `docker compose down`.
       - db-data:/app/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
 
 volumes:
   db-data:

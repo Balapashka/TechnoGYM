@@ -4,9 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-"SPORT LINER" — an educational e-commerce demo (Next.js 16 App Router, React 19, TypeScript,
-Tailwind v4, Prisma + SQLite, Zustand, Zod, Vitest). All products, copy and media are
-mock/placeholder by design; the logo is the only real asset. The brand name lives in
+"SPORT LINER" — a fitness-equipment online store being prepared for launch (Next.js 16 App
+Router, React 19, TypeScript, Tailwind v4, Prisma + SQLite, Zustand, Zod, Vitest, nodemailer).
+The starter catalog (models, prices, photos) is still placeholder content that the owner replaces
+via `/admin/import`; owner-facing docs are `НАЧАТЬ-ОТСЮДА.md` and `ЗАПУСК-ПРОДАЖ.md`. The brand name lives in
 `src/lib/brand.ts` — internal identifiers (`movigym_session` cookie, `movigym-cart` /
 `movigym-locale` storage keys, `@movigym.test` demo accounts) deliberately keep the old name so
 existing sessions and the documented credentials keep working.
@@ -27,16 +28,22 @@ npm run db:migrate   # prisma migrate deploy
 npm run db:seed      # tsx prisma/seed.ts (procedural catalog)
 npm run db:reset     # migrate reset --force (drops + reseeds)
 
-docker compose up --build   # full stack; entrypoint migrates + seeds + ensures demo accounts
+docker compose up --build   # full stack; entrypoint migrates, seeds an empty DB, creates admin
+docker compose -f docker-compose.prod.yml up -d --build   # + Caddy HTTPS for a real domain
+node scripts/create-admin.mjs email 'password'            # create admin / reset its password
+node scripts/backup-db.mjs                                # VACUUM INTO data/backups
 ```
 
 First-time local setup: `npm install` → `cp .env.example .env` → `npx prisma migrate dev` →
 `npx prisma db seed`. `postinstall` runs `prisma generate`, so the client is regenerated on install;
 after editing `prisma/schema.prisma` run a migration (or at least `npx prisma generate`) manually.
 
-Demo accounts (recreated on every Docker start by `scripts/ensure-accounts.mjs`, which **resets
-their passwords/roles each boot**): `admin@movigym.test` / `admin1234` (ADMIN),
-`demo@movigym.test` / `demo1234` (USER).
+Test accounts `admin@movigym.test` / `admin1234` (ADMIN) and `demo@movigym.test` / `demo1234`
+exist **only when `DEMO_ACCOUNTS=true`**: the seed creates them, the Docker entrypoint re-ensures
+them (resetting passwords) and the login page lists them. On a live store the administrator comes
+from `ADMIN_EMAIL`/`ADMIN_PASSWORD` via `scripts/create-admin.mjs` (never overwrites an existing
+password unless `ADMIN_RESET_PASSWORD=true`). The tracked `prisma/dev.db` is seeded with
+`DEMO_ACCOUNTS=true` for local development.
 
 ## Architecture
 
@@ -69,7 +76,9 @@ lead (`/api/quote-requests`, listed at `/admin/quote-requests`). The rule is enf
 independent layers and all three must hold: `toDTO` zeroes `priceCents` so the figure never reaches
 the browser (RSC payload, `GET /api/products`, the persisted compare store); `PriceOrRequest` /
 `ProductInstallment` in `src/components/ui/Price.tsx` are the single render-time guard; and
-`buildOrder` refuses a quote-only line so a stale or hand-edited cart cannot buy one. The admin and
+`buildOrder` refuses a quote-only line so a stale or hand-edited cart cannot buy one. Leads from
+the price-request modal, `/business` and `/contact` (`LeadForm`) all land in `QuoteRequest`
+(`source` = product | business | contact) and notify the manager. The admin and
 `buildOrder` read Prisma directly, so both still see the real price. `ORIGIN_PRIORITY` in
 `src/lib/countries.ts` is the one place that decides which origin leads the catalog — it drives the
 default `featured` sort, `getFeaturedProducts` and the category listings.
@@ -85,23 +94,36 @@ Checkout POSTs the client cart to `/api/checkout`, which validates with `checkou
 then **re-reads every line from the database** and passes that catalog to the pure `buildOrder()`
 (`src/lib/order.ts`). The `name`/`unitPriceCents` in the request are ignored — a tampered payload
 cannot change what an order costs — and `buildOrder` returns a `{ok:false, error}` result when a
-product or variant no longer exists (the route answers 409). Orders persist price/name snapshots in
-`BASE_CURRENCY`, always `PAID` (the fake card always succeeds). Line quantity is capped at
-`MAX_LINE_QUANTITY` (99) in `cart-store.ts`, mirrored by `checkoutItemSchema`.
+product or variant no longer exists (the route answers 409). Orders persist price/name/variant
+snapshots in `BASE_CURRENCY` plus the customer's name, phone, delivery method/address and comment;
+`OrderItem.productId` is nullable (`SetNull`) so deleting a product never breaks old orders. Every
+order starts `PENDING`; the admin moves it through `PAID → SHIPPED → DELIVERED` (or `CANCELLED`)
+at `/admin/orders/[id]`. Card data is never collected: payment is either "manual" (manager sends a
+link/invoice) or "online" via ЮKassa (`src/lib/payments/`): checkout creates the payment and
+redirects; `/api/payments/yookassa` (webhook) and `/checkout/result` re-read the payment from the
+ЮKassa API (`syncOrderPayment`) — the webhook body is never trusted. Manager/customer notifications
+(`src/lib/notify.ts`, texts in `notify-messages.ts`) run in `after()` and swallow errors. Line
+quantity is capped at `MAX_LINE_QUANTITY` (99) in `cart-store.ts`, mirrored by `checkoutItemSchema`.
 
 **Auth is a hand-rolled DB session**, no NextAuth, no middleware. `POST /api/auth/login` verifies
 a bcrypt hash and `createSession()` writes a `Session` row plus an httpOnly `movigym_session`
 cookie (7 days). Authorization is enforced in two independent places and both must be updated
 together: `src/app/admin/layout.tsx` redirects non-ADMINs, and **each** `/api/admin/*` route
-handler re-checks `getCurrentUser()?.role !== "ADMIN"` and returns 403. A new admin API route
-without that check is unprotected.
+handler re-checks the role (`forbidUnlessAdmin()` in `src/lib/auth.ts`, or the older inline
+`getCurrentUser()?.role !== "ADMIN"`) and returns 403. A new admin API route without that check is
+unprotected. Public POST endpoints (login, register, reset, checkout, leads, subscribe) are
+rate-limited per IP by `limitRequest()` (`src/lib/rate-limit.ts`, in-memory — single instance);
+public forms also carry a `Honeypot` field and a 152-ФЗ `Consent` checkbox (schemas require it).
 
-**Environment switches.** Behaviour that differs between the local demo and a public deployment is
-env-driven, never hardcoded (all listed in `.env.example`, table in `README.md`):
-`DEMO_EXPOSE_RESET_TOKEN` returns the password-reset token in the API response (no mail server —
-must be off publicly, or any email is an account takeover), `SESSION_COOKIE_SECURE` marks the
-session cookie `Secure` (must stay off on plain HTTP or login breaks), and `SITE_INDEXABLE` /
-`SITE_URL` drive `src/lib/site.ts`, which feeds `metadataBase`, `app/robots.ts` and `app/sitemap.ts`.
+**Environment switches vs. store settings.** Infrastructure is env-driven (all in `.env.example`,
+table in `README.md`): `SITE_URL`, `ADMIN_*`, `TELEGRAM_*`, `SMTP_*`, `YOOKASSA_*`,
+`SITE_INDEXABLE`, `SESSION_COOKIE_SECURE`, `NEXT_PUBLIC_INSTALLMENT_MONTHS` (build-time),
+`DEMO_ACCOUNTS` and `DEMO_EXPOSE_RESET_TOKEN` (both must be false publicly — the admin overview
+warns when they are on). Business content the owner edits — phone, email, address, hours, legal
+details (ИНН/ОГРН), pickup address, socials — lives in the `Setting` table, edited at
+`/admin/settings`, read with `getSettings()` (`src/lib/settings.ts`, React-`cache`d, never throws);
+the pure shape/defaults/helpers are in `src/lib/settings-shape.ts` (safe for client components).
+The root layout passes settings to `Footer`; `Header` passes the phone to `MobileMenu`.
 Both metadata routes are `force-dynamic` on purpose: statically prerendered, they would bake the
 build-time env values in and silently ignore the deployment's settings.
 
@@ -110,8 +132,8 @@ build-time env values in and silently ignore the deployment's settings.
 `BASE_CURRENCY` is `RUB` — the catalog, the admin form (`priceRub`) and every order are in roubles.
 The selected country (`src/store/locale-store.ts`, persisted as `movigym-locale`, CIS countries
 only) drives both the `Intl` locale and a **display-only** conversion: `formatPriceIn(cents,
-currency, country)` / `formatInstallmentIn(...)` convert through the `DEMO_RATES` table (rounded
-stand-ins, not a real FX feed). Never convert a value on its way *into* the cart or the checkout
+currency, country)` / `formatInstallmentIn(...)` convert through `DISPLAY_RATES` and prefix the
+result with "≈" (rounded reference rates, not a live FX feed). Never convert a value on its way *into* the cart or the checkout
 payload — orders are stored in the product's own currency.
 
 **Language.** Russian is the default; English is the secondary option, switched via
@@ -139,10 +161,12 @@ slots (`hero`, `productCard`, `logo`, …) with exact dimensions and a `src: nul
 SVG placeholder in `public/placeholders/`; `src/lib/media.ts` resolves them. Swapping in real
 assets means editing `media.json`, not components (see the size table in `README.md`).
 
-**Routing groups.** `src/app/(shop)` = PLP/PDP, `src/app/(content)` = marketing pages. Content
-pages are data-driven, not per-page components: `src/lib/pages.ts` (`infoPages` → generic
-`InfoPage`, statically generated via `[page]`) and `src/lib/landings.ts` (`landings` → richer
-`ThemedLanding`). Adding a marketing page usually means adding a key to one of those maps.
+**Routing groups.** `src/app/(shop)` = PLP/PDP/search, `src/app/(content)` = marketing pages.
+Info and legal pages are data-driven: `src/lib/pages.ts` maps a slug to a function of
+`{ settings, onlinePayment }` returning `InfoContent` (sections, `legal`, `contacts`, `form`),
+rendered by `InfoPage` via `[page]` (force-dynamic so saved settings show immediately). Legal texts
+(privacy/152-ФЗ, offer, returns/ЗоЗПП, terms, cookies) are templates; bump `LEGAL_UPDATED` when
+editing them. `src/lib/landings.ts` → `ThemedLanding` (wellness, design).
 Header/footer navigation is static config in `src/lib/nav.ts` — its hrefs must match seeded
 category slugs (see `prisma/seed.ts`), which are also the keys of `src/lib/category-color.ts`.
 
@@ -154,8 +178,15 @@ colors.
 ## Testing
 
 Vitest + jsdom, `globals: true`, `@` aliased to `src`, `vitest.setup.ts` shims `localStorage` so
-zustand `persist` works. Tests cover pure logic only — `lib/` (format, filter, order, media),
+zustand `persist` works. Tests cover pure logic only — `lib/` (format, filter, order, media,
+search, csv import, notification texts, rate limiter, settings helpers), `schemas/`,
 `store/` (cart, locale, compare) and `i18n/` (dictionary parity, plural/status helpers, and the
 key-usage scan). There are no component or route-handler tests and no test DB, so keep business
 rules in pure functions in `lib/`/`store/` where they can be tested, rather than inside route
 handlers or components.
+
+**Catalog import/export.** `/admin/import` round-trips the catalog through CSV (`src/lib/csv.ts`:
+`;`/`,` auto-detect, UTF-8 BOM or Windows-1251 for Excel RU). Import is all-or-nothing, matches by
+`slug`, keeps photos/features when those cells are empty, and can delete products missing from the
+file. Uploaded photos go to `data/uploads` (`src/lib/uploads.ts`, magic-byte check) and are served
+by `src/app/uploads/[name]/route.ts`; `Media` renders hosts outside `OPTIMIZED_HOSTS` unoptimized.

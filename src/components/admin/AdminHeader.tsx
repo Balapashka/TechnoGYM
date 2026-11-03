@@ -12,6 +12,7 @@ const tabs: { href: string; key: string }[] = [
   { href: "/admin/quote-requests", key: "admin.quoteRequests" },
   { href: "/admin/products", key: "admin.products" },
   { href: "/admin/categories", key: "admin.categories" },
+  { href: "/admin/import", key: "admin.import" },
   { href: "/admin/subscribers", key: "admin.subscribers" },
   { href: "/admin/settings", key: "admin.settings" },
 ];

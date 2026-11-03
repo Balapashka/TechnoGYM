@@ -1,0 +1,22 @@
+# HTTPS reverse proxy for the shop. Caddy obtains and renews the Let's Encrypt
+# certificate for {$DOMAIN} automatically.
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+
+	# Photo uploads in the admin panel can be up to 8 MB each.
+	request_body {
+		max_size 50MB
+	}
+
+	reverse_proxy app:3000
+}
+
+# www → main domain
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} permanent
+}

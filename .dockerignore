@@ -13,4 +13,6 @@ coverage
 .playwright-cli
 npm-debug.log*
 Dockerfile
-docker-compose.yml
+docker-compose*.yml
+data/
+deploy/

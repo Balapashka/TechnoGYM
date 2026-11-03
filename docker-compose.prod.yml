@@ -1,0 +1,49 @@
+# Боевой сервер: магазин + Caddy (автоматический HTTPS-сертификат Let's Encrypt).
+#
+#   1. Направьте A-запись домена на IP сервера.
+#   2. cp .env.example .env — заполните DOMAIN, SITE_URL=https://<домен>,
+#      ADMIN_EMAIL/ADMIN_PASSWORD, SESSION_COOKIE_SECURE=true и остальное.
+#   3. docker compose -f docker-compose.prod.yml up -d --build
+#
+# Магазин не публикует свой порт наружу: весь трафик идёт через Caddy (80/443),
+# поэтому заголовок X-Forwarded-For, по которому работает защита от перебора
+# паролей, подделать нельзя.
+services:
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_INSTALLMENT_MONTHS: "${NEXT_PUBLIC_INSTALLMENT_MONTHS:-0}"
+    env_file: .env
+    environment:
+      DATABASE_URL: "file:/app/data/dev.db"
+      PORT: "3000"
+    volumes:
+      - db-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+
+  caddy:
+    image: caddy:2.8
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: "${DOMAIN}"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - app
+
+volumes:
+  db-data:
+  caddy-data:
+  caddy-config:
