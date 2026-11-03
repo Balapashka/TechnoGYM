@@ -30,23 +30,17 @@ type LocaleState = {
   /** UI language. Russian by default, English available as a switch. */
   language: Locale;
   cookieAccepted: boolean | null; // null = not decided yet
-  countryModalDismissed: boolean;
   setCountry: (code: string) => void;
   setLanguage: (language: Locale) => void;
   acceptCookies: () => void;
   declineCookies: () => void;
-  dismissCountryModal: () => void;
 };
 
 const initialState = {
   country: DEFAULT_COUNTRY,
   language: DEFAULT_LOCALE,
   cookieAccepted: null,
-  countryModalDismissed: false,
-} satisfies Pick<
-  LocaleState,
-  "country" | "language" | "cookieAccepted" | "countryModalDismissed"
->;
+} satisfies Pick<LocaleState, "country" | "language" | "cookieAccepted">;
 
 /**
  * The country to format prices with. Falls back to the default country until
@@ -70,7 +64,6 @@ export const useLocaleStore = create<LocaleState>()(
       setLanguage: (language) => set({ language }),
       acceptCookies: () => set({ cookieAccepted: true }),
       declineCookies: () => set({ cookieAccepted: false }),
-      dismissCountryModal: () => set({ countryModalDismissed: true }),
     }),
     {
       name: "movigym-locale",

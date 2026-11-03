@@ -18,7 +18,14 @@ type ResultOrder = {
 };
 
 /** Thank-you / payment status screen shown after checkout. */
-export function CheckoutResult({ order }: { order: ResultOrder | null }) {
+export function CheckoutResult({
+  order,
+  emailSent,
+}: {
+  order: ResultOrder | null;
+  /** Mail is configured, so the confirmation email really went out. */
+  emailSent: boolean;
+}) {
   const t = useTranslation();
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,10 +71,13 @@ export function CheckoutResult({ order }: { order: ResultOrder | null }) {
       ? t("checkout.paymentPending")
       : t("checkout.orderConfirmed");
   const body = paid
-    ? t("checkout.paidBody", { email: order.email })
+    ? t("checkout.paidBody")
     : order.awaitingOnlinePayment
       ? t("checkout.paymentPendingBody")
-      : t("checkout.whatNext", { email: order.email });
+      : t("checkout.whatNext");
+  const emailNote = emailSent && !order.awaitingOnlinePayment
+    ? t("checkout.emailSent", { email: order.email })
+    : null;
 
   return (
     <div className="container-page flex-1 py-16 sm:py-20">
@@ -87,6 +97,7 @@ export function CheckoutResult({ order }: { order: ResultOrder | null }) {
           <Price cents={order.totalCents} currency={order.currency} />
         </p>
         <p className="mt-5 text-ink-soft">{body}</p>
+        {emailNote && <p className="mt-2 text-sm text-ink-soft">{emailNote}</p>}
 
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 

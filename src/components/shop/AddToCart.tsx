@@ -6,7 +6,11 @@ import { useCartStore } from "@/store/cart-store";
 import { useCartUiStore } from "@/store/cart-ui-store";
 import { useQuoteStore } from "@/store/quote-store";
 import { resolveMediaSrc } from "@/lib/media";
-import { formatPriceIn, formatInstallmentIn } from "@/lib/format";
+import {
+  formatPriceIn,
+  formatInstallmentIn,
+  INSTALLMENT_MONTHS,
+} from "@/lib/format";
 import { useDisplayCountry } from "@/store/locale-store";
 import { useTranslation } from "@/i18n/useTranslation";
 import type { ProductDTO } from "@/lib/catalog";
@@ -111,17 +115,19 @@ export function AddToCart({ product }: { product: ProductDTO }) {
                 <p className="text-2xl font-black">
                   {formatPriceIn(unitPriceCents, product.currency, country)}
                 </p>
-                <p className="text-xs text-ink-soft">
-                  {t("product.installment", {
-                    amount: formatInstallmentIn(
-                      unitPriceCents,
-                      36,
-                      product.currency,
-                      country,
-                    ),
-                    months: 36,
-                  })}
-                </p>
+                {INSTALLMENT_MONTHS > 0 && (
+                  <p className="text-xs text-ink-soft">
+                    {t("product.installment", {
+                      amount: formatInstallmentIn(
+                        unitPriceCents,
+                        INSTALLMENT_MONTHS,
+                        product.currency,
+                        country,
+                      ),
+                      months: INSTALLMENT_MONTHS,
+                    })}
+                  </p>
+                )}
               </>
             )}
           </div>

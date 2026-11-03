@@ -2,16 +2,24 @@
  * Product photo uploads: validation helpers (pure) and the storage location.
  *
  * Files are stored outside `public/` — Next.js only serves `public/` files that
- * existed at build time — in UPLOAD_DIR (default `./data/uploads`; under
- * Docker that is /app/data/uploads on the persistent volume, next to the
- * database) and served by src/app/uploads/[name]/route.ts.
+ * existed at build time — in `<app dir>/data/uploads` (under Docker that is
+ * /app/data/uploads on the persistent volume, next to the database) and served
+ * by src/app/uploads/[name]/route.ts.
  */
 import path from "node:path";
 
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 
 export function uploadDir(): string {
-  return process.env.UPLOAD_DIR || path.join(process.cwd(), "data", "uploads");
+  return path.join(process.cwd(), "data", "uploads");
+}
+
+/**
+ * Absolute path of one stored file. Spelled out with literal segments so the
+ * build's file tracer can scope it to data/uploads instead of the whole repo.
+ */
+export function uploadPath(name: string): string {
+  return path.join(process.cwd(), "data", "uploads", name);
 }
 
 export type ImageKind = { ext: "jpg" | "png" | "webp"; mime: string };

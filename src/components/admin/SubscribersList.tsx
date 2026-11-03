@@ -16,8 +16,6 @@ export function SubscribersList({
           {t("admin.subscribers")} <span className="text-ink-soft">{rows.length}</span>
         </h2>
         {rows.length > 0 && (
-          // A file download, not a page navigation — must stay a plain link.
-          // eslint-disable-next-line @next/next/no-html-link-for-pages
           <a
             href="/api/admin/subscribers"
             download

@@ -5,20 +5,74 @@ import { AddToCart } from "@/components/shop/AddToCart";
 import { CategoryName } from "@/components/shop/CategoryName";
 import { ProductOrigin } from "@/components/shop/ProductOrigin";
 import { Availability } from "@/components/shop/Availability";
-import { getProductBySlug } from "@/lib/catalog";
+import type { Metadata } from "next";
+import { getProductBySlug, type ProductDTO } from "@/lib/catalog";
+import { SITE_URL } from "@/lib/site";
+import { BRAND_NAME } from "@/lib/brand";
 import { BreadcrumbHome, ProductSpecs } from "./ProductDetailText";
+
+/** Absolute URL for an image path ("/uploads/…" → "https://site/uploads/…"). */
+function absolute(src: string): string {
+  return src.startsWith("/") ? `${SITE_URL}${src}` : src;
+}
+
+function shortDescription(text: string): string {
+  return text.length > 160 ? `${text.slice(0, 157).trimEnd()}…` : text;
+}
 
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
+  if (!product) return { title: "Товар не найден — SPORT LINER" };
+  const description = shortDescription(product.description);
+  const image = product.images[0];
   return {
-    title: product
-      ? `${product.name} — SPORT LINER`
-      : "Товар не найден — SPORT LINER",
+    title: `${product.name} — SPORT LINER`,
+    description,
+    alternates: { canonical: `/product/${product.slug}` },
+    openGraph: {
+      type: "website",
+      title: product.name,
+      description,
+      url: `/product/${product.slug}`,
+      images: image ? [{ url: absolute(image) }] : undefined,
+    },
+  };
+}
+
+/**
+ * schema.org Product for search engines. Quote-only products carry no offer:
+ * their price is deliberately not published.
+ */
+function productJsonLd(product: ProductDTO) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    sku: product.slug,
+    image: product.images.map(absolute),
+    url: `${SITE_URL}/product/${product.slug}`,
+    category: product.categoryName,
+    ...(product.brand ? { brand: { "@type": "Brand", name: product.brand } } : {}),
+    ...(product.priceOnRequest
+      ? {}
+      : {
+          offers: {
+            "@type": "Offer",
+            priceCurrency: product.currency,
+            price: (product.priceCents / 100).toFixed(2),
+            availability: product.inStock
+              ? "https://schema.org/InStock"
+              : "https://schema.org/BackOrder",
+            seller: { "@type": "Organization", name: BRAND_NAME },
+            url: `${SITE_URL}/product/${product.slug}`,
+          },
+        }),
   };
 }
 
@@ -33,6 +87,13 @@ export default async function ProductPage({
 
   return (
     <main className="container-page flex-1 py-8">
+      <script
+        type="application/ld+json"
+        // "<" is escaped so product text can never close the script tag.
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(productJsonLd(product)).replace(/</g, "\\u003c"),
+        }}
+      />
       <nav className="mb-6 text-xs text-ink-soft">
         <BreadcrumbHome />
         {" / "}

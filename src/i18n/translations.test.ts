@@ -48,7 +48,7 @@ describe("translations", () => {
     expect(ru.cart.summary).toBe("Сумма заказа");
     expect(ru.cart.subtotal).toBe("Товары");
     expect(ru.cart.shipping).toBe("Доставка");
-    expect(ru.cart.shippingAtCheckout).toBe("Рассчитывается при оформлении");
+    expect(ru.cart.shippingAtCheckout).toBe("Рассчитает менеджер");
     expect(ru.cart.checkout).toBe("Перейти к оформлению");
     expect(ru.cart.remove).toBe("Удалить");
   });

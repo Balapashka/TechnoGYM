@@ -22,12 +22,12 @@ export function UserMenu({ user }: { user: SessionUser | null }) {
   if (!user) {
     return (
       <div className="hidden items-center gap-4 lg:flex">
-        <Link href="/login" className="uppercase tracking-wide hover:text-ink-soft">
+        <Link href="/login" className="whitespace-nowrap uppercase tracking-wide hover:text-ink-soft">
           {t("common.login")}
         </Link>
         <Link
           href="/register"
-          className="hidden rounded-full bg-ink px-4 py-1.5 text-xs uppercase tracking-wide text-paper transition hover:bg-ink-soft xl:inline-block"
+          className="hidden whitespace-nowrap rounded-full bg-ink px-4 py-1.5 text-xs uppercase tracking-wide text-paper transition hover:bg-ink-soft 2xl:inline-block"
         >
           {t("common.join")}
         </Link>
@@ -39,12 +39,15 @@ export function UserMenu({ user }: { user: SessionUser | null }) {
     <div className="relative hidden lg:block">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 uppercase tracking-wide hover:text-ink-soft"
+        aria-label={user.name ?? t("common.account")}
+        className="flex items-center gap-2 whitespace-nowrap uppercase tracking-wide hover:text-ink-soft"
       >
         <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-[11px] font-black text-ink">
           {(user.name ?? user.email).charAt(0).toUpperCase()}
         </span>
-        <span className="hidden lg:inline">{user.name ?? t("common.account")}</span>
+        <span className="hidden max-w-[10rem] truncate 2xl:inline">
+          {user.name ?? t("common.account")}
+        </span>
       </button>
 
       {open && (

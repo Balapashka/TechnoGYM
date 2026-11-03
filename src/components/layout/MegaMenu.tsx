@@ -22,7 +22,7 @@ export function MegaMenu() {
         aria-expanded={open}
         aria-haspopup="true"
         onClick={() => setOpen((v) => !v)}
-        className="nav-underline py-2 text-sm font-semibold uppercase tracking-wide"
+        className="nav-underline whitespace-nowrap py-2 text-sm font-semibold uppercase tracking-wide"
       >
         {t("nav.shop")}
       </button>

@@ -8,8 +8,8 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 const accounts = [
-  { email: "admin@movigym.test", name: "Store Admin", password: "admin1234", role: "ADMIN" },
-  { email: "demo@movigym.test", name: "Demo User", password: "demo1234", role: "USER" },
+  { email: "admin@movigym.test", name: "Администратор", password: "admin1234", role: "ADMIN" },
+  { email: "demo@movigym.test", name: "Покупатель", password: "demo1234", role: "USER" },
 ];
 
 try {

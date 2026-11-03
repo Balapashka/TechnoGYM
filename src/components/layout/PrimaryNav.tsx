@@ -14,25 +14,11 @@ export function PrimaryNav() {
         <Link
           key={item.href + item.key}
           href={item.href}
-          className="nav-underline py-2 text-sm font-semibold uppercase tracking-wide"
+          className="nav-underline whitespace-nowrap py-2 text-sm font-semibold uppercase tracking-wide"
         >
           {t(item.key)}
         </Link>
       ))}
     </>
-  );
-}
-
-/** "For business" header link. */
-export function BusinessLink() {
-  const t = useTranslation();
-
-  return (
-    <Link
-      href="/business"
-      className="nav-underline hidden uppercase tracking-wide xl:inline"
-    >
-      {t("common.forBusiness")}
-    </Link>
   );
 }

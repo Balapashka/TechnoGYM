@@ -1,38 +1,81 @@
 import type { InfoContent } from "@/lib/pages";
-import { InfoDefaultSections, InfoDemoNote } from "@/components/InfoPageParts";
+import { LEGAL_UPDATED } from "@/lib/pages";
+import type { StoreSettings } from "@/lib/settings-shape";
+import { BRAND_NAME } from "@/lib/brand";
+import { InfoContacts, InfoContactForm, InfoUpdated } from "@/components/InfoPageParts";
 
-/** Generic content page used for all informational routes. */
-export function InfoPage({ content }: { content: InfoContent }) {
+/** Generic content page used for all informational and legal routes. */
+export function InfoPage({
+  content,
+  settings,
+}: {
+  content: InfoContent;
+  settings: StoreSettings;
+}) {
+  const requisites = [
+    settings.legalName,
+    settings.inn && `ИНН ${settings.inn}`,
+    settings.ogrn && `ОГРН ${settings.ogrn}`,
+    settings.legalAddress,
+  ].filter(Boolean);
+
   return (
     <main className="flex flex-1 flex-col">
       <div className="border-b border-stone bg-mist">
-        <div className="container-page py-14">
-          <p className="text-xs uppercase tracking-wide text-ink-soft">
-            SPORT LINER
-          </p>
-          <h1 className="text-4xl font-black uppercase tracking-tight md:text-5xl">
+        <div className="container-page py-12 md:py-14">
+          <p className="text-xs uppercase tracking-wide text-ink-soft">{BRAND_NAME}</p>
+          <h1 className="break-words text-3xl font-black uppercase tracking-tight sm:text-4xl md:text-5xl">
             {content.title}
           </h1>
           <p className="mt-3 max-w-2xl text-ink-soft">{content.lead}</p>
+          {content.legal && <InfoUpdated date={LEGAL_UPDATED} />}
         </div>
       </div>
 
-      <div className="container-page grid gap-8 py-12 md:grid-cols-2">
-        {content.sections ? (
-          content.sections.map((s) => (
-            <section key={s.heading}>
-              <h2 className="mb-2 text-xl font-bold uppercase">{s.heading}</h2>
-              <p className="text-ink-soft">{s.body}</p>
-            </section>
-          ))
-        ) : (
-          <InfoDefaultSections />
-        )}
-      </div>
+      {(content.contacts || content.form) && (
+        <div className="container-page grid gap-10 py-12 lg:grid-cols-[1fr_1.2fr]">
+          {content.contacts && <InfoContacts settings={settings} />}
+          {content.form && <InfoContactForm />}
+        </div>
+      )}
 
-      <div className="container-page pb-16">
-        <InfoDemoNote />
-      </div>
+      {content.sections.length > 0 && (
+        <div
+          className={
+            content.legal
+              ? "container-page max-w-3xl space-y-8 py-12"
+              : "container-page grid gap-x-12 gap-y-8 py-12 md:grid-cols-2"
+          }
+        >
+          {content.sections.map((s) => (
+            <section key={s.heading} className="min-w-0">
+              <h2 className="mb-3 text-lg font-bold uppercase md:text-xl">{s.heading}</h2>
+              {s.paragraphs?.map((p, i) => (
+                <p key={i} className="mb-3 break-words text-ink-soft">
+                  {p}
+                </p>
+              ))}
+              {s.list && (
+                <ul className="list-disc space-y-1.5 pl-5 text-ink-soft">
+                  {s.list.map((item) => (
+                    <li key={item} className="break-words">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          ))}
+        </div>
+      )}
+
+      {content.legal && requisites.length > 0 && (
+        <div className="container-page max-w-3xl pb-16">
+          <p className="rounded-xl bg-mist p-4 text-sm text-ink-soft">
+            {requisites.join(" · ")}
+          </p>
+        </div>
+      )}
     </main>
   );
 }

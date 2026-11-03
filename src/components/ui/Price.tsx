@@ -4,6 +4,7 @@ import {
   BASE_CURRENCY,
   formatInstallmentIn,
   formatPriceIn,
+  INSTALLMENT_MONTHS,
 } from "@/lib/format";
 import { useDisplayCountry } from "@/store/locale-store";
 import { useTranslation } from "@/i18n/useTranslation";
@@ -83,7 +84,8 @@ export function PriceOrRequest({
 
 /**
  * Installment line for a catalog product — renders nothing for quote-only
- * products, since a monthly payment would leak the hidden price.
+ * products (a monthly payment would leak the hidden price) and when
+ * instalments are not enabled (NEXT_PUBLIC_INSTALLMENT_MONTHS).
  */
 export function ProductInstallment({
   product,
@@ -94,7 +96,7 @@ export function ProductInstallment({
   months?: number;
   className?: string;
 }) {
-  if (product.priceOnRequest) return null;
+  if (product.priceOnRequest || INSTALLMENT_MONTHS === 0) return null;
 
   return (
     <Installment
@@ -109,7 +111,7 @@ export function ProductInstallment({
 /** "12 500 ₽ / мес · 36 месяцев" line under a price. */
 export function Installment({
   cents,
-  months = 36,
+  months = INSTALLMENT_MONTHS || 12,
   currency = BASE_CURRENCY,
   className,
 }: {

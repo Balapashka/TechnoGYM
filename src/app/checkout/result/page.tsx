@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { orderNumber } from "@/lib/order-format";
 import { syncOrderPayment } from "@/lib/payments/sync";
 import { yookassaEnabled } from "@/lib/payments/yookassa";
+import { mailEnabled } from "@/lib/mailer";
 import { CheckoutResult } from "./CheckoutResult";
 
 export const metadata: Metadata = {
@@ -48,6 +49,7 @@ export default async function CheckoutResultPage({
   return (
     <main className="flex flex-1 flex-col">
       <CheckoutResult
+        emailSent={mailEnabled()}
         order={
           order
             ? {

@@ -6,8 +6,8 @@ import { SITE_INDEXABLE, SITE_URL } from "@/lib/site";
 export const dynamic = "force-dynamic";
 
 /**
- * robots.txt. The demo blocks all crawlers (see SITE_INDEXABLE); once the
- * catalog holds real data, set `SITE_INDEXABLE=true` to expose the storefront
+ * robots.txt. Blocks all crawlers until `SITE_INDEXABLE=true` (set it once the
+ * catalog, prices and legal details are final); then exposes the storefront
  * while keeping private and transactional routes out of the index.
  */
 export default function robots(): MetadataRoute.Robots {
@@ -30,6 +30,7 @@ export default function robots(): MetadataRoute.Robots {
         "/register",
         "/forgot-password",
         "/reset-password",
+        "/search",
       ],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,

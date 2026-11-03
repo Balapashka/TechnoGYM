@@ -43,10 +43,9 @@ export const shopColumns: MegaColumn[] = [
 /** Top-level nav items besides "Shop" (which opens the mega-menu). */
 export const primaryNav: NavLink[] = [
   { key: "nav.collections", label: "Collections", href: "/collections" },
-  { key: "nav.wellness", label: "Wellness", href: "/wellness" },
-  { key: "nav.design", label: "Design", href: "/design" },
-  { key: "nav.stories", label: "Stories", href: "/stories" },
-  { key: "nav.community", label: "Community", href: "/community" },
+  { key: "nav.shippingShort", label: "Delivery", href: "/shipping" },
+  { key: "nav.contact", label: "Contact", href: "/contact" },
+  { key: "nav.forBusiness", label: "For business", href: "/business" },
 ];
 
 /** Footer link columns. */
@@ -55,6 +54,7 @@ export const footerColumns: MegaColumn[] = [
     key: "nav.products",
     title: "Products",
     links: [
+      { key: "nav.allProducts", label: "All products", href: "/category/all" },
       { key: "nav.treadmills", label: "Treadmills", href: "/category/treadmills" },
       { key: "nav.bikes", label: "Bikes", href: "/category/bikes" },
       { key: "nav.ellipticals", label: "Ellipticals", href: "/category/ellipticals" },
@@ -65,38 +65,29 @@ export const footerColumns: MegaColumn[] = [
   },
   {
     key: "nav.support",
-    title: "Support",
+    title: "Customers",
     links: [
+      { key: "nav.shipping", label: "Shipping & payment", href: "/shipping" },
+      { key: "nav.returns", label: "Returns & warranty", href: "/returns" },
+      { key: "nav.customerSupport", label: "Help & FAQ", href: "/customer-support" },
       { key: "nav.contact", label: "Contact", href: "/contact" },
-      { key: "nav.customerSupport", label: "Customer support", href: "/customer-support" },
-      { key: "nav.shipping", label: "Shipping", href: "/shipping" },
-      { key: "nav.returns", label: "Returns", href: "/returns" },
     ],
   },
   {
     key: "nav.company",
     title: "Company",
     links: [
-      { key: "nav.about", label: "About", href: "/about" },
-      { key: "nav.sustainability", label: "Sustainability", href: "/sustainability" },
-      { key: "nav.careers", label: "Careers", href: "/careers" },
-      { key: "nav.press", label: "Press", href: "/press" },
+      { key: "nav.about", label: "About us", href: "/about" },
+      { key: "nav.forBusiness", label: "For business", href: "/business" },
+      { key: "nav.wellness", label: "Wellness", href: "/wellness" },
+      { key: "nav.design", label: "Design", href: "/design" },
     ],
   },
 ];
 
-export const socialLinks: NavLink[] = [
-  { key: "social.instagram", label: "Instagram", href: "/social" },
-  { key: "social.tiktok", label: "TikTok", href: "/social" },
-  { key: "social.x", label: "X", href: "/social" },
-  { key: "social.facebook", label: "Facebook", href: "/social" },
-  { key: "social.linkedin", label: "LinkedIn", href: "/social" },
-  { key: "social.youtube", label: "YouTube", href: "/social" },
-];
-
 export const legalLinks: NavLink[] = [
   { key: "nav.privacy", label: "Privacy policy", href: "/privacy" },
-  { key: "nav.cookiePolicy", label: "Cookie policy", href: "/cookie-policy" },
-  { key: "nav.terms", label: "Terms & conditions", href: "/terms" },
   { key: "nav.salesConditions", label: "Sales conditions", href: "/sales-conditions" },
+  { key: "nav.terms", label: "Terms of use", href: "/terms" },
+  { key: "nav.cookiePolicy", label: "Cookie policy", href: "/cookie-policy" },
 ];

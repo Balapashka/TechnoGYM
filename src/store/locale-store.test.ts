@@ -11,7 +11,6 @@ const reset = () =>
     country: DEFAULT_COUNTRY,
     language: DEFAULT_LOCALE,
     cookieAccepted: null,
-    countryModalDismissed: false,
   });
 
 describe("locale-store", () => {
@@ -21,7 +20,6 @@ describe("locale-store", () => {
     const s = useLocaleStore.getState();
     expect(s.country.code).toBe(DEFAULT_COUNTRY.code);
     expect(s.cookieAccepted).toBeNull();
-    expect(s.countryModalDismissed).toBe(false);
   });
 
   it("defaults to Russia and the Russian language", () => {
@@ -54,11 +52,6 @@ describe("locale-store", () => {
     expect(useLocaleStore.getState().cookieAccepted).toBe(true);
     useLocaleStore.getState().declineCookies();
     expect(useLocaleStore.getState().cookieAccepted).toBe(false);
-  });
-
-  it("dismisses the country modal", () => {
-    useLocaleStore.getState().dismissCountryModal();
-    expect(useLocaleStore.getState().countryModalDismissed).toBe(true);
   });
 
   it("offers only CIS countries", () => {

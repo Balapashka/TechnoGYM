@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { forbidUnlessAdmin } from "@/lib/auth";
-import { MAX_UPLOAD_BYTES, sniffImage, uploadDir } from "@/lib/uploads";
+import { MAX_UPLOAD_BYTES, sniffImage, uploadDir, uploadPath } from "@/lib/uploads";
 
 /**
  * POST /api/admin/uploads — store product photos (admin only).
@@ -36,7 +35,7 @@ export async function POST(request: Request) {
       );
     }
     const name = `${randomUUID()}.${kind.ext}`;
-    await writeFile(path.join(dir, name), bytes);
+    await writeFile(uploadPath(name), bytes);
     urls.push(`/uploads/${name}`);
   }
   return NextResponse.json({ urls }, { status: 201 });

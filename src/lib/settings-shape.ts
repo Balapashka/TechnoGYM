@@ -124,3 +124,22 @@ export function socialHref(
   if (kind === "vk") return `https://vk.com/${value.replace(/^@/, "")}`;
   return `https://youtube.com/${value.startsWith("@") ? value : `@${value}`}`;
 }
+
+export const SOCIAL_LABELS = {
+  telegram: "Telegram",
+  whatsapp: "WhatsApp",
+  vk: "ВКонтакте",
+  youtube: "YouTube",
+} as const;
+
+export type SocialLink = { key: keyof typeof SOCIAL_LABELS; label: string; href: string };
+
+/** Social / messenger links that are filled in, ready to render. */
+export function socialLinksFrom(s: StoreSettings): SocialLink[] {
+  const links: SocialLink[] = [];
+  for (const key of Object.keys(SOCIAL_LABELS) as (keyof typeof SOCIAL_LABELS)[]) {
+    const href = socialHref(key, s[key]);
+    if (href) links.push({ key, label: SOCIAL_LABELS[key], href });
+  }
+  return links;
+}

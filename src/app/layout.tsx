@@ -4,7 +4,6 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CookieBanner } from "@/components/layout/CookieBanner";
-import { CountryModal } from "@/components/layout/CountryModal";
 import { MotionProvider } from "@/components/layout/MotionProvider";
 import { NavigationProgress } from "@/components/layout/NavigationProgress";
 import { QuickViewDrawer } from "@/components/shop/QuickViewDrawer";
@@ -13,6 +12,7 @@ import { CartDrawer } from "@/components/shop/CartDrawer";
 import { CompareBar } from "@/components/shop/CompareBar";
 import { CompareToast } from "@/components/shop/CompareToast";
 import { SITE_INDEXABLE, SITE_URL } from "@/lib/site";
+import { getSettings } from "@/lib/settings";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -23,14 +23,14 @@ const inter = Inter({
 
 const title = "SPORT LINER — интернет-магазин тренажёров";
 const description =
-  "Демонстрационный интернет-магазин: кардио- и силовые тренажёры, свободные веса, аксессуары. Учебный проект — цены и характеристики приведены для примера.";
+  "Интернет-магазин тренажёров: беговые дорожки, велотренажёры, силовые станции, свободные веса и аксессуары для дома и фитнес-клубов. Доставка по России и СНГ.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title,
   description,
-  // Mirrors robots.txt: the demo stays out of search results until the catalog
-  // holds real data (see SITE_INDEXABLE in src/lib/site.ts).
+  // Mirrors robots.txt: the site stays out of search results until
+  // SITE_INDEXABLE=true (see src/lib/site.ts).
   robots: SITE_INDEXABLE ? { index: true, follow: true } : { index: false, follow: false },
   openGraph: {
     type: "website",
@@ -43,11 +43,12 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSettings();
   return (
     <html lang="ru" className={`${inter.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-paper text-ink antialiased">
@@ -55,9 +56,8 @@ export default function RootLayout({
         <MotionProvider>
           <Header />
           {children}
-          <Footer />
+          <Footer settings={settings} />
           <CookieBanner />
-          <CountryModal />
           <QuickViewDrawer />
           <QuoteRequestModal />
           <CartDrawer />

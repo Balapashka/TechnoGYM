@@ -50,6 +50,11 @@ describe("convertCents", () => {
 });
 
 describe("formatPriceIn", () => {
+  it("marks a converted amount as approximate", () => {
+    expect(formatPriceIn(10000000, "RUB", KZ).startsWith("≈")).toBe(true);
+    expect(formatPriceIn(10000000, "RUB", RU).startsWith("≈")).toBe(false);
+  });
+
   it("shows a rouble price in tenge for a Kazakh shopper", () => {
     const out = formatPriceIn(10000000, "RUB", KZ);
     expect(out).toContain("₸");

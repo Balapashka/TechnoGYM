@@ -17,9 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const url = (path: string) => `${SITE_URL}${path}`;
 
-  // `landings` and `infoPages` can define the same slug (e.g. /wellness); the
-  // landing wins at runtime, so de-duplicate before emitting.
-  const contentSlugs = [...new Set([...landingSlugs, ...infoSlugs])];
+  const contentSlugs = [...new Set([...landingSlugs, ...infoSlugs, "business"])];
 
   return [
     { url: url("/"), changeFrequency: "daily", priority: 1 },

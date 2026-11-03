@@ -58,8 +58,6 @@ export interface Translation {
     collections: string;
     wellness: string;
     design: string;
-    stories: string;
-    community: string;
     cardio: string;
     strength: string;
     strengthStations: string;
@@ -74,9 +72,6 @@ export interface Translation {
     support: string;
     company: string;
     about: string;
-    sustainability: string;
-    careers: string;
-    press: string;
     contact: string;
     customerSupport: string;
     shipping: string;
@@ -85,6 +80,9 @@ export interface Translation {
     cookiePolicy: string;
     terms: string;
     salesConditions: string;
+    forBusiness: string;
+    allProducts: string;
+    shippingShort: string;
   };
 
   /**
@@ -136,6 +134,11 @@ export interface Translation {
     subscribeButton: string;
     socialLinks: string;
     legalDisclaimer: string;
+    contactsTitle: string;
+    seller: string;
+    inn: string;
+    ogrn: string;
+    rights: string;
   };
 
   // Product
@@ -232,11 +235,17 @@ export interface Translation {
 
   // Generic info pages
   info: {
-    demoNote: string;
-    placeholderHeading: string;
-    placeholderBody: string;
-    anotherHeading: string;
-    anotherBody: string;
+    updated: string;
+    needHelp: string;
+    needHelpBody: string;
+    contactUs: string;
+    phone: string;
+    email: string;
+    address: string;
+    hours: string;
+    requisites: string;
+    writeUs: string;
+    messengers: string;
   };
 
   // For-business page
@@ -397,8 +406,6 @@ export interface Translation {
   // Country/Locale modal + switcher
   locale: {
     chooseCountry: string;
-    browsingDemoStore: string;
-    pickRegion: string;
     language: string;
     country: string;
   };
@@ -416,6 +423,13 @@ export interface Translation {
     server: string;
     network: string;
     tooMany: string;
+    notFoundTitle: string;
+    notFoundBody: string;
+    crashTitle: string;
+    crashBody: string;
+    retry: string;
+    toCatalog: string;
+    toHome: string;
   };
 
   // Cookie banner
@@ -498,6 +512,7 @@ export interface Translation {
     deliveryCostNote: string;
     toAccount: string;
     continueShopping: string;
+    emailSent: string;
   };
 
   // Cart
@@ -528,6 +543,16 @@ export interface Translation {
     consentNewsletter: string;
     consentRequired: string;
   };
+  search: {
+    title: string;
+    placeholder: string;
+    submit: string;
+    found: string;
+    nothing: string;
+    nothingHint: string;
+    hint: string;
+    openSearch: string;
+  };
 }
 
 export const translations: Record<Locale, Translation> = {
@@ -553,8 +578,6 @@ export const translations: Record<Locale, Translation> = {
       explore: "Обзор",
       newSeason: "Новый сезон",
       yourWorkoutYourStyle: "Ваша тренировка, ваш стиль",
-      premiumHomeFitness:
-        "Премиальное оборудование для домашнего фитнеса, демонстрационный каталог в образовательных целях.",
       featuredProducts: "Рекомендуемые товары",
       shopByCategory: "Купить по категории",
       findYourTrainingSpace: "Найдите своё тренировочное пространство",
@@ -565,6 +588,7 @@ export const translations: Record<Locale, Translation> = {
       newArrivals: "Новинки",
       allProducts: "Все товары",
       forBusiness: "Для бизнеса",
+      premiumHomeFitness: "Беговые дорожки, велотренажёры, силовые станции и свободные веса для дома, фитнес-клубов и корпоративных залов. Доставка по России и СНГ.",
     },
     nav: {
       openMenu: "Открыть меню",
@@ -574,8 +598,6 @@ export const translations: Record<Locale, Translation> = {
       collections: "Коллекции",
       wellness: "Здоровье",
       design: "Дизайн",
-      stories: "Истории",
-      community: "Сообщество",
       cardio: "Кардиотренажеры",
       strength: "Силовые тренажёры",
       strengthStations: "Силовые станции",
@@ -587,20 +609,20 @@ export const translations: Record<Locale, Translation> = {
       accessories: "Аксессуары",
       explore: "Каталог",
       products: "Товары",
-      support: "Поддержка",
       company: "Компания",
-      about: "О нас",
-      sustainability: "Устойчивое развитие",
-      careers: "Карьера",
-      press: "Пресс-центр",
       contact: "Контакты",
-      customerSupport: "Поддержка клиентов",
-      shipping: "Доставка",
-      returns: "Возврат",
       privacy: "Политика конфиденциальности",
       cookiePolicy: "Политика cookie",
-      terms: "Условия использования",
-      salesConditions: "Условия продажи",
+      support: "Покупателям",
+      about: "О компании",
+      customerSupport: "Помощь покупателю",
+      shipping: "Доставка и оплата",
+      returns: "Обмен и возврат",
+      terms: "Пользовательское соглашение",
+      salesConditions: "Условия продажи (оферта)",
+      forBusiness: "Для бизнеса",
+      allProducts: "Все товары",
+      shippingShort: "Доставка и оплата",
     },
     categories: {
       treadmills: "Беговые дорожки",
@@ -644,13 +666,17 @@ export const translations: Record<Locale, Translation> = {
     },
     footer: {
       joinUs: "Присоединяйтесь к нам",
-      getTipsAndOffers:
-        "Получайте советы и предложения для достижения целей быстрее.",
       subscribePlaceholder: "Введите ваш email",
       subscribeButton: "Подписаться",
       socialLinks: "Мы в соцсетях",
-      legalDisclaimer:
-        "SPORT LINER — демонстрационный магазин. Образовательная демо-версия — общий контент, медиа-заглушки, тестовые товары.",
+
+      getTipsAndOffers: "Новинки, акции и советы по выбору оборудования — не чаще пары писем в месяц.",
+      contactsTitle: "Связаться с нами",
+      seller: "Продавец",
+      inn: "ИНН",
+      ogrn: "ОГРН",
+      rights: "Все права защищены.",
+      legalDisclaimer: "Характеристики, комплектация и внешний вид товаров могут быть изменены производителем. Актуальную информацию уточняйте у менеджера.",
     },
     product: {
       viewDetails: "Подробнее",
@@ -733,39 +759,40 @@ export const translations: Record<Locale, Translation> = {
       thanks: "Спасибо за подписку!",
     },
     info: {
-      demoNote:
-        "Это демонстрационная страница: содержимое приведено для примера.",
-      placeholderHeading: "Раздел-заготовка",
-      placeholderBody:
-        "Демонстрационный текст. Замените его реальным содержимым, когда потребуется.",
-      anotherHeading: "Ещё один раздел",
-      anotherBody:
-        "Ещё немного демонстрационного текста для наполнения макета.",
+      updated: "Редакция от {date}",
+      needHelp: "Остались вопросы?",
+      needHelpBody: "Позвоните или напишите нам — поможем подобрать оборудование и ответим по заказу.",
+      contactUs: "Связаться с нами",
+      phone: "Телефон",
+      email: "Email",
+      address: "Адрес",
+      hours: "Часы работы",
+      requisites: "Реквизиты",
+      writeUs: "Напишите нам",
+      messengers: "Мессенджеры и соцсети",
     },
     business: {
       eyebrow: "Для бизнеса",
       title: "Оснастите своё пространство",
-      lead: "Фитнес-клубы, отели, студии, корпоративные залы — расскажите о задаче, и менеджер подготовит предложение: подбор оборудования, проект зала, поставка и монтаж.",
       writeUs: "Напишите нам",
       company: "Компания",
       yourName: "Ваше имя",
       message: "Сообщение",
       send: "Отправить заявку",
       sent: "Заявка отправлена ✓",
-      sentBody:
-        "Спасибо, {name}. Это демоверсия, поэтому письмо никуда не уходит — но сценарий отрабатывает полностью.",
       errCompany: "Укажите название компании",
       errName: "Укажите ваше имя",
       errEmail: "Введите корректный email",
       errMessage: "Расскажите подробнее — не менее 10 символов",
       benefitPricing: "Оптовые цены",
-      benefitPricingBody: "Специальные условия для проектов и оптовых поставок.",
       benefitService: "Монтаж и сервис",
-      benefitServiceBody:
-        "Демонстрационные тарифы на установку, поддержку и обслуживание.",
       benefitContact: "Единая точка контакта",
       benefitContactBody:
         "Персональный менеджер — от первого письма до поставки.",
+      lead: "Фитнес-клубы, отели, студии, корпоративные залы — расскажите о задаче, и менеджер подготовит предложение: подбор оборудования, проект зала, поставка и монтаж.",
+      sentBody: "Спасибо, {name}! Менеджер свяжется с вами в рабочее время.",
+      benefitServiceBody: "Доставка, сборка и пусконаладка оборудования, гарантийное и сервисное обслуживание.",
+      benefitPricingBody: "Специальные условия для проектов и оптовых поставок.",
     },
     account: {
       title: "Личный кабинет",
@@ -901,10 +928,9 @@ export const translations: Record<Locale, Translation> = {
     },
     locale: {
       chooseCountry: "Выберите вашу страну",
-      browsingDemoStore: "Вы просматриваете демо-магазин ({country}).",
-      pickRegion: "Выберите регион для установки валюты.",
       language: "Язык",
       country: "Страна",
+
     },
     errors: {
       invalidData: "Проверьте правильность заполнения полей.",
@@ -915,6 +941,13 @@ export const translations: Record<Locale, Translation> = {
       server: "Ошибка сервера. Попробуйте позже.",
       network: "Не удалось связаться с сервером. Проверьте соединение.",
       tooMany: "Слишком много попыток. Подождите несколько минут и попробуйте снова.",
+      notFoundTitle: "Страница не найдена",
+      notFoundBody: "Возможно, страница была удалена или в адресе опечатка.",
+      crashTitle: "Что-то пошло не так",
+      crashBody: "Мы уже знаем о проблеме. Попробуйте обновить страницу или вернитесь позже.",
+      retry: "Попробовать снова",
+      toCatalog: "Перейти в каталог",
+      toHome: "На главную",
     },
     cookie: {
       message:
@@ -936,18 +969,17 @@ export const translations: Record<Locale, Translation> = {
       signInWithGoogle: "Войти через Google",
       orContinueWithEmail: "Или продолжить с email",
       welcomeBack: "С возвращением. Войдите, чтобы продолжить.",
-      registerLead:
-        "Зарегистрируйтесь в демомагазине, чтобы отслеживать заказы и оформлять покупки быстрее.",
-      forgotLead: "Укажите email, чтобы получить код для сброса пароля.",
       resetLead: "Вставьте код сброса и задайте новый пароль.",
       confirmPassword: "Подтвердите пароль",
       resetToken: "Код сброса",
       passwordUpdated: "Пароль обновлён",
       passwordUpdatedBody: "Пароль изменён. Теперь вы можете войти.",
-      demoToken: "Демонстрационный код",
       continueToReset: "Перейти к созданию нового пароля →",
       demoShopper: "Покупатель",
       demoAdmin: "Администратор",
+      registerLead: "Зарегистрируйтесь, чтобы видеть историю заказов и оформлять покупки быстрее.",
+      forgotLead: "Укажите email — мы отправим ссылку для сброса пароля.",
+      demoToken: "Тестовый режим: код сброса",
     },
     checkout: {
       checkout: "Оформление заказа",
@@ -982,17 +1014,18 @@ export const translations: Record<Locale, Translation> = {
       payOnlineHint: "Оплата на защищённой странице ЮKassa. Данные карты не передаются магазину.",
       placeOrderPay: "Перейти к оплате",
       orderNumber: "Номер заказа",
-      whatNext: "Менеджер свяжется с вами в рабочее время, чтобы подтвердить заказ и согласовать доставку. Детали заказа отправлены на {email}.",
       paymentPending: "Оплата не завершена",
       paymentPendingBody: "Заказ сохранён. Если вы закрыли страницу оплаты или платёж не прошёл — попробуйте ещё раз или дождитесь звонка менеджера.",
       payAgain: "Оплатить заказ",
       paid: "Заказ оплачен",
-      paidBody: "Оплата получена. Менеджер свяжется с вами, чтобы согласовать доставку. Чек отправлен на {email}.",
       orderNotFound: "Заказ не найден",
       currencyNote: "Оплата производится в российских рублях. Суммы в других валютах — ориентировочные.",
       deliveryCostNote: "Стоимость доставки рассчитывается отдельно — менеджер сообщит её до оплаты.",
       toAccount: "Мои заказы",
       continueShopping: "Продолжить покупки",
+      whatNext: "Менеджер свяжется с вами в рабочее время, чтобы подтвердить заказ и согласовать доставку. Сохраните номер заказа — он понадобится для связи с нами.",
+      paidBody: "Оплата получена. Менеджер свяжется с вами, чтобы согласовать доставку.",
+      emailSent: "Подтверждение отправлено на {email}.",
     },
     cart: {
       title: "Корзина",
@@ -1004,7 +1037,6 @@ export const translations: Record<Locale, Translation> = {
       summary: "Сумма заказа",
       subtotal: "Товары",
       shipping: "Доставка",
-      shippingAtCheckout: "Рассчитывается при оформлении",
       taxes: "Налоги",
       total: "Итого",
       checkout: "Перейти к оформлению",
@@ -1014,12 +1046,23 @@ export const translations: Record<Locale, Translation> = {
       increase: "Увеличить количество",
       decrease: "Уменьшить количество",
       closeCart: "Закрыть корзину",
+      shippingAtCheckout: "Рассчитает менеджер",
     },
     legal: {
       consentPrefix: "Я даю согласие на обработку персональных данных в соответствии с",
       privacyLink: "Политикой конфиденциальности",
-      consentNewsletter: "Согласен получать новости и предложения магазина. Отписаться можно в любой момент.",
       consentRequired: "Необходимо ваше согласие",
+      consentNewsletter: "Соглашаюсь получать новости и предложения магазина (отписаться можно в любой момент) в соответствии с",
+    },
+    search: {
+      title: "Поиск",
+      placeholder: "Название, бренд или тип тренажёра",
+      submit: "Найти",
+      found: "Найдено: {count}",
+      nothing: "По запросу «{q}» ничего не найдено",
+      nothingHint: "Проверьте написание или посмотрите весь каталог.",
+      hint: "Например: беговая дорожка, скамья, Technogym",
+      openSearch: "Поиск по каталогу",
     },
   },
   en: {
@@ -1044,8 +1087,6 @@ export const translations: Record<Locale, Translation> = {
       explore: "Explore",
       newSeason: "New season",
       yourWorkoutYourStyle: "Your workout, your style",
-      premiumHomeFitness:
-        "Premium home fitness equipment, mock catalog for an educational demo.",
       featuredProducts: "Featured products",
       shopByCategory: "Shop by category",
       findYourTrainingSpace: "Find your training space",
@@ -1056,6 +1097,7 @@ export const translations: Record<Locale, Translation> = {
       newArrivals: "New arrivals",
       allProducts: "All products",
       forBusiness: "For business",
+      premiumHomeFitness: "Treadmills, bikes, strength stations and free weights for home, gyms and corporate fitness rooms. Delivery across Russia and the CIS.",
     },
     nav: {
       openMenu: "Open menu",
@@ -1065,8 +1107,6 @@ export const translations: Record<Locale, Translation> = {
       collections: "Collections",
       wellness: "Wellness",
       design: "Design",
-      stories: "Stories",
-      community: "Community",
       cardio: "Cardio",
       strength: "Strength",
       strengthStations: "Strength stations",
@@ -1078,20 +1118,20 @@ export const translations: Record<Locale, Translation> = {
       accessories: "Accessories",
       explore: "Explore",
       products: "Products",
-      support: "Support",
       company: "Company",
-      about: "About",
-      sustainability: "Sustainability",
-      careers: "Careers",
-      press: "Press",
       contact: "Contact",
-      customerSupport: "Customer support",
-      shipping: "Shipping",
-      returns: "Returns",
       privacy: "Privacy policy",
       cookiePolicy: "Cookie policy",
-      terms: "Terms & conditions",
+      support: "Customers",
+      about: "About us",
+      customerSupport: "Help & FAQ",
+      shipping: "Shipping & payment",
+      returns: "Returns & warranty",
+      terms: "Terms of use",
       salesConditions: "Sales conditions",
+      forBusiness: "For business",
+      allProducts: "All products",
+      shippingShort: "Delivery",
     },
     categories: {
       treadmills: "Treadmills",
@@ -1135,12 +1175,17 @@ export const translations: Record<Locale, Translation> = {
     },
     footer: {
       joinUs: "Join us",
-      getTipsAndOffers: "Get tips and offers to reach your goals faster.",
       subscribePlaceholder: "Enter your email",
       subscribeButton: "Subscribe",
       socialLinks: "Follow us",
-      legalDisclaimer:
-        "SPORT LINER is a demo store. Educational demo only — generic content, placeholder media, mock products.",
+
+      getTipsAndOffers: "New arrivals, offers and equipment tips — a couple of emails a month at most.",
+      contactsTitle: "Contact us",
+      seller: "Seller",
+      inn: "INN",
+      ogrn: "OGRN",
+      rights: "All rights reserved.",
+      legalDisclaimer: "Specifications, configuration and appearance may be changed by the manufacturer. Please confirm the details with a manager.",
     },
     product: {
       viewDetails: "View details",
@@ -1223,34 +1268,39 @@ export const translations: Record<Locale, Translation> = {
       thanks: "Thanks for subscribing!",
     },
     info: {
-      demoNote: "This is an educational demo page with generic placeholder content.",
-      placeholderHeading: "Placeholder section",
-      placeholderBody: "Generic demo copy. Replace with real content when needed.",
-      anotherHeading: "Another section",
-      anotherBody: "More generic demo copy to fill the layout.",
+      updated: "Version of {date}",
+      needHelp: "Still have questions?",
+      needHelpBody: "Call or write to us — we will help you choose equipment and answer any order questions.",
+      contactUs: "Contact us",
+      phone: "Phone",
+      email: "Email",
+      address: "Address",
+      hours: "Working hours",
+      requisites: "Legal details",
+      writeUs: "Write to us",
+      messengers: "Messengers and social media",
     },
     business: {
       eyebrow: "For business",
       title: "Outfit your space",
-      lead: "Gyms, hotels, studios and corporate fitness rooms — tell us what you need and a manager will prepare an offer: equipment selection, gym layout, delivery and installation.",
       writeUs: "Write us a letter",
       company: "Company",
       yourName: "Your name",
       message: "Message",
       send: "Send letter",
       sent: "Letter sent ✓",
-      sentBody:
-        "Thanks, {name}. This is a demo, so no email actually leaves your machine — but the flow works.",
       errCompany: "Enter your company",
       errName: "Enter your name",
       errEmail: "Enter a valid email",
       errMessage: "Tell us a little more (min 10 chars)",
       benefitPricing: "Volume pricing",
-      benefitPricingBody: "Special terms for projects and bulk orders.",
       benefitService: "Install & service",
-      benefitServiceBody: "Delivery, assembly and commissioning, warranty and after-sales service.",
       benefitContact: "One point of contact",
       benefitContactBody: "A named account manager from first letter to delivery.",
+      lead: "Gyms, hotels, studios and corporate fitness rooms — tell us what you need and a manager will prepare an offer: equipment selection, gym layout, delivery and installation.",
+      sentBody: "Thank you, {name}! A manager will contact you during business hours.",
+      benefitServiceBody: "Delivery, assembly and commissioning, warranty and after-sales service.",
+      benefitPricingBody: "Special terms for projects and bulk orders.",
     },
     account: {
       title: "My account",
@@ -1386,10 +1436,9 @@ export const translations: Record<Locale, Translation> = {
     },
     locale: {
       chooseCountry: "Choose your country",
-      browsingDemoStore: "You are browsing the {country} demo store.",
-      pickRegion: "Pick a region to set the currency.",
       language: "Language",
       country: "Country",
+
     },
     errors: {
       invalidData: "Please check the values you entered.",
@@ -1400,6 +1449,13 @@ export const translations: Record<Locale, Translation> = {
       server: "Server error. Please try again later.",
       network: "Could not reach the server. Check your connection.",
       tooMany: "Too many attempts. Please wait a few minutes and try again.",
+      notFoundTitle: "Page not found",
+      notFoundBody: "The page may have been removed, or the address has a typo.",
+      crashTitle: "Something went wrong",
+      crashBody: "Please try reloading the page or come back later.",
+      retry: "Try again",
+      toCatalog: "Go to catalog",
+      toHome: "Home",
     },
     cookie: {
       message:
@@ -1421,18 +1477,17 @@ export const translations: Record<Locale, Translation> = {
       signInWithGoogle: "Sign in with Google",
       orContinueWithEmail: "Or continue with email",
       welcomeBack: "Welcome back. Sign in to continue.",
-      registerLead:
-        "Join the demo store to track orders and check out faster.",
-      forgotLead: "Enter your email to generate a reset token.",
       resetLead: "Paste your reset token and choose a new password.",
       confirmPassword: "Confirm password",
       resetToken: "Reset token",
       passwordUpdated: "Password updated",
       passwordUpdatedBody: "Your password has been changed. You can now sign in.",
-      demoToken: "Demo token",
       continueToReset: "Continue to set a new password →",
       demoShopper: "Shopper",
       demoAdmin: "Admin",
+      registerLead: "Create an account to see your order history and check out faster.",
+      forgotLead: "Enter your email and we will send you a password reset link.",
+      demoToken: "Test mode: reset code",
     },
     checkout: {
       checkout: "Checkout",
@@ -1467,17 +1522,18 @@ export const translations: Record<Locale, Translation> = {
       payOnlineHint: "Payment on the secure YooKassa page. Card details are never shared with the store.",
       placeOrderPay: "Proceed to payment",
       orderNumber: "Order number",
-      whatNext: "A manager will contact you during business hours to confirm the order and arrange delivery. Order details were sent to {email}.",
       paymentPending: "Payment not completed",
       paymentPendingBody: "Your order is saved. If you closed the payment page or the payment failed, try again or wait for our manager to call.",
       payAgain: "Pay for the order",
       paid: "Order paid",
-      paidBody: "Payment received. A manager will contact you to arrange delivery. The receipt was sent to {email}.",
       orderNotFound: "Order not found",
       currencyNote: "Payment is made in Russian roubles. Amounts in other currencies are approximate.",
       deliveryCostNote: "Delivery is calculated separately — a manager will confirm the cost before payment.",
       toAccount: "My orders",
       continueShopping: "Continue shopping",
+      whatNext: "A manager will contact you during business hours to confirm the order and arrange delivery. Keep the order number for reference.",
+      paidBody: "Payment received. A manager will contact you to arrange delivery.",
+      emailSent: "A confirmation was sent to {email}.",
     },
     cart: {
       title: "Cart",
@@ -1489,7 +1545,6 @@ export const translations: Record<Locale, Translation> = {
       summary: "Summary",
       subtotal: "Subtotal",
       shipping: "Shipping",
-      shippingAtCheckout: "Calculated at checkout",
       taxes: "Taxes",
       total: "Total",
       checkout: "Checkout",
@@ -1499,12 +1554,23 @@ export const translations: Record<Locale, Translation> = {
       increase: "Increase quantity",
       decrease: "Decrease quantity",
       closeCart: "Close cart",
+      shippingAtCheckout: "Confirmed by a manager",
     },
     legal: {
       consentPrefix: "I consent to the processing of my personal data in accordance with the",
       privacyLink: "Privacy policy",
-      consentNewsletter: "I agree to receive store news and offers. You can unsubscribe at any time.",
       consentRequired: "Your consent is required",
+      consentNewsletter: "I agree to receive store news and offers (unsubscribe at any time) in accordance with the",
+    },
+    search: {
+      title: "Search",
+      placeholder: "Name, brand or equipment type",
+      submit: "Search",
+      found: "Found: {count}",
+      nothing: "Nothing found for “{q}”",
+      nothingHint: "Check the spelling or browse the whole catalog.",
+      hint: "For example: treadmill, bench, Technogym",
+      openSearch: "Search the catalog",
     },
   },
 };

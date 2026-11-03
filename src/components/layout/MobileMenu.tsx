@@ -11,6 +11,7 @@ import { LOCALES } from "@/i18n/translations";
 import { useHydrated } from "@/lib/use-hydrated";
 import { Logo } from "./Logo";
 import type { SessionUser } from "@/lib/auth";
+import { phoneHref } from "@/lib/settings-shape";
 
 const FOCUSABLE = "a[href], button:not([disabled]), select";
 
@@ -21,7 +22,14 @@ const FOCUSABLE = "a[href], button:not([disabled]), select";
  * The footer carries the language/country switcher and auth actions that are
  * hidden from the mobile header.
  */
-export function MobileMenu({ user }: { user: SessionUser | null }) {
+export function MobileMenu({
+  user,
+  phone,
+}: {
+  user: SessionUser | null;
+  /** Store phone from the settings; shown as a call button. */
+  phone?: string;
+}) {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -139,16 +147,15 @@ export function MobileMenu({ user }: { user: SessionUser | null }) {
                         </Link>
                       </li>
                     ))}
-                    <li>
-                      <Link
-                        href="/business"
-                        onClick={close}
-                        className="block text-lg font-black uppercase tracking-wide"
-                      >
-                        {t("common.forBusiness")}
-                      </Link>
-                    </li>
                   </ul>
+                  {phone && (
+                    <a
+                      href={phoneHref(phone)}
+                      className="mt-6 block rounded-full bg-accent px-5 py-3 text-center text-base font-black text-ink"
+                    >
+                      {phone}
+                    </a>
+                  )}
 
                   {shopColumns.map((col, ci) => (
                     <motion.div
