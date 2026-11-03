@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { productSchema, type ProductInput } from "@/schemas/product";
+import {
+  productSchema,
+  splitLines,
+  type ProductInput,
+} from "@/schemas/product";
 import { field, fieldError } from "@/components/auth/AuthCard";
 import { useTranslation } from "@/i18n/useTranslation";
 import { errorKeyForStatus } from "@/i18n/translations";
@@ -22,6 +26,7 @@ export type ProductFormValues = {
   categoryId: string;
   badge: string;
   features: string;
+  images: string;
   inStock: boolean;
   priceOnRequest: boolean;
 };
@@ -39,9 +44,16 @@ export function ProductForm({
   const isEdit = Boolean(initial?.id);
   const [serverError, setServerError] = useState<string | null>(null);
 
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
+    getValues,
+    setValue,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ProductInput>({
     resolver: zodResolver(productSchema),
@@ -55,10 +67,40 @@ export function ProductForm({
       categoryId: initial?.categoryId ?? categories[0]?.id ?? "",
       badge: initial?.badge ?? "",
       features: initial?.features ?? "",
+      images: initial?.images ?? "",
       inStock: initial?.inStock ?? true,
       priceOnRequest: initial?.priceOnRequest ?? false,
     },
   });
+
+  const imageList = splitLines(useWatch({ control, name: "images" }));
+
+  async function upload(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    setUploadError(null);
+    const body = new FormData();
+    for (const f of Array.from(files)) body.append("files", f);
+    const res = await fetch("/api/admin/uploads", { method: "POST", body }).catch(
+      () => null,
+    );
+    setUploading(false);
+    if (fileInput.current) fileInput.current.value = "";
+    if (!res?.ok) {
+      const json = (await res?.json().catch(() => ({}))) as { error?: string } | undefined;
+      setUploadError(json?.error ?? t("admin.errUpload"));
+      return;
+    }
+    const { urls } = (await res.json()) as { urls: string[] };
+    // Drop the stock placeholder once a real photo is added.
+    const current = splitLines(getValues("images")).filter(
+      (u) => !u.startsWith("/placeholders/"),
+    );
+    setValue("images", [...current, ...urls].join("\n"), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }
 
   const onSubmit = handleSubmit(async (data) => {
     setServerError(null);
@@ -74,7 +116,7 @@ export function ProductForm({
       router.push("/admin/products");
       router.refresh();
     } else {
-        setServerError(t(errorKeyForStatus(res.status)));
+      setServerError(t(errorKeyForStatus(res.status)));
     }
   });
 
@@ -173,6 +215,54 @@ export function ProductForm({
           {t("admin.featuresPerLine")}
         </label>
         <textarea rows={4} className={field} {...register("features")} />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-xs font-bold uppercase">
+          {t("admin.images")}
+        </label>
+        {imageList.length > 0 && (
+          <ul className="mb-2 flex flex-wrap gap-2">
+            {imageList.map((src, i) => (
+              <li
+                key={`${src}-${i}`}
+                className={`h-20 w-20 overflow-hidden rounded-lg border bg-mist ${
+                  i === 0 ? "border-ink" : "border-stone"
+                }`}
+              >
+                {/* Plain <img>: arbitrary admin-entered URLs, preview only. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt="" className="h-full w-full object-cover" />
+              </li>
+            ))}
+          </ul>
+        )}
+        <textarea
+          rows={3}
+          className={`${field} font-mono text-xs`}
+          {...register("images")}
+        />
+        {errors.images && <p className={fieldError}>{errors.images.message}</p>}
+        <div className="mt-2 flex flex-wrap items-center gap-3">
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            className="hidden"
+            onChange={(e) => upload(e.target.files)}
+          />
+          <button
+            type="button"
+            disabled={uploading}
+            onClick={() => fileInput.current?.click()}
+            className="hover-lift rounded-full border border-ink px-4 py-2 text-xs font-bold uppercase disabled:opacity-50"
+          >
+            {uploading ? t("admin.uploading") : t("admin.uploadImages")}
+          </button>
+          <span className="text-xs text-ink-soft">{t("admin.uploadHint")}</span>
+        </div>
+        {uploadError && <p className={fieldError}>{uploadError}</p>}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

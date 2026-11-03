@@ -8,7 +8,10 @@ import { forgotSchema, type ForgotInput } from "@/schemas/auth";
 import { AuthCard, field, fieldError } from "@/components/auth/AuthCard";
 import { useTranslation } from "@/i18n/useTranslation";
 
-/** Step 1 of the local reset flow: request a token (shown on-screen in demo). */
+/**
+ * Step 1 of the reset flow: request a reset link by email. When the server runs
+ * in test mode (DEMO_EXPOSE_RESET_TOKEN) the token is shown on screen instead.
+ */
 export function ForgotForm() {
   const t = useTranslation();
   const [token, setToken] = useState<string | null>(null);
@@ -41,7 +44,12 @@ export function ForgotForm() {
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("auth.email")}
           </label>
-          <input className={field} type="email" {...register("email")} />
+          <input
+            className={field}
+            type="email"
+            autoComplete="email"
+            {...register("email")}
+          />
           {errors.email && <p className={fieldError}>{errors.email.message}</p>}
         </div>
 

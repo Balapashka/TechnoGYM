@@ -10,6 +10,7 @@ import { Reveal } from "@/components/motion/Reveal";
 export type AccountOrderItem = {
   id: string;
   nameSnapshot: string;
+  variantName: string | null;
   quantity: number;
   priceCents: number;
 };
@@ -17,6 +18,8 @@ export type AccountOrderItem = {
 /** Order as serialized by the account page for the client view. */
 export type AccountOrder = {
   id: string;
+  /** Short number customers quote to the manager, see orderNumber(). */
+  number: string;
   status: string;
   /** Pre-formatted on the server so the list matches the rendered HTML. */
   createdAtLabel: string;
@@ -29,6 +32,7 @@ const statusStyle: Record<string, string> = {
   PAID: "bg-green-100 text-green-800",
   PENDING: "bg-amber-100 text-amber-800",
   SHIPPED: "bg-blue-100 text-blue-800",
+  DELIVERED: "bg-mist text-ink",
   CANCELLED: "bg-red-100 text-red-700",
 };
 
@@ -99,7 +103,7 @@ export function AccountView({
               <div className="rounded-2xl border border-stone p-5">
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone pb-3">
                   <div>
-                    <span className="font-mono text-sm">{order.id}</span>
+                    <span className="font-mono text-sm font-bold">№{order.number}</span>
                     <span className="ml-3 text-xs text-ink-soft">
                       {order.createdAtLabel}
                     </span>
@@ -119,11 +123,12 @@ export function AccountView({
                 </div>
                 <ul className="mt-3 space-y-1 text-sm text-ink-soft">
                   {order.items.map((it) => (
-                    <li key={it.id} className="flex justify-between">
+                    <li key={it.id} className="flex justify-between gap-4">
                       <span>
-                        {it.nameSnapshot} × {it.quantity}
+                        {it.nameSnapshot}
+                        {it.variantName ? ` · ${it.variantName}` : ""} × {it.quantity}
                       </span>
-                      <span>
+                      <span className="whitespace-nowrap">
                         {formatPrice(it.priceCents * it.quantity, order.currency)}
                       </span>
                     </li>

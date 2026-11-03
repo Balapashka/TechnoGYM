@@ -3,9 +3,13 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/schemas/auth";
 import { createSession } from "@/lib/auth";
+import { limitRequest } from "@/lib/rate-limit";
 
 /** POST /api/auth/register — create a USER account and start a session. */
 export async function POST(request: Request) {
+  const limited = limitRequest(request, "register", 5, 60 * 60_000);
+  if (limited) return limited;
+
   const json = await request.json().catch(() => null);
   const parsed = registerSchema.safeParse(json);
   if (!parsed.success) {

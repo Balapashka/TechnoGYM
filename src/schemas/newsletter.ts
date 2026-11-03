@@ -1,7 +1,11 @@
 import { z } from "zod";
+import { emailField } from "./auth";
 
 export const newsletterSchema = z.object({
-  email: z.string().min(1, "Укажите email").email("Введите корректный email"),
+  email: emailField,
+  consent: z.literal(true, {
+    message: "Необходимо согласие на получение рассылки",
+  }),
 });
 
-export type NewsletterInput = z.infer<typeof newsletterSchema>;
+export type NewsletterInput = z.input<typeof newsletterSchema>;

@@ -38,3 +38,6 @@ npm-debug.log*
 # System files
 .DS_Store
 Thumbs.db
+
+# Uploaded product photos and the Docker data volume when run locally
+data/

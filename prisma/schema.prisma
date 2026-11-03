@@ -107,20 +107,43 @@ model Order {
   status     OrderStatus @default(PENDING)
   totalCents Int
   currency   String      @default("RUB")
+  /// Customer contact and delivery details captured at checkout.
+  customerName   String  @default("")
+  phone          String  @default("")
+  /// "delivery" (to the address below) or "pickup" (from the store's warehouse).
+  deliveryMethod String  @default("delivery")
+  country        String  @default("RU")
+  city           String  @default("")
+  address        String  @default("")
+  postalCode     String  @default("")
+  comment        String?
+  /// "manual" (the manager confirms and arranges payment) or "online" (YooKassa).
+  paymentMethod  String  @default("manual")
+  /// Payment provider id (YooKassa payment id) for online payments.
+  paymentId      String?
+  /// Internal note visible only in the admin panel.
+  adminNote      String?
   createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @default(now()) @updatedAt
   user       User?       @relation(fields: [userId], references: [id])
   items      OrderItem[]
+
+  @@index([createdAt])
 }
 
 model OrderItem {
   id           String  @id @default(cuid())
   orderId      String
-  productId    String
+  /// Null once the product is deleted from the catalog; the snapshots below
+  /// keep the order readable.
+  productId    String?
   nameSnapshot String
+  /// Selected configuration at the time of the order, e.g. "Pro".
+  variantName  String?
   priceCents   Int
   quantity     Int
-  product      Product @relation(fields: [productId], references: [id])
-  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 /// Lead captured by the "Запросить цену" form on quote-only products
@@ -131,6 +154,8 @@ model QuoteRequest {
   productId String?
   /// Product name at the time of the request; kept if the product is removed.
   productName String
+  /// Where the lead came from: "product" (price request), "business" or "contact".
+  source    String             @default("product")
   name      String
   phone     String
   email     String?
@@ -152,5 +177,22 @@ enum OrderStatus {
   PENDING
   PAID
   SHIPPED
+  DELIVERED
   CANCELLED
+}
+
+/// Newsletter subscription from the footer form.
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+/// Store settings editable in the admin panel (contacts, legal details,
+/// socials). Key/value so a new setting needs no migration; defaults live in
+/// src/lib/settings.ts.
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @default(now()) @updatedAt
 }

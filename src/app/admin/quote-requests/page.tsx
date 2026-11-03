@@ -4,11 +4,11 @@ import { QuoteRequestsTable } from "@/components/admin/QuoteRequestsTable";
 
 export const dynamic = "force-dynamic";
 
-/** Price requests left by shoppers on made-to-order (price on request) products. */
+/** Leads: price requests on made-to-order products plus the contact / B2B forms. */
 export default async function AdminQuoteRequestsPage() {
   const requests = await prisma.quoteRequest.findMany({
     orderBy: { createdAt: "desc" },
-    take: 100,
+    take: 300,
   });
 
   return (
@@ -19,6 +19,7 @@ export default async function AdminQuoteRequestsPage() {
           id: r.id,
           productId: r.productId,
           productName: r.productName,
+          source: r.source,
           name: r.name,
           phone: r.phone,
           email: r.email,
@@ -27,6 +28,7 @@ export default async function AdminQuoteRequestsPage() {
           createdAtLabel: r.createdAt.toLocaleString("ru-RU", {
             dateStyle: "short",
             timeStyle: "short",
+            timeZone: "Europe/Moscow",
           }),
         }))}
       />

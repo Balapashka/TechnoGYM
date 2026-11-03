@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n/useTranslation";
+import { LEAD_STATUSES } from "@/lib/order-format";
+import { phoneHref } from "@/lib/settings-shape";
 
 /** Quote request as serialized by the admin page for the client table. */
 export type QuoteRequestRow = {
@@ -9,6 +13,8 @@ export type QuoteRequestRow = {
   /** Null once the product is deleted — the name snapshot still stands. */
   productId: string | null;
   productName: string;
+  /** "product" | "business" | "contact" */
+  source: string;
   name: string;
   phone: string;
   email: string | null;
@@ -31,6 +37,36 @@ const statusStyle: Record<string, string> = {
  */
 export function QuoteRequestsTable({ rows }: { rows: QuoteRequestRow[] }) {
   const t = useTranslation();
+  const router = useRouter();
+  const [busy, setBusy] = useState<string | null>(null);
+
+  async function update(id: string, status: string) {
+    setBusy(id);
+    await fetch(`/api/admin/quote-requests/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    }).catch(() => null);
+    setBusy(null);
+    router.refresh();
+  }
+
+  async function remove(row: QuoteRequestRow) {
+    if (!confirm(t("admin.confirmDelete", { name: row.name }))) return;
+    setBusy(row.id);
+    await fetch(`/api/admin/quote-requests/${row.id}`, { method: "DELETE" }).catch(
+      () => null,
+    );
+    setBusy(null);
+    router.refresh();
+  }
+
+  const sourceLabel = (s: string) =>
+    s === "business"
+      ? t("admin.sourceBusiness")
+      : s === "contact"
+        ? t("admin.sourceContact")
+        : t("admin.sourceProduct");
 
   if (rows.length === 0) {
     return (
@@ -59,15 +95,34 @@ export function QuoteRequestsTable({ rows }: { rows: QuoteRequestRow[] }) {
                   <span className="whitespace-nowrap text-ink-soft">
                     {row.createdAtLabel}
                   </span>
-                  <span
-                    className={`mt-1 block w-fit rounded-full px-2 py-0.5 text-xs font-bold uppercase ${
+                  <select
+                    aria-label={t("admin.status")}
+                    value={row.status}
+                    disabled={busy === row.id}
+                    onChange={(e) => update(row.id, e.target.value)}
+                    className={`mt-1 block rounded-full border-0 px-2 py-0.5 text-xs font-bold uppercase ${
                       statusStyle[row.status] ?? "bg-mist text-ink"
                     }`}
                   >
-                    {row.status}
-                  </span>
+                    {LEAD_STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {t(`admin.lead${s}`)}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => remove(row)}
+                    disabled={busy === row.id}
+                    className="mt-2 block text-xs text-ink-soft underline hover:text-red-600"
+                  >
+                    {t("admin.delete")}
+                  </button>
                 </td>
                 <td className="px-4 py-3 font-semibold">
+                  <span className="mb-1 block text-xs font-normal uppercase tracking-wide text-ink-soft">
+                    {sourceLabel(row.source)}
+                  </span>
                   {row.productId ? (
                     <Link
                       href={`/admin/products/${row.productId}/edit`}
@@ -82,7 +137,7 @@ export function QuoteRequestsTable({ rows }: { rows: QuoteRequestRow[] }) {
                 <td className="px-4 py-3">
                   <span className="block font-semibold">{row.name}</span>
                   <a
-                    href={`tel:${row.phone.replace(/[^\d+]/g, "")}`}
+                    href={phoneHref(row.phone)}
                     className="block whitespace-nowrap underline hover:text-ink-soft"
                   >
                     {row.phone}

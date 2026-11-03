@@ -1,17 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { productSchema } from "@/schemas/product";
+import { productSchema, splitLines } from "@/schemas/product";
 import { packList } from "@/lib/json";
 import { resolveMediaSrc } from "@/lib/media";
 import { BASE_CURRENCY } from "@/lib/format";
 
-function featuresToList(raw?: string): string[] {
-  return (raw ?? "")
-    .split("\n")
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
 
 /** POST /api/admin/products — create a product (admin only). */
 export async function POST(request: Request) {
@@ -39,6 +33,14 @@ export async function POST(request: Request) {
     );
   }
 
+  const category = await prisma.category.findUnique({
+    where: { id: parsed.data.categoryId },
+    select: { id: true },
+  });
+  if (!category) {
+    return NextResponse.json({ error: "Unknown category" }, { status: 400 });
+  }
+
   const created = await prisma.product.create({
     data: {
       name: parsed.data.name,
@@ -48,12 +50,12 @@ export async function POST(request: Request) {
       currency: BASE_CURRENCY,
       brand: parsed.data.brand,
       originCountry: parsed.data.originCountry,
-      images: packList([
-        resolveMediaSrc("productCard"),
-        resolveMediaSrc("productGallery"),
-        resolveMediaSrc("productGallery"),
-      ]),
-      features: packList(featuresToList(parsed.data.features)),
+      images: packList(
+        splitLines(parsed.data.images).length > 0
+          ? splitLines(parsed.data.images)
+          : [resolveMediaSrc("productCard")],
+      ),
+      features: packList(splitLines(parsed.data.features)),
       badge: parsed.data.badge || null,
       inStock: parsed.data.inStock,
       priceOnRequest: parsed.data.priceOnRequest,

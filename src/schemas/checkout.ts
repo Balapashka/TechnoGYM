@@ -1,7 +1,13 @@
 import { z } from "zod";
 import { BASE_CURRENCY } from "@/lib/format";
-import { expiryInFuture, luhnValid } from "@/lib/card";
 import { CITY_PATTERN, CITY_ERROR_MESSAGE, normalizeCity } from "@/lib/city";
+import { emailField } from "@/schemas/auth";
+import {
+  normalizePhone,
+  PHONE_ERROR_MESSAGE,
+  PHONE_INPUT_PATTERN,
+  PHONE_PATTERN,
+} from "@/schemas/quote";
 
 /**
  * Countries a checkout can ship to — must stay in sync with `COUNTRIES` in
@@ -35,64 +41,79 @@ export const POSTAL_CODE_RULES: Record<
 const NAME_PATTERN =
   /^[A-Za-zА-Яа-яЁё]+(?:[ '-][A-Za-zА-Яа-яЁё]+)*$/;
 
+/** Shared phone rules (same as the price-request form). */
+const phoneField = z
+  .string()
+  .trim()
+  .min(1, PHONE_ERROR_MESSAGE)
+  .regex(PHONE_INPUT_PATTERN, PHONE_ERROR_MESSAGE)
+  .transform(normalizePhone)
+  .pipe(z.string().regex(PHONE_PATTERN, PHONE_ERROR_MESSAGE));
+
+export const DELIVERY_METHODS = ["delivery", "pickup"] as const;
+export type DeliveryMethod = (typeof DELIVERY_METHODS)[number];
+
+/**
+ * "manual": the order is placed without payment; a manager confirms stock,
+ * delivery cost and sends a payment link / invoice. "online": pay by card on
+ * ЮKassa's page right after checkout (only offered when ЮKassa is configured).
+ * Card details are never entered on this site.
+ */
+export const PAYMENT_METHODS = ["manual", "online"] as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+
 export const checkoutSchema = z
   .object({
-    email: z
-      .string()
-      .trim()
-      .min(1, "Укажите email")
-      .pipe(z.email("Введите корректный email")),
+    email: emailField,
     fullName: z
       .string()
       .trim()
       .min(1, "Укажите имя и фамилию")
+      .max(100, "Слишком длинное имя")
       .regex(NAME_PATTERN, "Только буквы, пробелы и дефис")
       .refine(
         (v) => v.split(/\s+/).length >= 2,
         "Укажите имя и фамилию через пробел",
       ),
-    address: z.string().trim().min(5, "Адрес — минимум 5 символов"),
-    // Double spaces are collapsed and the first letter capitalized before
-    // validation, so " москва " parses to "Москва".
-    city: z
-      .string()
-      .transform(normalizeCity)
-      .pipe(
-        z
-          .string()
-          .min(2, "Укажите город")
-          .regex(CITY_PATTERN, CITY_ERROR_MESSAGE),
-      ),
-    postalCode: z.string().trim().min(1, "Укажите почтовый индекс"),
+    phone: phoneField,
+    deliveryMethod: z.enum(DELIVERY_METHODS),
     country: z.enum(CHECKOUT_COUNTRY_CODES, { message: "Выберите страну" }),
-    // Fake card details — demo only, never stored (see /api/checkout).
-    cardName: z
+    // Address fields are required for delivery only (see superRefine below);
+    // for pickup they may stay empty.
+    city: z.string().max(100).transform(normalizeCity),
+    address: z.string().trim().max(300, "Слишком длинный адрес"),
+    postalCode: z.string().trim().max(10),
+    comment: z
       .string()
       .trim()
-      .min(2, "Укажите имя на карте")
-      .regex(
-        /^[A-Za-z]+(?: [A-Za-z]+)*$/,
-        "Только латинские буквы и пробелы",
-      )
-      .transform((s) => s.toUpperCase()),
-    cardNumber: z
-      .string()
-      .transform((s) => s.replace(/\s+/g, ""))
-      .pipe(
-        z
-          .string()
-          .regex(/^\d{16}$/, "Введите 16 цифр номера карты")
-          .refine(luhnValid, "Проверьте номер карты"),
-      ),
-    cardExpiry: z
-      .string()
-      .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Формат ММ/ГГ")
-      .refine((v) => expiryInFuture(v), "Срок действия карты истёк"),
-    cardCvc: z.string().regex(/^\d{3,4}$/, "3–4 цифры"),
+      .max(1000, "Комментарий — не более 1000 символов")
+      .optional(),
+    paymentMethod: z.enum(PAYMENT_METHODS),
+    consent: z.literal(true, {
+      message: "Необходимо согласие на обработку персональных данных",
+    }),
   })
   .superRefine((data, ctx) => {
+    if (data.deliveryMethod !== "delivery") return;
+
+    if (data.city.length < 2) {
+      ctx.addIssue({ code: "custom", path: ["city"], message: "Укажите город" });
+    } else if (!CITY_PATTERN.test(data.city)) {
+      ctx.addIssue({ code: "custom", path: ["city"], message: CITY_ERROR_MESSAGE });
+    }
+
+    if (data.address.length < 5) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["address"],
+        message: "Укажите улицу, дом и квартиру/офис",
+      });
+    }
+
+    // The postal code is optional (many people do not know theirs), but a
+    // value that is entered must match the country's format.
     const rule = POSTAL_CODE_RULES[data.country];
-    if (rule && !rule.pattern.test(data.postalCode)) {
+    if (data.postalCode && rule && !rule.pattern.test(data.postalCode)) {
       ctx.addIssue({
         code: "custom",
         path: ["postalCode"],
@@ -112,9 +133,9 @@ export type CheckoutOutput = z.output<typeof checkoutSchema>;
  * tampered payload cannot change what an order costs.
  */
 export const checkoutItemSchema = z.object({
-  productId: z.string().min(1),
-  variantId: z.string().nullable(),
-  name: z.string().min(1),
+  productId: z.string().min(1).max(100),
+  variantId: z.string().max(100).nullable(),
+  name: z.string().min(1).max(300),
   unitPriceCents: z.number().int().nonnegative(),
   // Upper bound mirrors MAX_LINE_QUANTITY in src/store/cart-store.ts.
   quantity: z.number().int().positive().max(99),
@@ -122,7 +143,7 @@ export const checkoutItemSchema = z.object({
 
 export const checkoutPayloadSchema = z.object({
   customer: checkoutSchema,
-  items: z.array(checkoutItemSchema).min(1, "Корзина пуста"),
+  items: z.array(checkoutItemSchema).min(1, "Корзина пуста").max(100),
   currency: z.string().default(BASE_CURRENCY),
 });
 

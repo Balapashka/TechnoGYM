@@ -35,6 +35,7 @@ export default async function EditProductPage({
           categoryId: product.categoryId,
           badge: product.badge ?? "",
           features: unpackList(product.features).join("\n"),
+          images: unpackList(product.images).join("\n"),
           inStock: product.inStock,
           priceOnRequest: product.priceOnRequest,
         }}

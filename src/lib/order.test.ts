@@ -5,14 +5,14 @@ import type { CheckoutPayload } from "@/schemas/checkout";
 const customer: CheckoutPayload["customer"] = {
   email: "buyer@example.com",
   fullName: "Jane Doe",
-  address: "1 Demo Street",
-  city: "Dublin",
+  phone: "+79991234567",
+  deliveryMethod: "delivery",
+  address: "ул. Ленина, д. 1",
+  city: "Москва",
   postalCode: "101000",
   country: "RU",
-  cardName: "JANE DOE",
-  cardNumber: "4111111111111111",
-  cardExpiry: "12/28",
-  cardCvc: "123",
+  paymentMethod: "manual",
+  consent: true,
 };
 
 const payload: CheckoutPayload = {
@@ -47,7 +47,7 @@ const catalog = new Map<string, CatalogEntry>([
       name: "Aero Bike",
       priceCents: 295000,
       priceOnRequest: false,
-      variants: [{ id: "v2", priceDeltaCents: 50000 }],
+      variants: [{ id: "v2", name: "Pro", priceDeltaCents: 50000 }],
     },
   ],
 ]);
@@ -74,6 +74,12 @@ describe("buildOrder", () => {
   it("adds the variant delta to the catalog price", () => {
     const order = build(payload);
     expect(order.items[1].priceCents).toBe(295000 + 50000);
+  });
+
+  it("snapshots the chosen variant name", () => {
+    const order = build(payload);
+    expect(order.items[0].variantName).toBeNull();
+    expect(order.items[1].variantName).toBe("Pro");
   });
 
   it("computes the total across lines", () => {

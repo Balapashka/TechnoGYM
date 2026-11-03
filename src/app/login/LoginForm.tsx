@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@/schemas/login";
@@ -10,9 +10,19 @@ import { AuthCard, field, fieldError } from "@/components/auth/AuthCard";
 import { useTranslation } from "@/i18n/useTranslation";
 import { errorKeyForStatus } from "@/i18n/translations";
 
-/** Login form. Verifies via /api/auth/login and starts a session. */
-export function LoginForm() {
+/** Only same-site paths are honoured, so `?next=` cannot redirect off-site. */
+function safeNext(value: string | null): string | null {
+  return value && value.startsWith("/") && !value.startsWith("//") ? value : null;
+}
+
+/**
+ * Login form. Verifies via /api/auth/login and starts a session.
+ * `showDemoAccounts` lists the test credentials — only when the server runs
+ * with DEMO_ACCOUNTS=true, never on a live store.
+ */
+export function LoginForm({ showDemoAccounts }: { showDemoAccounts: boolean }) {
   const router = useRouter();
+  const params = useSearchParams();
   const t = useTranslation();
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -31,7 +41,10 @@ export function LoginForm() {
     });
     const json = await res.json().catch(() => ({}));
     if (res.ok) {
-      router.push(json.role === "ADMIN" ? "/admin" : "/account");
+      router.push(
+        safeNext(params.get("next")) ??
+          (json.role === "ADMIN" ? "/admin" : "/account"),
+      );
       router.refresh();
     } else {
       setServerError(t(errorKeyForStatus(res.status)));
@@ -43,6 +56,7 @@ export function LoginForm() {
       title={t("auth.signIn")}
       subtitle={t("auth.welcomeBack")}
     >
+      {showDemoAccounts && (
       <div className="mb-4 space-y-2 rounded-lg bg-mist p-3 text-xs text-ink-soft">
         <p>
           {t("auth.demoShopper")} — <strong>demo@movigym.test</strong> / <strong>demo1234</strong>
@@ -51,19 +65,20 @@ export function LoginForm() {
           {t("auth.demoAdmin")} — <strong>admin@movigym.test</strong> / <strong>admin1234</strong>
         </p>
       </div>
+      )}
       <form onSubmit={onSubmit} noValidate className="space-y-4">
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("auth.email")}
           </label>
-          <input className={field} type="email" {...register("email")} />
+          <input className={field} type="email" autoComplete="email" {...register("email")} />
           {errors.email && <p className={fieldError}>{errors.email.message}</p>}
         </div>
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("auth.password")}
           </label>
-          <input className={field} type="password" {...register("password")} />
+          <input className={field} type="password" autoComplete="current-password" {...register("password")} />
           {errors.password && (
             <p className={fieldError}>{errors.password.message}</p>
           )}

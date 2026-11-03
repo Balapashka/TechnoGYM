@@ -8,6 +8,7 @@ const validRequest = {
   phone: "+7 (999) 123-45-67",
   email: "buyer@example.com",
   comment: "Когда будет доставка?",
+  consent: true,
 };
 
 /** Shorthand: parse the valid request with one field overridden. */
@@ -99,6 +100,24 @@ describe("quoteRequestSchema", () => {
       const res = parseWith({ comment: "   " });
       expect(res.success).toBe(true);
       if (res.success) expect(res.data.comment).toBeUndefined();
+    });
+  });
+
+  describe("consent", () => {
+    it("is required", () => {
+      expect(parseWith({ consent: undefined }).success).toBe(false);
+      expect(parseWith({ consent: false }).success).toBe(false);
+    });
+  });
+
+  describe("source", () => {
+    it("defaults to a product price request", () => {
+      const res = parseWith({});
+      expect(res.success).toBe(true);
+      if (res.success) expect(res.data.source).toBe("product");
+    });
+    it("rejects an unknown source", () => {
+      expect(parseWith({ source: "spam" }).success).toBe(false);
     });
   });
 

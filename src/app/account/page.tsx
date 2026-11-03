@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { orderNumber } from "@/lib/order-format";
 import { AccountView, type AccountOrder } from "./AccountView";
 
 export const metadata: Metadata = { title: "Личный кабинет — SPORT LINER" };
@@ -9,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/login?next=/account");
 
   const orders = await prisma.order.findMany({
     where: { userId: user.id },
@@ -19,6 +20,7 @@ export default async function AccountPage() {
 
   const view: AccountOrder[] = orders.map((order) => ({
     id: order.id,
+    number: orderNumber(order.id),
     status: order.status,
     createdAtLabel: order.createdAt.toLocaleDateString("ru-RU"),
     totalCents: order.totalCents,
@@ -26,6 +28,7 @@ export default async function AccountPage() {
     items: order.items.map((it) => ({
       id: it.id,
       nameSnapshot: it.nameSnapshot,
+      variantName: it.variantName,
       quantity: it.quantity,
       priceCents: it.priceCents,
     })),

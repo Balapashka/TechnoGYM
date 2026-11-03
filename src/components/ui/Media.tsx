@@ -11,6 +11,22 @@ import { cn } from "@/lib/cn";
 const BLUR_DATA_URL =
   "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='8' height='8' fill='%23f2f2f2'/%3E%3C/svg%3E";
 
+/**
+ * Hosts whitelisted for the Next.js image optimizer (mirror of
+ * `images.remotePatterns` in next.config.ts). A photo URL from any other host —
+ * e.g. pasted by an admin — is rendered as-is instead of failing.
+ */
+const OPTIMIZED_HOSTS = new Set(["images.unsplash.com", "picsum.photos"]);
+
+function canOptimize(src: string): boolean {
+  if (src.startsWith("/")) return true;
+  try {
+    return OPTIMIZED_HOSTS.has(new URL(src).hostname);
+  } catch {
+    return false;
+  }
+}
+
 type MediaProps = {
   /** Image URL. `null` renders the branded fallback surface instead. */
   src: string | null;
@@ -72,6 +88,7 @@ export function Media({
           fill
           sizes={sizes}
           priority={priority}
+          unoptimized={!canOptimize(src)}
           onError={() => setFailedSrc(src)}
           placeholder={src.startsWith("http") ? "blur" : undefined}
           blurDataURL={src.startsWith("http") ? BLUR_DATA_URL : undefined}

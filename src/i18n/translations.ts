@@ -316,6 +316,82 @@ export interface Translation {
     quoteProduct: string;
     quoteContact: string;
     quoteDate: string;
+    orders: string;
+    noOrders: string;
+    allStatuses: string;
+    orderNo: string;
+    date: string;
+    customer: string;
+    total: string;
+    status: string;
+    payment: string;
+    deliveryMethod: string;
+    orderTitle: string;
+    items: string;
+    contacts: string;
+    deliveryAddress: string;
+    customerComment: string;
+    adminNote: string;
+    notifyCustomer: string;
+    save: string;
+    saved: string;
+    backToOrders: string;
+    payManual: string;
+    payOnline: string;
+    pickup: string;
+    courier: string;
+    revenue: string;
+    newOrders: string;
+    newLeads: string;
+    customers: string;
+    leads: string;
+    leadSource: string;
+    sourceProduct: string;
+    sourceBusiness: string;
+    sourceContact: string;
+    leadNEW: string;
+    leadCONTACTED: string;
+    leadCLOSED: string;
+    subscribers: string;
+    noSubscribers: string;
+    exportCsv: string;
+    settings: string;
+    settingsLead: string;
+    settingsContacts: string;
+    settingsLegal: string;
+    settingsDelivery: string;
+    settingsSocial: string;
+    launchWarning: string;
+    goToSettings: string;
+    images: string;
+    uploadImages: string;
+    uploading: string;
+    uploadHint: string;
+    errUpload: string;
+    viewOnSite: string;
+    setting_phone: string;
+    setting_email: string;
+    setting_address: string;
+    setting_workingHours: string;
+    setting_pickupAddress: string;
+    setting_deliveryNote: string;
+    setting_legalName: string;
+    setting_inn: string;
+    setting_ogrn: string;
+    setting_legalAddress: string;
+    setting_telegram: string;
+    setting_whatsapp: string;
+    setting_vk: string;
+    setting_youtube: string;
+    integrations: string;
+    intTelegram: string;
+    intEmail: string;
+    intPayments: string;
+    intIndexing: string;
+    intOn: string;
+    intOff: string;
+    intHint: string;
+    testModeWarning: string;
   };
 
   // Country/Locale modal + switcher
@@ -339,6 +415,7 @@ export interface Translation {
     notFound: string;
     server: string;
     network: string;
+    tooMany: string;
   };
 
   // Cookie banner
@@ -380,13 +457,10 @@ export interface Translation {
   checkout: {
     checkout: string;
     shippingAddress: string;
-    billingAddress: string;
     paymentMethod: string;
     orderSummary: string;
     placeOrder: string;
     processing: string;
-    firstName: string;
-    lastName: string;
     fullName: string;
     email: string;
     address: string;
@@ -394,17 +468,36 @@ export interface Translation {
     postalCode: string;
     country: string;
     phone: string;
-    paymentDemoCard: string;
-    demoCardHint: string;
-    nameOnCard: string;
-    cardNumber: string;
-    expiryDate: string;
-    cvc: string;
     orderConfirmed: string;
-    orderLabel: string;
     backToHome: string;
     serverError: string;
     total: string;
+    contacts: string;
+    delivery: string;
+    deliveryCourier: string;
+    deliveryPickup: string;
+    pickupFrom: string;
+    addressHint: string;
+    postalOptional: string;
+    comment: string;
+    commentHint: string;
+    payManual: string;
+    payManualHint: string;
+    payOnline: string;
+    payOnlineHint: string;
+    placeOrderPay: string;
+    orderNumber: string;
+    whatNext: string;
+    paymentPending: string;
+    paymentPendingBody: string;
+    payAgain: string;
+    paid: string;
+    paidBody: string;
+    orderNotFound: string;
+    currencyNote: string;
+    deliveryCostNote: string;
+    toAccount: string;
+    continueShopping: string;
   };
 
   // Cart
@@ -428,6 +521,12 @@ export interface Translation {
     increase: string;
     decrease: string;
     closeCart: string;
+  };
+  legal: {
+    consentPrefix: string;
+    privacyLink: string;
+    consentNewsletter: string;
+    consentRequired: string;
   };
 }
 
@@ -646,7 +745,7 @@ export const translations: Record<Locale, Translation> = {
     business: {
       eyebrow: "Для бизнеса",
       title: "Оснастите своё пространство",
-      lead: "Отели, студии, офисы и клубы — расскажите о задаче, и наша команда свяжется с вами. (Демонстрационная форма: заявка никуда не отправляется.)",
+      lead: "Фитнес-клубы, отели, студии, корпоративные залы — расскажите о задаче, и менеджер подготовит предложение: подбор оборудования, проект зала, поставка и монтаж.",
       writeUs: "Напишите нам",
       company: "Компания",
       yourName: "Ваше имя",
@@ -660,7 +759,7 @@ export const translations: Record<Locale, Translation> = {
       errEmail: "Введите корректный email",
       errMessage: "Расскажите подробнее — не менее 10 символов",
       benefitPricing: "Оптовые цены",
-      benefitPricingBody: "Прогрессивные скидки для проектов любого масштаба.",
+      benefitPricingBody: "Специальные условия для проектов и оптовых поставок.",
       benefitService: "Монтаж и сервис",
       benefitServiceBody:
         "Демонстрационные тарифы на установку, поддержку и обслуживание.",
@@ -677,9 +776,10 @@ export const translations: Record<Locale, Translation> = {
       noOrders: "Заказов пока нет.",
       startShopping: "Перейти к покупкам",
       orderStatus: {
-        PENDING: "В обработке",
+        PENDING: "Новый",
         PAID: "Оплачен",
         SHIPPED: "Отправлен",
+        DELIVERED: "Выполнен",
         CANCELLED: "Отменён",
       },
     },
@@ -717,11 +817,87 @@ export const translations: Record<Locale, Translation> = {
       errGeneric: "Не удалось выполнить операцию",
       editProduct: "Редактирование «{name}»",
       priceOnRequest: "Цена по запросу",
-      quoteRequests: "Заявки на цену",
+      quoteRequests: "Заявки",
       quoteNoRequests: "Заявок пока нет",
       quoteProduct: "Товар",
       quoteContact: "Контакт",
       quoteDate: "Дата",
+      orders: "Заказы",
+      noOrders: "Заказов пока нет",
+      allStatuses: "Все",
+      orderNo: "№",
+      date: "Дата",
+      customer: "Покупатель",
+      total: "Сумма",
+      status: "Статус",
+      payment: "Оплата",
+      deliveryMethod: "Получение",
+      orderTitle: "Заказ №{number}",
+      items: "Состав заказа",
+      contacts: "Контакты",
+      deliveryAddress: "Доставка",
+      customerComment: "Комментарий покупателя",
+      adminNote: "Заметка менеджера (видна только в админке)",
+      notifyCustomer: "Сообщить покупателю о смене статуса по email",
+      save: "Сохранить",
+      saved: "Сохранено",
+      backToOrders: "← Все заказы",
+      payManual: "После подтверждения",
+      payOnline: "Онлайн",
+      pickup: "Самовывоз",
+      courier: "Доставка",
+      revenue: "Выручка (оплаченные)",
+      newOrders: "Новые заказы",
+      newLeads: "Новые заявки",
+      customers: "Покупатели",
+      leads: "Заявки",
+      leadSource: "Тип",
+      sourceProduct: "Запрос цены",
+      sourceBusiness: "Для бизнеса",
+      sourceContact: "Обратная связь",
+      leadNEW: "Новая",
+      leadCONTACTED: "В работе",
+      leadCLOSED: "Закрыта",
+      subscribers: "Подписчики",
+      noSubscribers: "Подписчиков пока нет",
+      exportCsv: "Скачать CSV",
+      settings: "Настройки",
+      settingsLead: "Контакты и реквизиты показываются в шапке, подвале, на страницах «Контакты», «Доставка», «Возврат» и в юридических документах. Пустые поля на сайте не выводятся.",
+      settingsContacts: "Контакты",
+      settingsLegal: "Реквизиты продавца",
+      settingsDelivery: "Доставка и самовывоз",
+      settingsSocial: "Соцсети и мессенджеры",
+      launchWarning: "Перед запуском продаж заполните обязательные данные продавца — без них интернет-магазин нарушает закон о защите прав потребителей:",
+      goToSettings: "Открыть настройки",
+      images: "Фотографии (по одной ссылке в строке, первая — главная)",
+      uploadImages: "Загрузить фото",
+      uploading: "Загрузка…",
+      uploadHint: "JPG, PNG или WebP до 8 МБ. Лучше квадратные, от 1000×1000 px.",
+      errUpload: "Не удалось загрузить файл",
+      viewOnSite: "Открыть на сайте",
+      setting_phone: "Телефон",
+      setting_email: "Email для покупателей",
+      setting_address: "Адрес офиса / шоурума",
+      setting_workingHours: "Часы работы",
+      setting_pickupAddress: "Адрес самовывоза (пусто — самовывоза нет)",
+      setting_deliveryNote: "Условия доставки (коротко)",
+      setting_legalName: "Продавец: ИП / ООО полностью",
+      setting_inn: "ИНН",
+      setting_ogrn: "ОГРН / ОГРНИП",
+      setting_legalAddress: "Юридический адрес",
+      setting_telegram: "Telegram (@имя или ссылка)",
+      setting_whatsapp: "WhatsApp (номер или ссылка)",
+      setting_vk: "ВКонтакте (ссылка)",
+      setting_youtube: "YouTube (ссылка)",
+      integrations: "Подключения",
+      intTelegram: "Уведомления в Telegram",
+      intEmail: "Отправка писем (SMTP)",
+      intPayments: "Онлайн-оплата (ЮKassa)",
+      intIndexing: "Индексация поисковиками",
+      intOn: "подключено",
+      intOff: "не настроено",
+      intHint: "Подключения настраиваются в файле .env на сервере — инструкция в ЗАПУСК-ПРОДАЖ.md.",
+      testModeWarning: "Включён тестовый режим: на странице входа видны демо-пароли, коды сброса пароля показываются на экране. Отключите DEMO_ACCOUNTS и DEMO_EXPOSE_RESET_TOKEN перед запуском.",
     },
     locale: {
       chooseCountry: "Выберите вашу страну",
@@ -738,6 +914,7 @@ export const translations: Record<Locale, Translation> = {
       notFound: "Запись не найдена.",
       server: "Ошибка сервера. Попробуйте позже.",
       network: "Не удалось связаться с сервером. Проверьте соединение.",
+      tooMany: "Слишком много попыток. Подождите несколько минут и попробуйте снова.",
     },
     cookie: {
       message:
@@ -775,13 +952,10 @@ export const translations: Record<Locale, Translation> = {
     checkout: {
       checkout: "Оформление заказа",
       shippingAddress: "Адрес доставки",
-      billingAddress: "Платёжный адрес",
       paymentMethod: "Способ оплаты",
       orderSummary: "Сумма заказа",
-      placeOrder: "Оплатить и оформить заказ",
-      processing: "Обрабатываем платёж…",
-      firstName: "Имя",
-      lastName: "Фамилия",
+      placeOrder: "Оформить заказ",
+      processing: "Оформляем заказ…",
       fullName: "Имя и фамилия",
       email: "Email",
       address: "Адрес",
@@ -789,18 +963,36 @@ export const translations: Record<Locale, Translation> = {
       postalCode: "Почтовый индекс",
       country: "Страна",
       phone: "Телефон",
-      paymentDemoCard: "Оплата · демо-карта",
-      demoCardHint:
-        "Реальный платёж не проводится. Используйте 4242 4242 4242 4242, любой будущий срок действия и любой CVC.",
-      nameOnCard: "Имя на карте",
-      cardNumber: "Номер карты",
-      expiryDate: "Срок действия (ММ/ГГ)",
-      cvc: "CVC",
-      orderConfirmed: "Заказ подтверждён",
-      orderLabel: "Заказ",
+      orderConfirmed: "Спасибо! Заказ принят",
       backToHome: "На главную",
       serverError: "Что-то пошло не так. Проверьте введённые данные.",
       total: "Итого",
+      contacts: "Контактные данные",
+      delivery: "Получение",
+      deliveryCourier: "Доставка по адресу",
+      deliveryPickup: "Самовывоз",
+      pickupFrom: "Забрать заказ можно по адресу: {address}",
+      addressHint: "Улица, дом, квартира или офис",
+      postalOptional: "Индекс (необязательно)",
+      comment: "Комментарий к заказу",
+      commentHint: "Удобное время для звонка, этаж, наличие грузового лифта…",
+      payManual: "Оплата после подтверждения заказа",
+      payManualHint: "Менеджер позвонит, подтвердит наличие, сроки и стоимость доставки и пришлёт ссылку на оплату или счёт для юрлиц.",
+      payOnline: "Онлайн-оплата картой или СБП",
+      payOnlineHint: "Оплата на защищённой странице ЮKassa. Данные карты не передаются магазину.",
+      placeOrderPay: "Перейти к оплате",
+      orderNumber: "Номер заказа",
+      whatNext: "Менеджер свяжется с вами в рабочее время, чтобы подтвердить заказ и согласовать доставку. Детали заказа отправлены на {email}.",
+      paymentPending: "Оплата не завершена",
+      paymentPendingBody: "Заказ сохранён. Если вы закрыли страницу оплаты или платёж не прошёл — попробуйте ещё раз или дождитесь звонка менеджера.",
+      payAgain: "Оплатить заказ",
+      paid: "Заказ оплачен",
+      paidBody: "Оплата получена. Менеджер свяжется с вами, чтобы согласовать доставку. Чек отправлен на {email}.",
+      orderNotFound: "Заказ не найден",
+      currencyNote: "Оплата производится в российских рублях. Суммы в других валютах — ориентировочные.",
+      deliveryCostNote: "Стоимость доставки рассчитывается отдельно — менеджер сообщит её до оплаты.",
+      toAccount: "Мои заказы",
+      continueShopping: "Продолжить покупки",
     },
     cart: {
       title: "Корзина",
@@ -822,6 +1014,12 @@ export const translations: Record<Locale, Translation> = {
       increase: "Увеличить количество",
       decrease: "Уменьшить количество",
       closeCart: "Закрыть корзину",
+    },
+    legal: {
+      consentPrefix: "Я даю согласие на обработку персональных данных в соответствии с",
+      privacyLink: "Политикой конфиденциальности",
+      consentNewsletter: "Согласен получать новости и предложения магазина. Отписаться можно в любой момент.",
+      consentRequired: "Необходимо ваше согласие",
     },
   },
   en: {
@@ -1034,7 +1232,7 @@ export const translations: Record<Locale, Translation> = {
     business: {
       eyebrow: "For business",
       title: "Outfit your space",
-      lead: "Hotels, studios, offices and clubs — tell us what you need and our team will write back. (Demo form: nothing is actually sent.)",
+      lead: "Gyms, hotels, studios and corporate fitness rooms — tell us what you need and a manager will prepare an offer: equipment selection, gym layout, delivery and installation.",
       writeUs: "Write us a letter",
       company: "Company",
       yourName: "Your name",
@@ -1048,9 +1246,9 @@ export const translations: Record<Locale, Translation> = {
       errEmail: "Enter a valid email",
       errMessage: "Tell us a little more (min 10 chars)",
       benefitPricing: "Volume pricing",
-      benefitPricingBody: "Tiered rates for fit-outs of any size.",
+      benefitPricingBody: "Special terms for projects and bulk orders.",
       benefitService: "Install & service",
-      benefitServiceBody: "Generic demo support, setup and maintenance plans.",
+      benefitServiceBody: "Delivery, assembly and commissioning, warranty and after-sales service.",
       benefitContact: "One point of contact",
       benefitContactBody: "A named account manager from first letter to delivery.",
     },
@@ -1063,9 +1261,10 @@ export const translations: Record<Locale, Translation> = {
       noOrders: "No orders yet.",
       startShopping: "Start shopping",
       orderStatus: {
-        PENDING: "Pending",
+        PENDING: "New",
         PAID: "Paid",
         SHIPPED: "Shipped",
+        DELIVERED: "Completed",
         CANCELLED: "Cancelled",
       },
     },
@@ -1103,11 +1302,87 @@ export const translations: Record<Locale, Translation> = {
       errGeneric: "Failed",
       editProduct: "Edit “{name}”",
       priceOnRequest: "Price on request",
-      quoteRequests: "Price requests",
+      quoteRequests: "Requests",
       quoteNoRequests: "No requests yet",
       quoteProduct: "Product",
       quoteContact: "Contact",
       quoteDate: "Date",
+      orders: "Orders",
+      noOrders: "No orders yet",
+      allStatuses: "All",
+      orderNo: "No.",
+      date: "Date",
+      customer: "Customer",
+      total: "Total",
+      status: "Status",
+      payment: "Payment",
+      deliveryMethod: "Delivery",
+      orderTitle: "Order #{number}",
+      items: "Items",
+      contacts: "Contacts",
+      deliveryAddress: "Delivery",
+      customerComment: "Customer comment",
+      adminNote: "Manager note (admin only)",
+      notifyCustomer: "Email the customer about the status change",
+      save: "Save",
+      saved: "Saved",
+      backToOrders: "← All orders",
+      payManual: "After confirmation",
+      payOnline: "Online",
+      pickup: "Pickup",
+      courier: "Delivery",
+      revenue: "Revenue (paid)",
+      newOrders: "New orders",
+      newLeads: "New requests",
+      customers: "Customers",
+      leads: "Requests",
+      leadSource: "Type",
+      sourceProduct: "Price request",
+      sourceBusiness: "Business",
+      sourceContact: "Contact form",
+      leadNEW: "New",
+      leadCONTACTED: "In progress",
+      leadCLOSED: "Closed",
+      subscribers: "Subscribers",
+      noSubscribers: "No subscribers yet",
+      exportCsv: "Download CSV",
+      settings: "Settings",
+      settingsLead: "Contacts and legal details appear in the header, footer, the contacts, shipping and returns pages and the legal documents. Empty fields are hidden.",
+      settingsContacts: "Contacts",
+      settingsLegal: "Seller's legal details",
+      settingsDelivery: "Delivery and pickup",
+      settingsSocial: "Social media and messengers",
+      launchWarning: "Before you start selling, fill in the seller's required details — the law requires them for an online store:",
+      goToSettings: "Open settings",
+      images: "Photos (one URL per line, the first is the main one)",
+      uploadImages: "Upload photos",
+      uploading: "Uploading…",
+      uploadHint: "JPG, PNG or WebP up to 8 MB. Square, 1000×1000 px or larger works best.",
+      errUpload: "Could not upload the file",
+      viewOnSite: "View on site",
+      setting_phone: "Phone",
+      setting_email: "Customer email",
+      setting_address: "Office / showroom address",
+      setting_workingHours: "Working hours",
+      setting_pickupAddress: "Pickup address (empty = no pickup)",
+      setting_deliveryNote: "Delivery terms (short)",
+      setting_legalName: "Seller: full legal name",
+      setting_inn: "Tax ID (INN)",
+      setting_ogrn: "OGRN",
+      setting_legalAddress: "Registered address",
+      setting_telegram: "Telegram (@handle or link)",
+      setting_whatsapp: "WhatsApp (number or link)",
+      setting_vk: "VK (link)",
+      setting_youtube: "YouTube (link)",
+      integrations: "Integrations",
+      intTelegram: "Telegram notifications",
+      intEmail: "Outgoing email (SMTP)",
+      intPayments: "Online payments (YooKassa)",
+      intIndexing: "Search engine indexing",
+      intOn: "on",
+      intOff: "off",
+      intHint: "Integrations are configured in the server's .env file — see ЗАПУСК-ПРОДАЖ.md.",
+      testModeWarning: "Test mode is on: demo passwords are listed on the login page and reset codes are shown on screen. Turn off DEMO_ACCOUNTS and DEMO_EXPOSE_RESET_TOKEN before launch.",
     },
     locale: {
       chooseCountry: "Choose your country",
@@ -1124,6 +1399,7 @@ export const translations: Record<Locale, Translation> = {
       notFound: "Record not found.",
       server: "Server error. Please try again later.",
       network: "Could not reach the server. Check your connection.",
+      tooMany: "Too many attempts. Please wait a few minutes and try again.",
     },
     cookie: {
       message:
@@ -1161,13 +1437,10 @@ export const translations: Record<Locale, Translation> = {
     checkout: {
       checkout: "Checkout",
       shippingAddress: "Shipping address",
-      billingAddress: "Billing address",
       paymentMethod: "Payment method",
       orderSummary: "Order summary",
-      placeOrder: "Pay & place order",
-      processing: "Processing payment…",
-      firstName: "First name",
-      lastName: "Last name",
+      placeOrder: "Place order",
+      processing: "Placing your order…",
       fullName: "Full name",
       email: "Email",
       address: "Address",
@@ -1175,18 +1448,36 @@ export const translations: Record<Locale, Translation> = {
       postalCode: "Postal code",
       country: "Country",
       phone: "Phone",
-      paymentDemoCard: "Payment · demo card",
-      demoCardHint:
-        "No real payment is taken. Try 4242 4242 4242 4242, any future expiry and any CVC.",
-      nameOnCard: "Name on card",
-      cardNumber: "Card number",
-      expiryDate: "Expiry (MM/YY)",
-      cvc: "CVC",
-      orderConfirmed: "Order confirmed",
-      orderLabel: "Order",
+      orderConfirmed: "Thank you! Your order is placed",
       backToHome: "Back to home",
       serverError: "Something went wrong. Please check your details.",
       total: "Total",
+      contacts: "Contact details",
+      delivery: "Delivery",
+      deliveryCourier: "Delivery to address",
+      deliveryPickup: "Pickup",
+      pickupFrom: "Pick up your order at: {address}",
+      addressHint: "Street, building, apartment or office",
+      postalOptional: "Postal code (optional)",
+      comment: "Order comment",
+      commentHint: "Best time to call, floor, freight elevator…",
+      payManual: "Pay after order confirmation",
+      payManualHint: "A manager will call to confirm availability, delivery time and cost, then send a payment link or an invoice for companies.",
+      payOnline: "Pay online by card or SBP",
+      payOnlineHint: "Payment on the secure YooKassa page. Card details are never shared with the store.",
+      placeOrderPay: "Proceed to payment",
+      orderNumber: "Order number",
+      whatNext: "A manager will contact you during business hours to confirm the order and arrange delivery. Order details were sent to {email}.",
+      paymentPending: "Payment not completed",
+      paymentPendingBody: "Your order is saved. If you closed the payment page or the payment failed, try again or wait for our manager to call.",
+      payAgain: "Pay for the order",
+      paid: "Order paid",
+      paidBody: "Payment received. A manager will contact you to arrange delivery. The receipt was sent to {email}.",
+      orderNotFound: "Order not found",
+      currencyNote: "Payment is made in Russian roubles. Amounts in other currencies are approximate.",
+      deliveryCostNote: "Delivery is calculated separately — a manager will confirm the cost before payment.",
+      toAccount: "My orders",
+      continueShopping: "Continue shopping",
     },
     cart: {
       title: "Cart",
@@ -1208,6 +1499,12 @@ export const translations: Record<Locale, Translation> = {
       increase: "Increase quantity",
       decrease: "Decrease quantity",
       closeCart: "Close cart",
+    },
+    legal: {
+      consentPrefix: "I consent to the processing of my personal data in accordance with the",
+      privacyLink: "Privacy policy",
+      consentNewsletter: "I agree to receive store news and offers. You can unsubscribe at any time.",
+      consentRequired: "Your consent is required",
     },
   },
 };
@@ -1251,6 +1548,7 @@ export function errorKeyForStatus(status: number): string {
   if (status === 403) return "errors.forbidden";
   if (status === 404) return "errors.notFound";
   if (status === 409) return "errors.conflict";
+  if (status === 429) return "errors.tooMany";
   if (status >= 500) return "errors.server";
   return "errors.server";
 }

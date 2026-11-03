@@ -33,6 +33,9 @@ export async function PUT(request: Request, { params }: Ctx) {
     );
   }
 
+  const exists = await prisma.category.findUnique({ where: { id }, select: { id: true } });
+  if (!exists) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
   const updated = await prisma.category.update({
     where: { id },
     data: { name: parsed.data.name, slug: parsed.data.slug },
@@ -58,6 +61,6 @@ export async function DELETE(_request: Request, { params }: Ctx) {
     );
   }
 
-  await prisma.category.delete({ where: { id } });
+  await prisma.category.deleteMany({ where: { id } });
   return NextResponse.json({ ok: true });
 }

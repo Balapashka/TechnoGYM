@@ -104,7 +104,8 @@ describe("formatProductCount", () => {
 
 describe("orderStatusLabel", () => {
   it("localizes every OrderStatus value from the Prisma schema", () => {
-    expect(orderStatusLabel("ru", "PENDING")).toBe("В обработке");
+    expect(orderStatusLabel("ru", "PENDING")).toBe("Новый");
+    expect(orderStatusLabel("ru", "DELIVERED")).toBe("Выполнен");
     expect(orderStatusLabel("ru", "PAID")).toBe("Оплачен");
     expect(orderStatusLabel("ru", "SHIPPED")).toBe("Отправлен");
     expect(orderStatusLabel("ru", "CANCELLED")).toBe("Отменён");

@@ -4,6 +4,8 @@ import { BASE_CURRENCY } from "@/lib/format";
 export type OrderLine = {
   productId: string;
   nameSnapshot: string;
+  /** Chosen configuration, null when the product has none selected. */
+  variantName: string | null;
   priceCents: number;
   quantity: number;
 };
@@ -24,7 +26,7 @@ export type CatalogEntry = {
   priceCents: number;
   /** Quote-only products are not sold through the cart — see buildOrder. */
   priceOnRequest: boolean;
-  variants: { id: string; priceDeltaCents: number }[];
+  variants: { id: string; name: string; priceDeltaCents: number }[];
 };
 
 export type BuildOrderResult =
@@ -61,6 +63,7 @@ export function buildOrder(
     }
 
     let priceDeltaCents = 0;
+    let variantName: string | null = null;
     if (line.variantId !== null) {
       const variant = product.variants.find((v) => v.id === line.variantId);
       if (!variant) {
@@ -70,12 +73,14 @@ export function buildOrder(
         };
       }
       priceDeltaCents = variant.priceDeltaCents;
+      variantName = variant.name;
     }
 
     items.push({
       productId: line.productId,
       // Snapshot the catalog's name and price, not the ones in the request.
       nameSnapshot: product.name,
+      variantName,
       priceCents: product.priceCents + priceDeltaCents,
       quantity: line.quantity,
     });

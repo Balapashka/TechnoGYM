@@ -12,6 +12,9 @@ import {
 import { field, fieldError } from "@/components/auth/AuthCard";
 import { useQuoteStore, type QuoteProduct } from "@/store/quote-store";
 import { useTranslation } from "@/i18n/useTranslation";
+import { errorKeyForStatus } from "@/i18n/translations";
+import { Consent } from "@/components/ui/Consent";
+import { Honeypot } from "@/components/ui/Honeypot";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -151,7 +154,11 @@ function QuoteForm({
       });
 
       if (!res.ok) {
-        setServerError(t("checkout.serverError"));
+        setServerError(
+          res.status === 429
+            ? t(errorKeyForStatus(429))
+            : t("checkout.serverError"),
+        );
         return;
       }
     } catch {
@@ -300,6 +307,13 @@ function QuoteForm({
               </p>
             )}
           </div>
+
+          <Consent
+            id="quote-consent"
+            registration={register("consent")}
+            error={errors.consent}
+          />
+          <Honeypot registration={register("website")} />
 
           {serverError && <p className="text-sm text-red-600">{serverError}</p>}
 

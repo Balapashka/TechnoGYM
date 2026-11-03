@@ -1,15 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { productSchema } from "@/schemas/product";
+import { productSchema, splitLines } from "@/schemas/product";
 import { packList } from "@/lib/json";
+import { resolveMediaSrc } from "@/lib/media";
 
-function featuresToList(raw?: string): string[] {
-  return (raw ?? "")
-    .split("\n")
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -42,6 +37,17 @@ export async function PUT(request: Request, { params }: Ctx) {
     );
   }
 
+  const category = await prisma.category.findUnique({
+    where: { id: parsed.data.categoryId },
+    select: { id: true },
+  });
+  if (!category) {
+    return NextResponse.json({ error: "Unknown category" }, { status: 400 });
+  }
+
+  const exists = await prisma.product.findUnique({ where: { id }, select: { id: true } });
+  if (!exists) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
   const updated = await prisma.product.update({
     where: { id },
     data: {
@@ -55,7 +61,17 @@ export async function PUT(request: Request, { params }: Ctx) {
       inStock: parsed.data.inStock,
       priceOnRequest: parsed.data.priceOnRequest,
       categoryId: parsed.data.categoryId,
-      features: packList(featuresToList(parsed.data.features)),
+      features: packList(splitLines(parsed.data.features)),
+      // Only touch photos when the form sent the field.
+      ...(parsed.data.images !== undefined
+        ? {
+            images: packList(
+              splitLines(parsed.data.images).length > 0
+                ? splitLines(parsed.data.images)
+                : [resolveMediaSrc("productCard")],
+            ),
+          }
+        : {}),
     },
     select: { id: true, slug: true },
   });
@@ -71,9 +87,11 @@ export async function DELETE(_request: Request, { params }: Ctx) {
   }
   const { id } = await params;
 
-  // Clear cart references first (orders keep their snapshots).
+  // Clear cart references first. Orders keep their name/price snapshots and
+  // their product link is set to null by the database (onDelete: SetNull).
   await prisma.cartItem.deleteMany({ where: { productId: id } });
-  await prisma.product.delete({ where: { id } });
+  const res = await prisma.product.deleteMany({ where: { id } });
+  if (res.count === 0) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   return NextResponse.json({ ok: true });
 }

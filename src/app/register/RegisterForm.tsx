@@ -5,7 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema, type RegisterInput } from "@/schemas/auth";
+import {
+  registerSchema,
+  type RegisterInput,
+  type RegisterOutput,
+} from "@/schemas/auth";
+import { Consent } from "@/components/ui/Consent";
 import { AuthCard, field, fieldError } from "@/components/auth/AuthCard";
 import { useTranslation } from "@/i18n/useTranslation";
 import { errorKeyForStatus } from "@/i18n/translations";
@@ -20,7 +25,9 @@ export function RegisterForm() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterInput>({ resolver: zodResolver(registerSchema) });
+  } = useForm<RegisterInput, unknown, RegisterOutput>({
+    resolver: zodResolver(registerSchema),
+  });
 
   const onSubmit = handleSubmit(async (data) => {
     setServerError(null);
@@ -47,21 +54,31 @@ export function RegisterForm() {
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("auth.name")}
           </label>
-          <input className={field} {...register("name")} />
+          <input className={field} autoComplete="name" {...register("name")} />
           {errors.name && <p className={fieldError}>{errors.name.message}</p>}
         </div>
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("auth.email")}
           </label>
-          <input className={field} type="email" {...register("email")} />
+          <input
+            className={field}
+            type="email"
+            autoComplete="email"
+            {...register("email")}
+          />
           {errors.email && <p className={fieldError}>{errors.email.message}</p>}
         </div>
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("auth.password")}
           </label>
-          <input className={field} type="password" {...register("password")} />
+          <input
+            className={field}
+            type="password"
+            autoComplete="new-password"
+            {...register("password")}
+          />
           {errors.password && (
             <p className={fieldError}>{errors.password.message}</p>
           )}
@@ -70,11 +87,22 @@ export function RegisterForm() {
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("auth.confirmPassword")}
           </label>
-          <input className={field} type="password" {...register("confirm")} />
+          <input
+            className={field}
+            type="password"
+            autoComplete="new-password"
+            {...register("confirm")}
+          />
           {errors.confirm && (
             <p className={fieldError}>{errors.confirm.message}</p>
           )}
         </div>
+
+        <Consent
+          id="register-consent"
+          registration={register("consent")}
+          error={errors.consent}
+        />
 
         {serverError && <p className="text-sm text-red-600">{serverError}</p>}
 

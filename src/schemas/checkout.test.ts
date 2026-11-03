@@ -9,18 +9,18 @@ import { COUNTRIES } from "@/store/locale-store";
 const validCustomer = {
   email: "buyer@example.com",
   fullName: "Иван Петров",
+  phone: "+7 (999) 123-45-67",
+  deliveryMethod: "delivery",
   address: "ул. Ленина, д. 1",
   city: "Москва",
   postalCode: "101000",
   country: "RU",
-  cardName: "Ivan Petrov",
-  cardNumber: "4242 4242 4242 4242",
-  cardExpiry: "04/49",
-  cardCvc: "123",
+  paymentMethod: "manual",
+  consent: true,
 };
 
 /** Shorthand: parse the valid customer with one field overridden. */
-function parseWith(overrides: Partial<typeof validCustomer>) {
+function parseWith(overrides: Partial<Record<keyof typeof validCustomer, unknown>>) {
   return checkoutSchema.safeParse({ ...validCustomer, ...overrides });
 }
 
@@ -94,7 +94,7 @@ describe("checkoutSchema", () => {
   });
 
   describe("postalCode", () => {
-    it("requires 6 digits for RU", () => {
+    it("requires 6 digits for RU when entered", () => {
       expect(parseWith({ postalCode: "10100" }).success).toBe(false);
       expect(parseWith({ postalCode: "10100a" }).success).toBe(false);
     });
@@ -118,55 +118,61 @@ describe("checkoutSchema", () => {
     });
   });
 
-  describe("cardName", () => {
-    it("uppercases the value", () => {
-      const res = parseWith({ cardName: "ivan petrov" });
-      expect(res.success).toBe(true);
-      if (res.success) expect(res.data.cardName).toBe("IVAN PETROV");
-    });
-
-    it("rejects cyrillic and digits", () => {
-      expect(parseWith({ cardName: "Иван Петров" }).success).toBe(false);
-      expect(parseWith({ cardName: "IVAN 4" }).success).toBe(false);
-    });
-  });
-
-  describe("cardNumber", () => {
-    it("strips spaces in the output", () => {
+  describe("phone", () => {
+    it("is required and normalized", () => {
+      expect(parseWith({ phone: "" }).success).toBe(false);
       const res = parseWith({});
       expect(res.success).toBe(true);
-      if (res.success) expect(res.data.cardNumber).toBe("4242424242424242");
+      if (res.success) expect(res.data.phone).toBe("+79991234567");
     });
-
-    it("rejects wrong length", () => {
-      expect(parseWith({ cardNumber: "4242 4242 4242 424" }).success).toBe(
-        false,
-      );
-    });
-
-    it("rejects a number failing the Luhn check", () => {
-      expect(parseWith({ cardNumber: "4242 4242 4242 4241" }).success).toBe(
-        false,
-      );
+    it("rejects junk", () => {
+      expect(parseWith({ phone: "позвоните" }).success).toBe(false);
+      expect(parseWith({ phone: "12345" }).success).toBe(false);
     });
   });
 
-  describe("cardExpiry", () => {
-    it("rejects a bad month or format", () => {
-      expect(parseWith({ cardExpiry: "13/29" }).success).toBe(false);
-      expect(parseWith({ cardExpiry: "0429" }).success).toBe(false);
-    });
-
-    it("rejects an expiry in the past", () => {
-      expect(parseWith({ cardExpiry: "01/20" }).success).toBe(false);
+  describe("email", () => {
+    it("is lower-cased", () => {
+      const res = parseWith({ email: "  Buyer@Example.COM " });
+      expect(res.success).toBe(true);
+      if (res.success) expect(res.data.email).toBe("buyer@example.com");
     });
   });
 
-  describe("cardCvc", () => {
-    it("accepts 3 or 4 digits only", () => {
-      expect(parseWith({ cardCvc: "1234" }).success).toBe(true);
-      expect(parseWith({ cardCvc: "12" }).success).toBe(false);
-      expect(parseWith({ cardCvc: "12a" }).success).toBe(false);
+  describe("pickup", () => {
+    it("does not require an address", () => {
+      expect(
+        parseWith({
+          deliveryMethod: "pickup",
+          city: "",
+          address: "",
+          postalCode: "",
+        }).success,
+      ).toBe(true);
+    });
+  });
+
+  describe("delivery", () => {
+    it("requires city and address", () => {
+      expect(parseWith({ city: "" }).success).toBe(false);
+      expect(parseWith({ address: "" }).success).toBe(false);
+    });
+    it("accepts an empty postal code", () => {
+      expect(parseWith({ postalCode: "" }).success).toBe(true);
+    });
+    it("rejects an unknown delivery method", () => {
+      expect(parseWith({ deliveryMethod: "drone" }).success).toBe(false);
+    });
+  });
+
+  describe("payment and consent", () => {
+    it("accepts only known payment methods", () => {
+      expect(parseWith({ paymentMethod: "online" }).success).toBe(true);
+      expect(parseWith({ paymentMethod: "crypto" }).success).toBe(false);
+    });
+    it("requires personal-data consent", () => {
+      expect(parseWith({ consent: false }).success).toBe(false);
+      expect(parseWith({ consent: undefined }).success).toBe(false);
     });
   });
 });

@@ -69,7 +69,7 @@ export function ResetForm() {
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("auth.password")}
           </label>
-          <input className={field} type="password" {...register("password")} />
+          <input className={field} type="password" autoComplete="new-password" {...register("password")} />
           {errors.password && (
             <p className={fieldError}>{errors.password.message}</p>
           )}
@@ -78,7 +78,7 @@ export function ResetForm() {
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("auth.confirmPassword")}
           </label>
-          <input className={field} type="password" {...register("confirm")} />
+          <input className={field} type="password" autoComplete="new-password" {...register("confirm")} />
           {errors.confirm && (
             <p className={fieldError}>{errors.confirm.message}</p>
           )}

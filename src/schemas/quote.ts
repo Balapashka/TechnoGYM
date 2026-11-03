@@ -16,13 +16,13 @@ export function normalizePhone(value: string): string {
  * separators. Checked before normalization so "+7 999 123 45 67 доб. 12" is
  * rejected instead of silently becoming a different number.
  */
-const PHONE_INPUT_PATTERN = /^\+?[\d\s().-]+$/;
+export const PHONE_INPUT_PATTERN = /^\+?[\d\s().-]+$/;
 
 /**
  * RU/CIS numbers are 10 digits without a country code ("9991234567") and 11–15
  * with one; the upper bound is the E.164 maximum.
  */
-const PHONE_PATTERN = /^\+?\d{10,15}$/;
+export const PHONE_PATTERN = /^\+?\d{10,15}$/;
 
 export const PHONE_ERROR_MESSAGE = "Введите корректный номер телефона";
 
@@ -34,8 +34,8 @@ export const quoteRequestSchema = z.object({
   // The product may have been removed by the time the form is submitted, so the
   // id is optional and the name below is what makes the lead readable.
   productId: z.string().trim().optional(),
-  productName: z.string().trim().min(1, "Не удалось определить товар"),
-  name: z.string().trim().min(2, "Укажите ваше имя"),
+  productName: z.string().trim().min(1, "Не удалось определить товар").max(200),
+  name: z.string().trim().min(2, "Укажите ваше имя").max(100),
   phone: z
     .string()
     .trim()
@@ -56,6 +56,17 @@ export const quoteRequestSchema = z.object({
     .max(1000, "Комментарий — не более 1000 символов")
     .transform((v) => (v.length > 0 ? v : undefined))
     .optional(),
+  /** Which form sent the lead: product price request, B2B or contact page. */
+  source: z.enum(["product", "business", "contact"]).default("product"),
+  /** Personal-data consent (152-ФЗ) — the form cannot be sent without it. */
+  consent: z.literal(true, {
+    message: "Необходимо согласие на обработку персональных данных",
+  }),
+  /**
+   * Honeypot: a visually hidden field people never fill in. Bots that fill
+   * every input get a fake success and nothing is stored.
+   */
+  website: z.string().max(200).optional(),
 });
 
 export type QuoteRequestInput = z.input<typeof quoteRequestSchema>;
