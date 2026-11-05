@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 # ---- Builder: install deps and build the Next.js app ----
 FROM node:22-bookworm-slim AS builder
 WORKDIR /app

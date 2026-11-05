@@ -39,10 +39,19 @@ if ! grep -q '/swapfile' /proc/swaps; then
 fi
 
 say "3/7 Docker"
-if ! command -v docker >/dev/null; then
-  curl -fsSL https://get.docker.com | sh >/dev/null
+# Docker from Ubuntu's own repositories: download.docker.com and Docker Hub
+# limit access from Russian IPs. Images are pulled through the Timeweb mirror
+# (Docker falls back to Docker Hub itself if the mirror is unreachable).
+if ! command -v docker >/dev/null || ! docker compose version >/dev/null 2>&1; then
+  apt-get install -y -qq docker.io docker-compose-v2 docker-buildx >/dev/null
 fi
-systemctl enable --now docker >/dev/null
+mkdir -p /etc/docker
+if [ ! -f /etc/docker/daemon.json ]; then
+  printf '{\n  "registry-mirrors": ["https://dockerhub.timeweb.cloud"]\n}\n' > /etc/docker/daemon.json
+fi
+systemctl enable docker >/dev/null 2>&1 || true
+systemctl restart docker
+docker compose version
 
 say "4/7 Брандмауэр: открыты только SSH, HTTP и HTTPS"
 ufw allow OpenSSH >/dev/null; ufw allow 80/tcp >/dev/null; ufw allow 443/tcp >/dev/null
