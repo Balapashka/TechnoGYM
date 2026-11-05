@@ -21,8 +21,13 @@ die() { printf '\n\033[1;31m✗ %s\033[0m\n' "$*"; exit 1; }
 [ -n "$DOMAIN" ] || die "Укажите домен: … | bash -s -- sportliner.store you@mail.ru"
 [ -n "$ADMIN_EMAIL" ] || die "Укажите email администратора вторым аргументом."
 
+trap 'printf "\n\033[1;31m✗ Ошибка в строке %s (шаг выше). Покажите этот вывод разработчику.\033[0m\n" "$LINENO"' ERR
+
 say "1/7 Обновляю систему и ставлю нужные программы"
 export DEBIAN_FRONTEND=noninteractive
+# On a fresh server the OS installs updates on first boot and holds the
+# package lock; wait for it instead of failing (applies to get.docker.com too).
+echo 'DPkg::Lock::Timeout "1200";' > /etc/apt/apt.conf.d/99sportliner-lock-timeout
 apt-get update -qq
 apt-get install -y -qq git curl ca-certificates dnsutils ufw openssl cron >/dev/null
 
@@ -105,8 +110,10 @@ echo
 echo "   Сайт:     https://$DOMAIN"
 echo "   Админка:  https://$DOMAIN/admin"
 echo "   Логин:    $ADMIN_EMAIL"
-if [ -n "$NEW_PASSWORD" ]; then
+if [ -n "$NEW_PASSWORD" ] && [ -z "${ADMIN_PASSWORD:-}" ]; then
   printf '   Пароль:   \033[1m%s\033[0m   ← сохраните его сейчас, он показывается один раз\n' "$NEW_PASSWORD"
+elif [ -n "$NEW_PASSWORD" ]; then
+  echo "   Пароль:   заданный при установке"
 else
   echo "   Пароль:   прежний (см. ADMIN_PASSWORD в $DIR/.env)"
 fi
