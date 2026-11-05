@@ -3,7 +3,8 @@
 #
 #   curl -fsSL https://raw.githubusercontent.com/Balapashka/TechnoGYM/<branch>/scripts/server-setup.sh | sudo bash -s -- shop.example.ru owner@mail.ru <branch>
 #
-# Arguments: <domain> <admin email> [git branch]. Safe to run again: it updates
+# Arguments: <domain> <admin email> [git branch]. Optional env ADMIN_PASSWORD
+# presets the admin password (otherwise a random one is printed). Safe to run again: it updates
 # the code and restarts the shop, keeping the database, photos and .env.
 set -euo pipefail
 
@@ -53,7 +54,8 @@ cd "$DIR"
 say "6/7 Настройки (.env)"
 NEW_PASSWORD=""
 if [ ! -f .env ]; then
-  NEW_PASSWORD="$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | cut -c1-16)"
+  # A preset password (ADMIN_PASSWORD env, e.g. from cloud-init) or a random one.
+  NEW_PASSWORD="${ADMIN_PASSWORD:-$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | cut -c1-16)}"
   cp .env.example .env
   set_env() { sed -i "s|^$1=.*|$1=$2|" .env; }
   set_env DOMAIN "\"$DOMAIN\""
