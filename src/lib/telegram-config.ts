@@ -106,8 +106,10 @@ export class TelegramApiError extends Error {
   }
 }
 
-const ATTEMPTS = 3;
-const ATTEMPT_TIMEOUT_MS = 7000;
+// A normal call takes ~0.7 s; a stalled connection does not recover, so give
+// up on it early and try a fresh one.
+const ATTEMPTS = 5;
+const ATTEMPT_TIMEOUT_MS = 4000;
 
 /**
  * Call a Bot API method. Throws TelegramApiError with Telegram's description

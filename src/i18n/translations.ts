@@ -453,6 +453,8 @@ export interface Translation {
     tgLinked: string;
     tgLinkTimeout: string;
     tgRemove: string;
+    tgTest: string;
+    tgTestDone: string;
     tgUnreachable: string;
     tgRelay: string;
     tgRelayHint: string;
@@ -1088,6 +1090,8 @@ export const translations: Record<Locale, Translation> = {
       tgLinked: "Готово: {name} будет получать уведомления. В Telegram пришло проверочное сообщение.",
       tgLinkTimeout: "Не дождались нажатия «Запустить». Попробуйте ещё раз.",
       tgRemove: "Убрать",
+      tgTest: "Отправить проверочное сообщение",
+      tgTestDone: "Доставлено: {sent} из {total}. Проверьте Telegram.",
       tgUnreachable: "Бот сохранён, но сейчас сервер не может связаться с Telegram — уведомления не уходят. Проверьте адрес ретранслятора.",
       tgRelay: "Адрес ретранслятора",
       tgRelayHint: "Нужен, если сервер не может связаться с Telegram напрямую — так бывает в российских дата-центрах. Адрес даёт разработчик.",
@@ -1706,6 +1710,8 @@ export const translations: Record<Locale, Translation> = {
       tgLinked: "Done: {name} will receive notifications. A test message arrived in Telegram.",
       tgLinkTimeout: "Start was not pressed in time. Please try again.",
       tgRemove: "Remove",
+      tgTest: "Send a test message",
+      tgTestDone: "Delivered: {sent} of {total}. Check Telegram.",
       tgUnreachable: "The bot is saved, but the server cannot reach Telegram right now — notifications are not sent. Check the relay address.",
       tgRelay: "Relay address",
       tgRelayHint: "Needed when the server cannot reach Telegram directly — common in Russian data centres. Your developer provides the address.",

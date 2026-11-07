@@ -37,6 +37,7 @@ export function TelegramConnect() {
   const [linking, setLinking] = useState<Linking | null>(null);
   const [linked, setLinked] = useState<string | null>(null);
   const [linkTimedOut, setLinkTimedOut] = useState(false);
+  const [testResult, setTestResult] = useState<{ sent: number; total: number } | null>(null);
 
   function apply(s: Status) {
     setStatus(s);
@@ -126,6 +127,20 @@ export function TelegramConnect() {
     else window.open(url, "_blank", "noopener");
   }
 
+  async function sendTest() {
+    setBusy(true);
+    setError(null);
+    setTestResult(null);
+    const res = await fetch("/api/admin/telegram/test", { method: "POST" }).catch(() => null);
+    const json = (await res?.json().catch(() => null)) as ({ sent: number; total: number } & Failure) | null;
+    setBusy(false);
+    if (!res?.ok || !json) {
+      setError({ error: json?.error ?? t("admin.errGeneric") });
+      return;
+    }
+    setTestResult({ sent: json.sent, total: json.total });
+  }
+
   const saved = Boolean(status?.tokenSaved);
   const ready = saved && Boolean(status?.reachable);
 
@@ -160,6 +175,23 @@ export function TelegramConnect() {
                   </li>
                 ))}
               </ul>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={sendTest}
+                className="mt-3 text-xs font-semibold underline disabled:opacity-50"
+              >
+                {t("admin.tgTest")}
+              </button>
+              {testResult && (
+                <p
+                  className={`mt-1 text-xs font-semibold ${
+                    testResult.sent === testResult.total ? "text-green-800" : "text-amber-800"
+                  }`}
+                >
+                  {t("admin.tgTestDone", { sent: String(testResult.sent), total: String(testResult.total) })}
+                </p>
+              )}
             </>
           ) : (
             <p className="text-amber-800">{t("admin.tgNoChats", { bot: status!.bot ?? "" })}</p>
