@@ -1,20 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { extractChats, isTokenRejected, looksLikeBotToken, mergeChats, normalizeApiBase } from "./telegram-chats";
-
-describe("extractChats", () => {
-  it("collects unique private and group chats", () => {
-    const chats = extractChats([
-      { message: { chat: { id: 42, type: "private", first_name: "Ерлан", last_name: "Б." } } },
-      { message: { chat: { id: 42, type: "private", first_name: "Ерлан" } } },
-      { my_chat_member: { chat: { id: -100123, type: "supergroup", title: "Заказы" } } },
-      {},
-    ]);
-    expect(chats).toEqual([
-      { id: "42", title: "Ерлан" },
-      { id: "-100123", title: "Заказы" },
-    ]);
-  });
-});
+import {
+  LINK_CODE_RE,
+  findLinkedChat,
+  isTokenRejected,
+  looksLikeBotToken,
+  maxUpdateId,
+  mergeChats,
+  newLinkCode,
+  normalizeApiBase,
+} from "./telegram-chats";
 
 describe("mergeChats", () => {
   it("keeps saved chats and adds new ones", () => {
@@ -55,5 +49,32 @@ describe("isTokenRejected", () => {
     expect(isTokenRejected("Not Found")).toBe(true);
     expect(isTokenRejected("The operation was aborted due to timeout")).toBe(false);
     expect(isTokenRejected("Telegram HTTP 403")).toBe(false);
+  });
+});
+
+describe("link codes", () => {
+  it("generates random codes the server accepts", () => {
+    const a = newLinkCode();
+    expect(a).toMatch(LINK_CODE_RE);
+    expect(newLinkCode()).not.toBe(a);
+  });
+
+  const code = "0123456789abcdef01234567";
+  const updates = [
+    { update_id: 5, message: { text: "/start", chat: { id: 1, first_name: "Чужой" } } },
+    { update_id: 6, message: { text: "/start wrongcode000000000", chat: { id: 2, first_name: "Тоже" } } },
+    { update_id: 7, message: { text: `/start ${code}`, chat: { id: 42, first_name: "Ерлан" } } },
+    { update_id: 8, message: { text: `/start@SportlinerStore_Bot ${code}`, chat: { id: -100, title: "Менеджеры" } } },
+  ];
+
+  it("links only the chat that sent this code", () => {
+    expect(findLinkedChat(updates, code)).toEqual({ id: "42", title: "Ерлан" });
+    expect(findLinkedChat(updates.slice(3), code)).toEqual({ id: "-100", title: "Менеджеры" });
+    expect(findLinkedChat(updates.slice(0, 2), code)).toBeNull();
+  });
+
+  it("finds the update id to confirm", () => {
+    expect(maxUpdateId(updates)).toBe(8);
+    expect(maxUpdateId([])).toBeNull();
   });
 });

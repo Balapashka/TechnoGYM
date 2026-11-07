@@ -1,31 +1,20 @@
 /**
  * Pure helpers for connecting the Telegram bot from the admin panel: the
- * owner writes /start to the bot, and we read the chats from getUpdates.
+ * owner opens t.me/<bot>?start=<one-time code>, presses Start, and we find
+ * that chat in getUpdates.
  */
 export type TgChat = { id: string; title: string };
 
 type Chat = { id: number | string; type?: string; title?: string; first_name?: string; last_name?: string; username?: string };
-type Update = {
-  message?: { chat?: Chat };
-  channel_post?: { chat?: Chat };
-  my_chat_member?: { chat?: Chat };
+export type Update = {
+  update_id?: number;
+  message?: { chat?: Chat; text?: string };
 };
 
 export function chatTitle(c: Chat): string {
   if (c.title) return c.title;
   const name = [c.first_name, c.last_name].filter(Boolean).join(" ");
   return name || (c.username ? `@${c.username}` : String(c.id));
-}
-
-/** Unique chats (private chats and groups) the bot has heard from. */
-export function extractChats(updates: Update[]): TgChat[] {
-  const map = new Map<string, TgChat>();
-  for (const u of updates) {
-    const chat = u.message?.chat ?? u.my_chat_member?.chat ?? u.channel_post?.chat;
-    if (!chat || chat.id === undefined) continue;
-    map.set(String(chat.id), { id: String(chat.id), title: chatTitle(chat) });
-  }
-  return [...map.values()];
 }
 
 /** Merge newly found chats into the saved list, keeping order and titles. */
@@ -59,4 +48,36 @@ export function normalizeApiBase(raw: string): string {
 /** Telegram answered and refused the token (as opposed to "could not reach it"). */
 export function isTokenRejected(message: string): boolean {
   return /unauthorized|not found/i.test(message);
+}
+
+/** One-time code the admin puts into the t.me/<bot>?start=<code> link. */
+export const LINK_CODE_RE = /^[A-Za-z0-9_-]{16,64}$/;
+
+/** A fresh random link code (browser or Node 19+). */
+export function newLinkCode(): string {
+  const bytes = new Uint8Array(12);
+  globalThis.crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/**
+ * The chat that pressed Start in the admin's link: Telegram delivers it as
+ * "/start <code>" (private chat) or "/start@bot <code>" (group). Only that
+ * chat is linked — a stranger who finds the public bot gets nothing.
+ */
+export function findLinkedChat(updates: Update[], code: string): TgChat | null {
+  for (const u of updates) {
+    const m = u.message;
+    const match = m?.text?.trim().match(/^\/start(?:@\w+)?\s+(\S+)$/);
+    if (match && match[1] === code && m?.chat && m.chat.id !== undefined) {
+      return { id: String(m.chat.id), title: chatTitle(m.chat) };
+    }
+  }
+  return null;
+}
+
+/** Highest update_id in a batch — confirm with offset = max + 1. */
+export function maxUpdateId(updates: Update[]): number | null {
+  const ids = updates.map((u) => u.update_id).filter((id): id is number => typeof id === "number");
+  return ids.length ? Math.max(...ids) : null;
 }

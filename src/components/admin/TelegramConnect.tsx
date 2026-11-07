@@ -3,21 +3,29 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/i18n/useTranslation";
 import { field } from "@/components/auth/AuthCard";
+import { newLinkCode, type TgChat } from "@/lib/telegram-chats";
 
 type Status = {
   tokenSaved: boolean;
   reachable: boolean;
   connected: boolean;
   bot: string | null;
-  chats: { id: string; title: string }[];
+  chats: TgChat[];
   relay: string;
   relayFromEnv: boolean;
   includeContacts: boolean;
 };
 
 type Failure = { error?: string; code?: string };
+type Linking = { code: string; url: string; startedAt: number; forOther: boolean };
 
-/** Connect the store's Telegram bot: token + chats that wrote /start (+ relay). */
+const LINK_POLL_MS = 3000;
+const LINK_WAIT_MS = 10 * 60 * 1000;
+
+/**
+ * Connect the store's Telegram bot: token (+ relay), then recipients added one
+ * by one through a one-time t.me/<bot>?start=<code> link.
+ */
 export function TelegramConnect() {
   const t = useTranslation();
   const [status, setStatus] = useState<Status | null>(null);
@@ -26,6 +34,9 @@ export function TelegramConnect() {
   const [relayOpen, setRelayOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<Failure | null>(null);
+  const [linking, setLinking] = useState<Linking | null>(null);
+  const [linked, setLinked] = useState<string | null>(null);
+  const [linkTimedOut, setLinkTimedOut] = useState(false);
 
   function apply(s: Status) {
     setStatus(s);
@@ -40,10 +51,46 @@ export function TelegramConnect() {
       .catch(() => null);
   }, []);
 
-  async function call(method: "POST" | "PATCH" | "DELETE", body?: unknown) {
+  // While a link is open, ask the server every few seconds whether Start was pressed.
+  useEffect(() => {
+    if (!linking) return;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const tick = async () => {
+      const res = await fetch("/api/admin/telegram/link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: linking.code }),
+      }).catch(() => null);
+      const json = (await res?.json().catch(() => null)) as
+        | { linked?: boolean; chat?: TgChat; chats?: TgChat[] }
+        | null;
+      if (stopped) return;
+      if (json?.linked && json.chat && json.chats) {
+        const chats = json.chats;
+        setLinking(null);
+        setLinked(json.chat.title);
+        setStatus((s) => (s ? { ...s, chats, connected: chats.length > 0 } : s));
+        return;
+      }
+      if (Date.now() - linking.startedAt > LINK_WAIT_MS) {
+        setLinking(null);
+        setLinkTimedOut(true);
+        return;
+      }
+      timer = setTimeout(tick, LINK_POLL_MS);
+    };
+    timer = setTimeout(tick, LINK_POLL_MS);
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+    };
+  }, [linking]);
+
+  async function call(method: "POST" | "PATCH" | "DELETE", body?: unknown, query = "") {
     setBusy(true);
     setError(null);
-    const res = await fetch("/api/admin/telegram", {
+    const res = await fetch(`/api/admin/telegram${query}`, {
       method,
       headers: { "Content-Type": "application/json" },
       body: body ? JSON.stringify(body) : undefined,
@@ -66,7 +113,21 @@ export function TelegramConnect() {
     call("POST", body);
   }
 
+  /** `share`: a link for a manager — copied, not opened on this device. */
+  function openLink(kind: "start" | "startgroup", share = false) {
+    if (!status?.bot) return;
+    const code = newLinkCode();
+    const url = `https://t.me/${status.bot}?${kind}=${code}`;
+    setLinked(null);
+    setLinkTimedOut(false);
+    setError(null);
+    setLinking({ code, url, startedAt: Date.now(), forOther: share });
+    if (share) navigator.clipboard?.writeText(url).catch(() => null);
+    else window.open(url, "_blank", "noopener");
+  }
+
   const saved = Boolean(status?.tokenSaved);
+  const ready = saved && Boolean(status?.reachable);
 
   return (
     <section className="max-w-3xl space-y-4 rounded-2xl border border-stone p-5">
@@ -84,15 +145,63 @@ export function TelegramConnect() {
               <p className="font-semibold text-green-800">
                 {t("admin.tgConnectedTo", { bot: status!.bot ?? "" })}
               </p>
-              <ul className="mt-1 list-disc pl-5">
+              <ul className="mt-2 space-y-1">
                 {status!.chats.map((c) => (
-                  <li key={c.id}>{c.title}</li>
+                  <li key={c.id} className="flex items-center justify-between gap-3">
+                    <span>• {c.title}</span>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => call("DELETE", undefined, `?chat=${encodeURIComponent(c.id)}`)}
+                      className="text-xs font-semibold text-ink-soft underline disabled:opacity-50"
+                    >
+                      {t("admin.tgRemove")}
+                    </button>
+                  </li>
                 ))}
               </ul>
             </>
           ) : (
-            <p className="text-amber-800">{t("admin.tgNoChats")}</p>
+            <p className="text-amber-800">{t("admin.tgNoChats", { bot: status!.bot ?? "" })}</p>
           )}
+        </div>
+      )}
+
+      {ready && (
+        <div className="space-y-3 rounded-xl border border-stone p-4">
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => openLink("start")}
+              className="hover-lift rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase text-ink"
+            >
+              {t("admin.tgOpenBot")}
+            </button>
+            <button
+              type="button"
+              onClick={() => openLink("start", true)}
+              className="rounded-full border border-stone px-6 py-3 text-sm font-bold uppercase"
+            >
+              {t("admin.tgShareLink")}
+            </button>
+            <button
+              type="button"
+              onClick={() => openLink("startgroup")}
+              className="rounded-full border border-stone px-6 py-3 text-sm font-bold uppercase"
+            >
+              {t("admin.tgOpenGroup")}
+            </button>
+          </div>
+          {linking && (
+            <p className="text-sm text-ink-soft">
+              {t(linking.forOther ? "admin.tgWaitingShare" : "admin.tgWaiting")}{" "}
+              <a href={linking.url} target="_blank" rel="noopener noreferrer" className="break-all underline">
+                {linking.url}
+              </a>
+            </p>
+          )}
+          {linked && <p className="text-sm font-semibold text-green-800">{t("admin.tgLinked", { name: linked })}</p>}
+          {linkTimedOut && <p className="text-sm text-amber-800">{t("admin.tgLinkTimeout")}</p>}
         </div>
       )}
 
@@ -169,7 +278,7 @@ export function TelegramConnect() {
           type="button"
           disabled={busy || (!token && !saved)}
           onClick={connect}
-          className="hover-lift rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase text-ink disabled:opacity-50"
+          className="rounded-full border border-ink px-6 py-3 text-sm font-bold uppercase disabled:opacity-50"
         >
           {busy ? t("common.loading") : token || !saved ? t("admin.tgConnect") : t("admin.tgRefresh")}
         </button>

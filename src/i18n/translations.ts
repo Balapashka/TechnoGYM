@@ -445,6 +445,14 @@ export interface Translation {
     tgDisconnect: string;
     tgConnectedTo: string;
     tgNoChats: string;
+    tgOpenBot: string;
+    tgOpenGroup: string;
+    tgShareLink: string;
+    tgWaitingShare: string;
+    tgWaiting: string;
+    tgLinked: string;
+    tgLinkTimeout: string;
+    tgRemove: string;
     tgUnreachable: string;
     tgRelay: string;
     tgRelayHint: string;
@@ -1063,15 +1071,23 @@ export const translations: Record<Locale, Translation> = {
       tgTitle: "Уведомления в Telegram",
       tgLead: "Новые заказы и заявки будут приходить вам в Telegram.",
       tgStep1: "Создайте бота у @BotFather (команда /newbot) и скопируйте токен — строку вида 123456789:AA…",
-      tgStep2: "Откройте своего бота в Telegram и отправьте ему /start. Менеджеры тоже могут написать /start или добавьте бота в общую группу.",
-      tgStep3: "Вставьте токен ниже и нажмите «Подключить» — в Telegram придёт проверочное сообщение.",
+      tgStep2: "Вставьте токен ниже и нажмите «Подключить».",
+      tgStep3: "Нажмите «Открыть бота в Telegram», а в Telegram — «Запустить». Чат добавится сам, придёт проверочное сообщение. Менеджеру — «Ссылка для менеджера», для общего чата — «Добавить бота в группу».",
       tgToken: "Токен бота",
       tgTokenSaved: "Токен сохранён. Оставьте поле пустым, чтобы не менять его.",
       tgConnect: "Подключить",
-      tgRefresh: "Добавить новых получателей",
+      tgRefresh: "Проверить связь",
       tgDisconnect: "Отключить",
       tgConnectedTo: "Подключено: бот @{bot}. Получатели:",
-      tgNoChats: "Бот подключён, но ему ещё никто не написал. Отправьте боту /start и нажмите «Добавить новых получателей».",
+      tgNoChats: "Бот @{bot} подключён, но получателей пока нет — нажмите «Открыть бота в Telegram».",
+      tgOpenBot: "Открыть бота в Telegram",
+      tgOpenGroup: "Добавить бота в группу",
+      tgShareLink: "Ссылка для менеджера",
+      tgWaitingShare: "Ссылка скопирована — отправьте её менеджеру: он откроет её и нажмёт «Запустить» (в течение 10 минут). Ссылка:",
+      tgWaiting: "Ждём, когда вы нажмёте «Запустить» в Telegram… Если он не открылся, откройте ссылку:",
+      tgLinked: "Готово: {name} будет получать уведомления. В Telegram пришло проверочное сообщение.",
+      tgLinkTimeout: "Не дождались нажатия «Запустить». Попробуйте ещё раз.",
+      tgRemove: "Убрать",
       tgUnreachable: "Бот сохранён, но сейчас сервер не может связаться с Telegram — уведомления не уходят. Проверьте адрес ретранслятора.",
       tgRelay: "Адрес ретранслятора",
       tgRelayHint: "Нужен, если сервер не может связаться с Telegram напрямую — так бывает в российских дата-центрах. Адрес даёт разработчик.",
@@ -1673,15 +1689,23 @@ export const translations: Record<Locale, Translation> = {
       tgTitle: "Telegram notifications",
       tgLead: "New orders and requests will arrive in your Telegram.",
       tgStep1: "Create a bot with @BotFather (/newbot) and copy its token — a line like 123456789:AA…",
-      tgStep2: "Open your bot in Telegram and send it /start. Managers can do the same, or add the bot to a group.",
-      tgStep3: "Paste the token below and press Connect — a test message will arrive in Telegram.",
+      tgStep2: "Paste the token below and press Connect.",
+      tgStep3: "Press “Open the bot in Telegram”, then Start in Telegram. The chat is added automatically and a test message arrives. For a manager use “Link for a manager”, for a shared chat “Add the bot to a group”.",
       tgToken: "Bot token",
       tgTokenSaved: "Token saved. Leave empty to keep it.",
       tgConnect: "Connect",
-      tgRefresh: "Add new recipients",
+      tgRefresh: "Check connection",
       tgDisconnect: "Disconnect",
       tgConnectedTo: "Connected: bot @{bot}. Recipients:",
-      tgNoChats: "The bot is connected, but nobody has written to it yet. Send /start to the bot and press “Add new recipients”.",
+      tgNoChats: "Bot @{bot} is connected, but there are no recipients yet — press “Open the bot in Telegram”.",
+      tgOpenBot: "Open the bot in Telegram",
+      tgOpenGroup: "Add the bot to a group",
+      tgShareLink: "Link for a manager",
+      tgWaitingShare: "Link copied — send it to your manager: they open it and press Start (within 10 minutes). Link:",
+      tgWaiting: "Waiting for you to press Start in Telegram… If it did not open, use this link:",
+      tgLinked: "Done: {name} will receive notifications. A test message arrived in Telegram.",
+      tgLinkTimeout: "Start was not pressed in time. Please try again.",
+      tgRemove: "Remove",
       tgUnreachable: "The bot is saved, but the server cannot reach Telegram right now — notifications are not sent. Check the relay address.",
       tgRelay: "Relay address",
       tgRelayHint: "Needed when the server cannot reach Telegram directly — common in Russian data centres. Your developer provides the address.",

@@ -12,15 +12,7 @@ import {
   telegramApi,
   type TelegramConfig,
 } from "@/lib/telegram-config";
-import {
-  extractChats,
-  isTokenRejected,
-  looksLikeBotToken,
-  mergeChats,
-  normalizeApiBase,
-  type TgChat,
-} from "@/lib/telegram-chats";
-import { BRAND_NAME } from "@/lib/brand";
+import { isTokenRejected, looksLikeBotToken, normalizeApiBase, type TgChat } from "@/lib/telegram-chats";
 
 type BotInfo = { username: string; first_name: string };
 
@@ -78,8 +70,8 @@ function connectError(message: string, apiBase: string) {
 }
 
 /**
- * POST — connect or refresh. With `token`: verify it and save it. Then read the
- * chats that wrote to the bot (/start), add them and send each a test message.
+ * POST — connect or re-check. With `token`: verify it and save it (a new bot
+ * starts with no recipients). `relay` sets or clears the relay address.
  */
 export async function POST(request: Request) {
   const forbidden = await forbidUnlessAdmin();
@@ -118,20 +110,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ ...body, detail: message.slice(0, 200) }, { status: code });
   }
 
-  const updates = await telegramApi<unknown[]>(target, "getUpdates", { timeout: 0 }).catch(() => []);
-  const found = extractChats(updates as Parameters<typeof extractChats>[0]);
-  const chats = mergeChats(token === current?.token ? current.chats : [], found);
+  // Recipients are added one by one through a one-time link (link/route.ts),
+  // never from whoever happened to write to the public bot.
+  const chats = token === current?.token ? current.chats : [];
   await saveTelegramConfig(token, chats, relay);
-
-  const fresh = found.filter((c) => !current?.chats.some((s) => s.id === c.id) || token !== current?.token);
-  await Promise.all(
-    fresh.map((c) =>
-      telegramApi(target, "sendMessage", {
-        chat_id: c.id,
-        text: `✅ ${BRAND_NAME}: уведомления о заказах и заявках подключены. Сюда будут приходить новые заказы.`,
-      }).catch(() => null),
-    ),
-  );
 
   return NextResponse.json(await status(await getTelegramConfig(), bot, chats));
 }
@@ -148,10 +130,18 @@ export async function PATCH(request: Request) {
   return NextResponse.json(await currentStatus());
 }
 
-/** DELETE — disconnect the bot (the relay address stays). */
-export async function DELETE() {
+/** DELETE — `?chat=<id>` removes one recipient; without it, disconnects the bot (the relay stays). */
+export async function DELETE(request: Request) {
   const forbidden = await forbidUnlessAdmin();
   if (forbidden) return forbidden;
+  const chatId = new URL(request.url).searchParams.get("chat");
+  if (chatId) {
+    const cfg = await getTelegramConfig();
+    if (cfg) {
+      await saveTelegramConfig(cfg.token, cfg.chats.filter((c) => c.id !== chatId), await getSavedApiBase());
+    }
+    return NextResponse.json(await currentStatus());
+  }
   await clearTelegramConfig();
   return NextResponse.json(await status(null, null, []));
 }
