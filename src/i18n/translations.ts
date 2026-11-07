@@ -482,6 +482,8 @@ export interface Translation {
     mailPass: string;
     mailHost: string;
     mailConnect: string;
+    mailTest: string;
+    mailTestDone: string;
     settingsSeo: string;
     setting_yandexVerification: string;
     setting_googleVerification: string;
@@ -1128,6 +1130,8 @@ export const translations: Record<Locale, Translation> = {
       mailPass: "Пароль приложения",
       mailHost: "Почтовый сервер (SMTP)",
       mailConnect: "Подключить",
+      mailTest: "Отправить проверочное письмо",
+      mailTestDone: "Отправлено на {email}. Если письма нет во «Входящих», загляните в «Спам» и отметьте «Не спам».",
       settingsSeo: "Поисковики и аналитика",
       setting_yandexVerification: "Код Яндекс Вебмастера (content из meta-тега)",
       setting_googleVerification: "Код Google Search Console (content из meta-тега)",
@@ -1757,6 +1761,8 @@ export const translations: Record<Locale, Translation> = {
       mailPass: "App password",
       mailHost: "Mail server (SMTP)",
       mailConnect: "Connect",
+      mailTest: "Send a test email",
+      mailTestDone: "Sent to {email}. If it is not in the inbox, check Spam and mark it “Not spam”.",
       settingsSeo: "Search engines and analytics",
       setting_yandexVerification: "Yandex Webmaster code (meta tag content)",
       setting_googleVerification: "Google Search Console code (meta tag content)",

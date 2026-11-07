@@ -70,6 +70,20 @@ async function notifyManager(subject: string, full: string, short = full): Promi
   ]);
 }
 
+/** Admin «Отправить проверочное письмо»: one email to where notifications go. */
+export async function sendManagerTestEmail(): Promise<{ to: string | null; ok: boolean }> {
+  const to = await managerEmail();
+  if (!to) return { to: null, ok: false };
+  const text = `🔔 ${BRAND_NAME}: проверка почты.\n\nУведомления о новых заказах и заявках с сайта приходят на этот адрес.`;
+  const ok = await sendMail({
+    to,
+    subject: `${BRAND_NAME}: проверка уведомлений`,
+    text,
+    html: textToHtml(text),
+  });
+  return { to, ok };
+}
+
 /** New order: alert the manager and confirm to the customer. */
 export async function notifyNewOrder(order: OrderForMessage): Promise<void> {
   try {

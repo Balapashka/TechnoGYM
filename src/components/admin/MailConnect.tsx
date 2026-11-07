@@ -16,6 +16,7 @@ export function MailConnect() {
   const [host, setHost] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [testTo, setTestTo] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/mail")
@@ -44,6 +45,20 @@ export function MailConnect() {
     setStatus(json);
   }
 
+  async function sendTest() {
+    setBusy(true);
+    setError(null);
+    setTestTo(null);
+    const res = await fetch("/api/admin/mail/test", { method: "POST" }).catch(() => null);
+    const json = (await res?.json().catch(() => null)) as { to?: string; error?: string } | null;
+    setBusy(false);
+    if (!res?.ok || !json?.to) {
+      setError(json?.error ?? t("admin.errGeneric"));
+      return;
+    }
+    setTestTo(json.to);
+  }
+
   return (
     <section className="max-w-3xl space-y-4 rounded-2xl border border-stone p-5">
       <div>
@@ -52,9 +67,24 @@ export function MailConnect() {
       </div>
 
       {status?.connected && (
-        <p className="rounded-xl bg-mist p-4 text-sm font-semibold text-green-800">
-          {t("admin.mailConnected", { email: status.user ?? "" })}
-        </p>
+        <div className="rounded-xl bg-mist p-4 text-sm">
+          <p className="font-semibold text-green-800">
+            {t("admin.mailConnected", { email: status.user ?? "" })}
+          </p>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={sendTest}
+            className="mt-2 text-xs font-semibold underline disabled:opacity-50"
+          >
+            {t("admin.mailTest")}
+          </button>
+          {testTo && (
+            <p className="mt-1 text-xs font-semibold text-green-800">
+              {t("admin.mailTestDone", { email: testTo })}
+            </p>
+          )}
+        </div>
       )}
 
       {status?.fromEnv ? (
