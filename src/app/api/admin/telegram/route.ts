@@ -50,8 +50,20 @@ export async function POST(request: Request) {
   let bot: BotInfo;
   try {
     bot = await telegramApi<BotInfo>(token, "getMe");
-  } catch {
-    return NextResponse.json({ error: "Telegram не принял токен — проверьте его" }, { status: 400 });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    // Telegram answered and refused the token, or we could not reach it at all.
+    const unauthorized = /unauthorized|not found/i.test(message);
+    console.error("[telegram] getMe failed:", message);
+    return NextResponse.json(
+      {
+        error: unauthorized
+          ? "Telegram не принял токен — проверьте его"
+          : "Сервер не может связаться с Telegram (api.telegram.org недоступен из дата-центра). Уведомления можно получать на почту.",
+        detail: message.slice(0, 200),
+      },
+      { status: unauthorized ? 400 : 502 },
+    );
   }
 
   const updates = await telegramApi<unknown[]>(token, "getUpdates", { timeout: 0 }).catch(() => []);
