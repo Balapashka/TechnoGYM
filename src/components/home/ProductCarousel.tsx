@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import useEmblaCarousel from "embla-carousel-react";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { useTranslation } from "@/i18n/useTranslation";
@@ -14,10 +15,16 @@ import type { ProductDTO } from "@/lib/catalog";
 export function ProductCarousel({
   title,
   titleKey,
+  leadKey,
+  viewAllHref,
   products,
 }: {
   title?: string;
   titleKey?: string;
+  /** Optional one-line subtitle (dictionary path). */
+  leadKey?: string;
+  /** Optional "view all" link next to the arrows. */
+  viewAllHref?: string;
   products: ProductDTO[];
 }) {
   const t = useTranslation();
@@ -27,14 +34,25 @@ export function ProductCarousel({
   });
 
   const heading = titleKey ? t(titleKey) : (title ?? "");
+  if (products.length === 0) return null;
 
 
   return (
-    <section className="container-page py-12">
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-black uppercase tracking-tight md:text-3xl">
-          {heading}
-        </h2>
+    <section className="container-page py-14 md:py-20">
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div className="max-w-2xl">
+          <h2 className="text-3xl font-semibold uppercase md:text-5xl">{heading}</h2>
+          {leadKey && <p className="mt-3 text-ink-soft">{t(leadKey)}</p>}
+        </div>
+        <div className="flex items-center gap-4">
+          {viewAllHref && (
+            <Link
+              href={viewAllHref}
+              className="border-b border-ink pb-0.5 text-xs font-semibold uppercase tracking-wider"
+            >
+              {t("home.viewAll")}
+            </Link>
+          )}
         <div className="hidden gap-2 md:flex">
           <button
             aria-label={t("landing.previous")}
@@ -51,10 +69,11 @@ export function ProductCarousel({
             ›
           </button>
         </div>
+        </div>
       </div>
 
       <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex gap-4">
+        <div className="flex gap-5">
           {products.map((p) => (
             <div
               key={p.id}

@@ -40,7 +40,7 @@ export function Gallery({ images, name }: { images: string[]; name: string }) {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-w-0 flex-col gap-4">
       <div
         ref={frameRef}
         onMouseMove={onMove}
@@ -65,7 +65,7 @@ export function Gallery({ images, name }: { images: string[]; name: string }) {
                 priority
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 fit="contain"
-                imgClassName="scale-110 p-8"
+                imgClassName="p-6 mix-blend-multiply md:p-10"
               />
             </motion.div>
           </motion.div>
@@ -86,14 +86,14 @@ export function Gallery({ images, name }: { images: string[]; name: string }) {
       </div>
 
       {safe.length > 1 && (
-        <div className="flex gap-3">
+        <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
           {safe.map((src, i) => (
             <button
               key={`${src}-${i}`}
               onClick={() => select(i)}
               aria-label={t("product.viewImage", { number: i + 1 })}
               aria-current={i === active}
-              className={`hover-lift relative h-20 w-20 overflow-hidden rounded-xl border bg-mist ${
+              className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border bg-mist ${
                 i === active ? "border-ink ring-2 ring-accent" : "border-stone"
               }`}
             >
@@ -102,7 +102,7 @@ export function Gallery({ images, name }: { images: string[]; name: string }) {
                 alt=""
                 sizes="80px"
                 fit="contain"
-                imgClassName="p-2"
+                imgClassName="p-2 mix-blend-multiply"
               />
             </button>
           ))}

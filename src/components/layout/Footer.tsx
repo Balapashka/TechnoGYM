@@ -6,6 +6,8 @@ import { footerColumns, legalLinks } from "@/lib/nav";
 import { NewsletterForm } from "./NewsletterForm";
 import { useTranslation } from "@/i18n/useTranslation";
 import { BRAND_NAME } from "@/lib/brand";
+import { categoryName } from "@/i18n/translations";
+import type { ShopNav } from "@/lib/nav-groups";
 import {
   phoneHref,
   socialLinksFrom,
@@ -17,7 +19,13 @@ import {
  * settings, legal links and the seller's details (required for an online
  * store by the consumer protection law).
  */
-export function Footer({ settings: s }: { settings: StoreSettings }) {
+export function Footer({
+  settings: s,
+  nav,
+}: {
+  settings: StoreSettings;
+  nav: ShopNav;
+}) {
   const t = useTranslation();
   const socials = socialLinksFrom(s);
   const requisites = [
@@ -30,11 +38,37 @@ export function Footer({ settings: s }: { settings: StoreSettings }) {
 
   return (
     <footer className="mt-auto bg-ink text-paper">
-      <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <p className="mb-2 text-2xl font-black uppercase">{t("footer.joinUs")}</p>
           <p className="mb-5 text-sm text-white/70">{t("footer.getTipsAndOffers")}</p>
           <NewsletterForm />
+        </div>
+
+        <div>
+          <p className="mb-4 text-xs font-bold uppercase tracking-wide text-white/60">
+            {t("nav.products")}
+          </p>
+          <ul className="space-y-2">
+            <li>
+              <Link
+                href="/category/all"
+                className="link-slide inline-block text-sm text-white/85 hover:text-accent"
+              >
+                {t("nav.allProducts")}
+              </Link>
+            </li>
+            {nav.categories.map((c) => (
+              <li key={c.slug}>
+                <Link
+                  href={`/category/${c.slug}`}
+                  className="link-slide inline-block text-sm text-white/85 hover:text-accent"
+                >
+                  {categoryName(t.locale, c.slug, c.name)}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
 
         {footerColumns.map((col) => (

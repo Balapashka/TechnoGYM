@@ -1,4 +1,4 @@
-import { getCategories } from "@/lib/catalog";
+import { getBrands, getCategories } from "@/lib/catalog";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { AdminHeading } from "@/components/admin/AdminHeading";
 
@@ -9,7 +9,10 @@ export default async function NewProductPage() {
   return (
     <div>
       <AdminHeading tKey="admin.createProduct" />
-      <ProductForm categories={categories} />
+      <ProductForm
+        categories={categories}
+        brands={(await getBrands()).map((b) => b.name)}
+      />
     </div>
   );
 }

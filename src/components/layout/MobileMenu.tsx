@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { shopColumns, primaryNav } from "@/lib/nav";
+import { primaryNav } from "@/lib/nav";
+import { shopColumnsFrom, type ShopNav } from "@/lib/nav-groups";
+import { categoryName } from "@/i18n/translations";
 import { useTranslation } from "@/i18n/useTranslation";
 import { useLocaleStore, COUNTRIES } from "@/store/locale-store";
 import { LOCALES } from "@/i18n/translations";
@@ -25,8 +27,11 @@ const FOCUSABLE = "a[href], button:not([disabled]), select";
 export function MobileMenu({
   user,
   phone,
+  nav,
 }: {
   user: SessionUser | null;
+  /** Categories and brands from the catalog (see lib/nav-groups). */
+  nav: ShopNav;
   /** Store phone from the settings; shown as a call button. */
   phone?: string;
 }) {
@@ -157,7 +162,7 @@ export function MobileMenu({
                     </a>
                   )}
 
-                  {shopColumns.map((col, ci) => (
+                  {shopColumnsFrom(nav).map((col, ci) => (
                     <motion.div
                       key={col.key}
                       initial={{ opacity: 0, y: 10 }}
@@ -170,13 +175,17 @@ export function MobileMenu({
                       </p>
                       <ul className="space-y-2">
                         {col.links.map((link) => (
-                          <li key={link.href + link.key}>
+                          <li key={link.href}>
                             <Link
                               href={link.href}
                               onClick={close}
                               className="link-slide block text-sm text-ink-soft"
                             >
-                              {t(link.key)}
+                              {link.key
+                                ? t(link.key)
+                                : link.slug
+                                  ? categoryName(t.locale, link.slug, link.label)
+                                  : link.label}
                             </Link>
                           </li>
                         ))}

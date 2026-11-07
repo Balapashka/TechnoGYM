@@ -1,19 +1,22 @@
 @import "tailwindcss";
 
 /*
-  Generic design tokens for the demo store.
-  Palette: black / white / gray with a yellow accent. No brand assets.
+  Design tokens. Palette: black / white / warm greys with the logo's yellow
+  as a sparing accent.
 */
 @theme {
   --color-ink: #111111;
   --color-ink-soft: #555555;
   --color-paper: #ffffff;
-  --color-mist: #f2f2f2;
+  --color-mist: #f4f4f2;
   --color-stone: #e4e4e4;
   --color-accent: #ffed00;
   --color-accent-strong: #e6d600;
 
   --font-sans: var(--font-sans), Arial, Helvetica, sans-serif;
+  --font-display: var(--font-montserrat), var(--font-sans), Arial, sans-serif;
+  /* Headings use the display face, whose heaviest loaded weight is 800. */
+  --font-weight-black: 800;
 
   --breakpoint-3xl: 120rem;
 }
@@ -32,6 +35,15 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Headings: wide display face, slightly open tracking (Technogym-like). */
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
 }
 
 /* Utility: full-bleed section helper used by hero/banners */

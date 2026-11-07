@@ -8,6 +8,7 @@ import { LocaleSwitcher } from "./LocaleSwitcher";
 import { SearchButton } from "./SearchButton";
 import { getCurrentUser } from "@/lib/auth";
 import { getSettings } from "@/lib/settings";
+import { getShopNav } from "@/lib/catalog";
 
 /**
  * Sticky top header. Below `lg` it collapses to burger — centered logo — cart
@@ -15,18 +16,22 @@ import { getSettings } from "@/lib/settings";
  * is logo + mega-menu/nav on the left and account/cart actions on the right.
  */
 export async function Header() {
-  const [user, settings] = await Promise.all([getCurrentUser(), getSettings()]);
+  const [user, settings, nav] = await Promise.all([
+    getCurrentUser(),
+    getSettings(),
+    getShopNav(),
+  ]);
 
   return (
     <header className="sticky top-0 z-30 border-b border-stone bg-paper/95 backdrop-blur">
       <div className="container-page grid h-16 grid-cols-[1fr_auto_1fr] items-center lg:flex lg:justify-between lg:gap-6">
         <div className="flex items-center justify-start gap-3 lg:gap-6 xl:gap-8">
-          <MobileMenu user={user} phone={settings.phone} />
+          <MobileMenu user={user} phone={settings.phone} nav={nav} />
           <div className="hidden shrink-0 lg:block">
             <Logo />
           </div>
           <nav className="hidden items-center gap-4 lg:flex xl:gap-6">
-            <MegaMenu />
+            <MegaMenu nav={nav} />
             <PrimaryNav />
           </nav>
         </div>

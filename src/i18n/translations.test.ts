@@ -34,7 +34,7 @@ describe("translations", () => {
   it("uses the full Russian names for the equipment categories", () => {
     expect(categoryName("ru", "strength")).toBe("Силовые тренажёры");
     expect(categoryName("ru", "free-weights")).toBe("Свободные веса");
-    expect(getTranslation("ru", "nav.cardio")).toBe("Кардиотренажеры");
+    expect(getTranslation("ru", "nav.cardio")).toBe("Кардиотренажёры");
     expect(getTranslation("ru", "nav.strength")).toBe("Силовые тренажёры");
   });
 

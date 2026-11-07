@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { shopColumns } from "@/lib/nav";
+import { shopColumnsFrom, type ShopNav } from "@/lib/nav-groups";
+import { categoryName } from "@/i18n/translations";
 import { useTranslation } from "@/i18n/useTranslation";
 
 /** "Shop" trigger that reveals an animated mega-menu panel on hover/focus. */
-export function MegaMenu() {
+export function MegaMenu({ nav }: { nav: ShopNav }) {
+  const columns = shopColumnsFrom(nav);
   const [open, setOpen] = useState(false);
   const t = useTranslation();
 
@@ -34,11 +36,11 @@ export function MegaMenu() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute left-1/2 top-full z-40 w-[44rem] -translate-x-1/2 rounded-b-2xl border-t-2 border-accent bg-paper p-8 shadow-2xl"
+            className="absolute left-0 top-full z-40 w-[52rem] max-w-[calc(100vw-4rem)] rounded-b-2xl border-t-2 border-ink bg-paper p-8 shadow-2xl"
             role="menu"
           >
-            <div className="grid grid-cols-3 gap-8">
-              {shopColumns.map((col, ci) => (
+            <div className="grid grid-cols-4 gap-8">
+              {columns.map((col, ci) => (
                 <motion.div
                   key={col.key}
                   initial={{ opacity: 0, y: 10 }}
@@ -50,13 +52,17 @@ export function MegaMenu() {
                   </p>
                   <ul className="space-y-2">
                     {col.links.map((link) => (
-                      <li key={link.href + link.key}>
+                      <li key={link.href}>
                         <Link
                           href={link.href}
                           className="link-slide block text-sm text-ink-soft"
                           onClick={() => setOpen(false)}
                         >
-                          {t(link.key)}
+                          {link.key
+                            ? t(link.key)
+                            : link.slug
+                              ? categoryName(t.locale, link.slug, link.label)
+                              : link.label}
                         </Link>
                       </li>
                     ))}

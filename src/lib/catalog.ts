@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { unpackList } from "@/lib/json";
 import { originRank } from "@/lib/countries";
@@ -94,30 +95,89 @@ export type CategoryDTO = {
   id: string;
   slug: string;
   name: string;
-  /** Representative photo: first image of the category's oldest product. */
+  /** Representative photo: first real (non-placeholder) product image. */
   image: string | null;
+  /** Number of products in the category. */
+  count: number;
 };
 
-export async function getCategories(): Promise<CategoryDTO[]> {
+/**
+ * Display order of the standard categories (cardio first, then strength);
+ * categories the owner adds later follow, alphabetically.
+ */
+export const CATEGORY_ORDER = [
+  "treadmills",
+  "bikes",
+  "ellipticals",
+  "rowers",
+  "strength",
+  "benches",
+  "racks",
+  "free-weights",
+  "cardio-accessories",
+  "recovery",
+];
+
+export function sortCategories<T extends { slug: string; name: string }>(list: T[]): T[] {
+  const rank = (slug: string) => {
+    const i = CATEGORY_ORDER.indexOf(slug);
+    return i === -1 ? CATEGORY_ORDER.length : i;
+  };
+  return [...list].sort(
+    (a, b) => rank(a.slug) - rank(b.slug) || a.name.localeCompare(b.name, "ru"),
+  );
+}
+
+/**
+ * All categories with their product counts. Pass `nonEmpty` for storefront
+ * navigation, so a category without products never leads to an empty page.
+ */
+export async function getCategories(
+  opts: { nonEmpty?: boolean } = {},
+): Promise<CategoryDTO[]> {
   const rows = await prisma.category.findMany({
-    orderBy: { name: "asc" },
     select: {
       id: true,
       slug: true,
       name: true,
+      _count: { select: { products: true } },
       products: {
         orderBy: { createdAt: "asc" },
-        take: 1,
+        take: 6,
         select: { images: true },
       },
     },
   });
-  return rows.map((c) => ({
-    id: c.id,
-    slug: c.slug,
-    name: c.name,
-    image: unpackList(c.products[0]?.images)[0] ?? null,
-  }));
+  const list = rows.map((c) => {
+    const images = c.products.flatMap((p) => unpackList(p.images).slice(0, 1));
+    return {
+      id: c.id,
+      slug: c.slug,
+      name: c.name,
+      image: images.find((src) => !src.startsWith("/placeholders/")) ?? images[0] ?? null,
+      count: c._count.products,
+    };
+  });
+  return sortCategories(opts.nonEmpty ? list.filter((c) => c.count > 0) : list);
+}
+
+export type BrandDTO = { name: string; count: number; inStock: number };
+
+/** Brands present in the catalog, largest first. */
+export async function getBrands(): Promise<BrandDTO[]> {
+  const rows = await prisma.product.groupBy({
+    by: ["brand", "inStock"],
+    _count: { _all: true },
+  });
+  const map = new Map<string, BrandDTO>();
+  for (const r of rows) {
+    if (!r.brand) continue;
+    const b = map.get(r.brand) ?? { name: r.brand, count: 0, inStock: 0 };
+    b.count += r._count._all;
+    if (r.inStock) b.inStock += r._count._all;
+    map.set(r.brand, b);
+  }
+  return [...map.values()].sort((a, b) => b.count - a.count);
 }
 
 export async function getAllProducts(): Promise<ProductDTO[]> {
@@ -154,4 +214,85 @@ export async function getFeaturedProducts(limit = 8): Promise<ProductDTO[]> {
     orderBy: { createdAt: "asc" },
   });
   return byOriginPriority(rows.map(toDTO)).slice(0, limit);
+}
+
+/**
+ * Shop navigation data (non-empty categories + brands), memoized per request
+ * so the header, mobile menu and footer share one query.
+ */
+export const getShopNav = cache(async () => {
+  try {
+    const [categories, brands] = await Promise.all([
+      getCategories({ nonEmpty: true }),
+      getBrands(),
+    ]);
+    return {
+      categories: categories.map(({ slug, name, count }) => ({ slug, name, count })),
+      brands: brands.map(({ name, count }) => ({ name, count })),
+    };
+  } catch (e) {
+    console.error("[nav] could not load categories:", e);
+    return { categories: [], brands: [] };
+  }
+});
+
+/** Pick up to `limit` products, round-robin across categories for variety. */
+export function diverse<T extends { categorySlug: string }>(list: T[], limit: number): T[] {
+  const byCat = new Map<string, T[]>();
+  for (const p of list) {
+    const arr = byCat.get(p.categorySlug) ?? [];
+    arr.push(p);
+    byCat.set(p.categorySlug, arr);
+  }
+  const queues = [...byCat.values()];
+  const out: T[] = [];
+  while (out.length < limit && queues.some((q) => q.length)) {
+    for (const q of queues) {
+      const next = q.shift();
+      if (next) out.push(next);
+      if (out.length >= limit) break;
+    }
+  }
+  return out;
+}
+
+const hasPhoto = (p: ProductDTO) =>
+  p.images.length > 0 && !p.images[0].startsWith("/placeholders/");
+
+export type BrandShowcase = {
+  name: string;
+  count: number;
+  inStock: number;
+  originCountry: string;
+  image: string | null;
+};
+
+/** Everything the homepage shows, from one catalog read. */
+export async function getHomeShowcase() {
+  const all = await getAllProducts();
+  const flagships = diverse(all.filter((p) => p.priceOnRequest && hasPhoto(p)), 8);
+  const inStock = diverse(
+    all.filter((p) => p.inStock && !p.priceOnRequest && hasPhoto(p)),
+    12,
+  );
+  const brands = new Map<string, BrandShowcase>();
+  for (const p of all) {
+    if (!p.brand) continue;
+    const b = brands.get(p.brand) ?? {
+      name: p.brand,
+      count: 0,
+      inStock: 0,
+      originCountry: p.originCountry,
+      image: null,
+    };
+    b.count += 1;
+    if (p.inStock) b.inStock += 1;
+    if (!b.image && hasPhoto(p)) b.image = p.images[0];
+    brands.set(p.brand, b);
+  }
+  return {
+    flagships: flagships.length ? flagships : all.slice(0, 8),
+    inStock,
+    brands: [...brands.values()].sort((a, b) => b.count - a.count),
+  };
 }

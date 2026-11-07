@@ -100,6 +100,40 @@ docker compose -f docker-compose.prod.yml up -d --build
 CRON="30 3 * * * cd $DIR && docker compose -f docker-compose.prod.yml exec -T app node scripts/backup-db.mjs >/dev/null 2>&1"
 { crontab -l 2>/dev/null | grep -v 'backup-db.mjs' || true; echo "$CRON"; } | crontab -
 
+# Auto-update: every 10 minutes pull the branch; rebuild only when it changed.
+cat > /usr/local/bin/sportliner-update <<UPD
+#!/bin/sh
+set -e
+cd $DIR
+git fetch -q origin $BRANCH
+if [ "\$(git rev-parse HEAD)" != "\$(git rev-parse origin/$BRANCH)" ]; then
+  echo "Updating to \$(git rev-parse --short origin/$BRANCH)"
+  git reset -q --hard origin/$BRANCH
+  docker compose -f docker-compose.prod.yml up -d --build
+  docker image prune -f >/dev/null 2>&1 || true
+fi
+UPD
+chmod +x /usr/local/bin/sportliner-update
+cat > /etc/systemd/system/sportliner-update.service <<'UNIT'
+[Unit]
+Description=Update SPORT LINER from git
+After=network-online.target docker.service
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/sportliner-update
+UNIT
+cat > /etc/systemd/system/sportliner-update.timer <<'UNIT'
+[Unit]
+Description=Check for SPORT LINER updates every 10 minutes
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=10min
+[Install]
+WantedBy=timers.target
+UNIT
+systemctl daemon-reload
+systemctl enable --now sportliner-update.timer >/dev/null
+
 printf '   Жду запуска магазина'
 for _ in $(seq 1 60); do
   if docker compose -f docker-compose.prod.yml exec -T app node -e "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))" 2>/dev/null; then
@@ -127,4 +161,4 @@ else
   echo "   Пароль:   прежний (см. ADMIN_PASSWORD в $DIR/.env)"
 fi
 echo
-echo "   Обновить сайт позже: запустите эту же команду ещё раз."
+echo "   Обновления: сервер сам проверяет GitHub каждые 10 минут (журнал: journalctl -u sportliner-update)."

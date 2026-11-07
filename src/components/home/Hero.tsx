@@ -12,7 +12,7 @@ export function Hero() {
   const showVideo = hasRealAsset("hero") && hero.type === "video";
 
   return (
-    <section className="relative flex min-h-[70vh] items-end overflow-hidden bg-ink text-paper">
+    <section className="relative flex min-h-[86svh] items-end overflow-hidden bg-ink text-paper">
       {showVideo ? (
         <video
           className="absolute inset-0 h-full w-full object-cover"
@@ -31,13 +31,13 @@ export function Hero() {
             alt=""
             priority
             sizes="100vw"
-            imgClassName="opacity-70"
+            imgClassName="opacity-80"
             fallbackClassName="bg-transparent"
           />
         )
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10" />
 
       <HeroIntro />
     </section>

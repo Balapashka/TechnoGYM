@@ -9,7 +9,9 @@ import type { Metadata } from "next";
 import { getProductBySlug, type ProductDTO } from "@/lib/catalog";
 import { SITE_URL } from "@/lib/site";
 import { BRAND_NAME } from "@/lib/brand";
-import { BreadcrumbHome, ProductSpecs } from "./ProductDetailText";
+import { BreadcrumbHome, ProductSpecs, SectionTitle } from "./ProductDetailText";
+import { splitFeatures } from "@/lib/features";
+import { Description } from "./Description";
 
 /** Absolute URL for an image path ("/uploads/…" → "https://site/uploads/…"). */
 function absolute(src: string): string {
@@ -84,6 +86,7 @@ export default async function ProductPage({
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) notFound();
+  const { specs, notes } = splitFeatures(product.features);
 
   return (
     <main className="container-page flex-1 py-8">
@@ -121,7 +124,7 @@ export default async function ProductPage({
                 fallback={product.categoryName}
               />
             </p>
-            <h1 className="text-3xl font-black uppercase tracking-tight md:text-4xl">
+            <h1 className="mt-1 text-3xl font-semibold uppercase leading-tight md:text-4xl">
               {product.name}
             </h1>
             <ProductOrigin
@@ -130,28 +133,46 @@ export default async function ProductPage({
               className="mt-2"
             />
             <Availability inStock={product.inStock} className="mt-3" />
+            {product.description && (
+              <p className="mt-5 line-clamp-4 text-ink-soft">
+                {product.description.split(/\n+/)[0]}
+              </p>
+            )}
           </div>
 
-          <p className="text-ink-soft">{product.description}</p>
+          <AddToCart product={product} />
+        </div>
+      </div>
 
-          {product.features.length > 0 && (
-            <ul className="space-y-2">
-              {product.features.map((f) => (
-                <li key={f} className="flex items-center gap-2 text-sm">
-                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
+      <div className="mt-16 grid gap-12 border-t border-stone pt-12 lg:grid-cols-2">
+        <section>
+          <SectionTitle kind="description" />
+          <Description text={product.description} />
+        </section>
+        <section>
+          <SectionTitle kind="specs" />
+          <ProductSpecs brand={product.brand} originCountry={product.originCountry} />
+          {specs.length > 0 && (
+            <dl className="divide-y divide-stone border-b border-stone text-sm">
+              {specs.map(([k, v]) => (
+                <div key={k} className="grid grid-cols-2 gap-4 py-3">
+                  <dt className="text-ink-soft">{k}</dt>
+                  <dd className="font-medium">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          {notes.length > 0 && (
+            <ul className="mt-6 space-y-2">
+              {notes.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm">
+                  <span className="mt-2 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-ink" />
                   {f}
                 </li>
               ))}
             </ul>
           )}
-
-          <ProductSpecs
-            brand={product.brand}
-            originCountry={product.originCountry}
-          />
-
-          <AddToCart product={product} />
-        </div>
+        </section>
       </div>
     </main>
   );

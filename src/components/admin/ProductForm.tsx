@@ -12,6 +12,8 @@ import {
 import { field, fieldError } from "@/components/auth/AuthCard";
 import { useTranslation } from "@/i18n/useTranslation";
 import { errorKeyForStatus } from "@/i18n/translations";
+import { slugify } from "@/lib/slugify";
+import { BRAND_PRESETS, brandPreset } from "@/lib/brand-presets";
 
 type Category = { id: string; name: string };
 
@@ -35,9 +37,12 @@ export type ProductFormValues = {
 export function ProductForm({
   categories,
   initial,
+  brands = [],
 }: {
   categories: Category[];
   initial?: ProductFormValues;
+  /** Brands already in the catalog, suggested in the brand field. */
+  brands?: string[];
 }) {
   const router = useRouter();
   const t = useTranslation();
@@ -74,6 +79,17 @@ export function ProductForm({
   });
 
   const imageList = splitLines(useWatch({ control, name: "images" }));
+  const priceOnRequest = useWatch({ control, name: "priceOnRequest" });
+
+  // The URL is generated from the name until the owner edits it by hand
+  // (and never changes for an existing product, so links stay stable).
+  const [slugTouched, setSlugTouched] = useState(isEdit);
+  const nameField = register("name");
+  const slugField = register("slug");
+  const brandField = register("brand");
+  const brandOptions = [
+    ...new Set([...BRAND_PRESETS.map((b) => b.name), ...brands]),
+  ].sort((a, b) => a.localeCompare(b));
 
   async function upload(files: FileList | null) {
     if (!files || files.length === 0) return;
@@ -127,14 +143,31 @@ export function ProductForm({
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("admin.name")}
           </label>
-          <input className={field} {...register("name")} />
+          <input
+            className={field}
+            {...nameField}
+            onChange={(e) => {
+              nameField.onChange(e);
+              if (!slugTouched) {
+                setValue("slug", slugify(e.target.value), { shouldValidate: false });
+              }
+            }}
+          />
           {errors.name && <p className={fieldError}>{errors.name.message}</p>}
         </div>
         <div>
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("admin.slug")}
           </label>
-          <input className={field} {...register("slug")} />
+          <input
+            className={`${field} font-mono text-xs`}
+            {...slugField}
+            onChange={(e) => {
+              setSlugTouched(true);
+              slugField.onChange(e);
+            }}
+          />
+          <p className="mt-1 text-xs text-ink-soft">{t("admin.slugHint")}</p>
           {errors.slug && <p className={fieldError}>{errors.slug.message}</p>}
         </div>
       </div>
@@ -158,8 +191,12 @@ export function ProductForm({
             type="number"
             step="1"
             className={field}
+            placeholder={priceOnRequest ? "0" : undefined}
             {...register("priceRub", { valueAsNumber: true })}
           />
+          {priceOnRequest && (
+            <p className="mt-1 text-xs text-ink-soft">{t("admin.priceHiddenHint")}</p>
+          )}
           {errors.priceRub && (
             <p className={fieldError}>{errors.priceRub.message}</p>
           )}
@@ -192,7 +229,27 @@ export function ProductForm({
           <label className="mb-1 block text-xs font-bold uppercase">
             {t("product.brand")}
           </label>
-          <input className={field} placeholder="Technogym" {...register("brand")} />
+          <input
+            className={field}
+            list="brand-options"
+            placeholder="Technogym"
+            {...brandField}
+            onChange={(e) => {
+              brandField.onChange(e);
+              const preset = brandPreset(e.target.value);
+              if (preset) {
+                setValue("originCountry", preset.originCountry, { shouldValidate: true });
+                setValue("inStock", preset.inStock);
+                setValue("priceOnRequest", preset.priceOnRequest, { shouldValidate: true });
+              }
+            }}
+          />
+          <datalist id="brand-options">
+            {brandOptions.map((b) => (
+              <option key={b} value={b} />
+            ))}
+          </datalist>
+          <p className="mt-1 text-xs text-ink-soft">{t("admin.brandHint")}</p>
           {errors.brand && <p className={fieldError}>{errors.brand.message}</p>}
         </div>
         <div>
@@ -214,7 +271,12 @@ export function ProductForm({
         <label className="mb-1 block text-xs font-bold uppercase">
           {t("admin.featuresPerLine")}
         </label>
-        <textarea rows={4} className={field} {...register("features")} />
+        <textarea
+          rows={6}
+          className={field}
+          placeholder={"Макс. вес пользователя: 150 кг\nСкорость: 1–20 км/ч\nБеговое полотно: 140 × 51 см"}
+          {...register("features")}
+        />
       </div>
 
       <div>

@@ -8,38 +8,6 @@ export type NavLink = { key: string; label: string; href: string };
 
 export type MegaColumn = { key: string; title: string; links: NavLink[] };
 
-/** Columns shown in the "Shop" mega-menu. Slugs match seeded categories. */
-export const shopColumns: MegaColumn[] = [
-  {
-    key: "nav.cardio",
-    title: "Cardio",
-    links: [
-      { key: "nav.treadmills", label: "Treadmills", href: "/category/treadmills" },
-      { key: "nav.bikes", label: "Bikes", href: "/category/bikes" },
-      { key: "nav.ellipticals", label: "Ellipticals", href: "/category/ellipticals" },
-      { key: "nav.rowers", label: "Rowers", href: "/category/rowers" },
-    ],
-  },
-  {
-    key: "nav.strength",
-    title: "Strength",
-    links: [
-      { key: "nav.strengthStations", label: "Strength stations", href: "/category/strength" },
-      { key: "nav.benches", label: "Benches", href: "/category/benches" },
-      { key: "nav.accessories", label: "Accessories", href: "/category/cardio-accessories" },
-    ],
-  },
-  {
-    key: "nav.explore",
-    title: "Explore",
-    links: [
-      { key: "common.allProducts", label: "All products", href: "/category/all" },
-      { key: "common.collections", label: "Collections", href: "/collections" },
-      { key: "common.newArrivals", label: "New arrivals", href: "/category/all" },
-    ],
-  },
-];
-
 /** Top-level nav items besides "Shop" (which opens the mega-menu). */
 export const primaryNav: NavLink[] = [
   { key: "nav.collections", label: "Collections", href: "/collections" },
@@ -48,21 +16,8 @@ export const primaryNav: NavLink[] = [
   { key: "nav.forBusiness", label: "For business", href: "/business" },
 ];
 
-/** Footer link columns. */
+/** Footer link columns (the product column is built from the catalog). */
 export const footerColumns: MegaColumn[] = [
-  {
-    key: "nav.products",
-    title: "Products",
-    links: [
-      { key: "nav.allProducts", label: "All products", href: "/category/all" },
-      { key: "nav.treadmills", label: "Treadmills", href: "/category/treadmills" },
-      { key: "nav.bikes", label: "Bikes", href: "/category/bikes" },
-      { key: "nav.ellipticals", label: "Ellipticals", href: "/category/ellipticals" },
-      { key: "nav.rowers", label: "Rowers", href: "/category/rowers" },
-      { key: "nav.strength", label: "Strength", href: "/category/strength" },
-      { key: "nav.accessories", label: "Accessories", href: "/category/cardio-accessories" },
-    ],
-  },
   {
     key: "nav.support",
     title: "Customers",

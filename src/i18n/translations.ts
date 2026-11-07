@@ -83,6 +83,8 @@ export interface Translation {
     forBusiness: string;
     allProducts: string;
     shippingShort: string;
+    brands: string;
+    inStockMoscow: string;
   };
 
   /**
@@ -191,6 +193,9 @@ export interface Translation {
     requestErrName: string;
     requestErrPhone: string;
     requestErrEmail: string;
+    description: string;
+    readMore: string;
+    readLess: string;
   };
 
   // Compare (floating bar + /compare page)
@@ -425,6 +430,9 @@ export interface Translation {
     importPreview: string;
     importDone: string;
     importErrors: string;
+    slugHint: string;
+    brandHint: string;
+    priceHiddenHint: string;
   };
 
   // Country/Locale modal + switcher
@@ -577,6 +585,42 @@ export interface Translation {
     hint: string;
     openSearch: string;
   };
+  home: {
+    heroEyebrow: string;
+    heroTitle: string;
+    heroLead: string;
+    heroCatalog: string;
+    heroBusiness: string;
+    brandsTitle: string;
+    brandsLead: string;
+    brandModels: string;
+    brandInStock: string;
+    brandToOrder: string;
+    brandView: string;
+    brand_technogym: string;
+    brand_panatta: string;
+    brand_unixfit: string;
+    flagshipsTitle: string;
+    flagshipsLead: string;
+    inStockTitle: string;
+    inStockLead: string;
+    viewAll: string;
+    categoriesTitle: string;
+    businessEyebrow: string;
+    businessTitle: string;
+    businessLead: string;
+    businessCta: string;
+    benefit1Title: string;
+    benefit1Body: string;
+    benefit2Title: string;
+    benefit2Body: string;
+    benefit3Title: string;
+    benefit3Body: string;
+    benefit4Title: string;
+    benefit4Body: string;
+    brandOnRequest: string;
+    brandAsk: string;
+  };
 }
 
 export const translations: Record<Locale, Translation> = {
@@ -622,8 +666,6 @@ export const translations: Record<Locale, Translation> = {
       collections: "Коллекции",
       wellness: "Здоровье",
       design: "Дизайн",
-      cardio: "Кардиотренажеры",
-      strength: "Силовые тренажёры",
       strengthStations: "Силовые станции",
       treadmills: "Беговые дорожки",
       bikes: "Велотренажёры",
@@ -647,6 +689,10 @@ export const translations: Record<Locale, Translation> = {
       forBusiness: "Для бизнеса",
       allProducts: "Все товары",
       shippingShort: "Доставка и оплата",
+      brands: "Бренды",
+      inStockMoscow: "В наличии в Москве",
+      cardio: "Кардиотренажёры",
+      strength: "Силовые тренажёры",
     },
     categories: {
       treadmills: "Беговые дорожки",
@@ -747,6 +793,9 @@ export const translations: Record<Locale, Translation> = {
       requestErrName: "Укажите ваше имя",
       requestErrPhone: "Укажите телефон для связи",
       requestErrEmail: "Введите корректный email",
+      description: "Описание",
+      readMore: "Читать полностью",
+      readLess: "Свернуть",
     },
     compare: {
       title: "Сравнение товаров",
@@ -845,7 +894,6 @@ export const translations: Record<Locale, Translation> = {
       price: "Цена (₽)",
       category: "Категория",
       badgeOptional: "Метка (необязательно)",
-      featuresPerLine: "Характеристики (по одной в строке)",
       inStock: "В наличии",
       outOfStock: "Нет в наличии",
       saving: "Сохранение…",
@@ -973,6 +1021,10 @@ export const translations: Record<Locale, Translation> = {
       importPreview: "Будет создано: {created}, обновлено: {updated}, удалено: {deleted}.",
       importDone: "Готово. Создано: {created}, обновлено: {updated}, удалено: {deleted}.",
       importErrors: "Файл не загружен — исправьте ошибки:",
+      slugHint: "Заполняется сам из названия. Это адрес страницы товара на сайте.",
+      brandHint: "Выберите из списка: страна, наличие и «цена по запросу» подставятся сами.",
+      priceHiddenHint: "Цена скрыта на сайте — покупатель увидит кнопку «Запросить цену». Можно указать закупочную для себя или оставить 0.",
+      featuresPerLine: "Характеристики — по одной в строке, «Название: значение»",
     },
     locale: {
       chooseCountry: "Выберите вашу страну",
@@ -1112,6 +1164,42 @@ export const translations: Record<Locale, Translation> = {
       hint: "Например: беговая дорожка, скамья, Technogym",
       openSearch: "Поиск по каталогу",
     },
+    home: {
+      heroEyebrow: "Technogym · Panatta · UNIX Fit",
+      heroTitle: "Тренажёры, с которыми хочется тренироваться",
+      heroLead: "Итальянское оборудование Technogym и Panatta под заказ и тренажёры UNIX Fit в наличии в Москве. Для дома, студий и фитнес-клубов.",
+      heroCatalog: "Смотреть каталог",
+      heroBusiness: "Для фитнес-клубов",
+      brandsTitle: "Наши бренды",
+      brandsLead: "Три производителя — от домашней беговой дорожки до полного оснащения клуба.",
+      brandModels: "{count} моделей",
+      brandInStock: "В наличии в Москве",
+      brandToOrder: "Под заказ из Италии",
+      brandView: "Смотреть модели",
+      brand_technogym: "Итальянский лидер премиального фитнеса: дизайн, технологии и комфорт, которые выбирают лучшие клубы мира.",
+      brand_panatta: "Итальянские силовые тренажёры профессионального класса — биомеханика, надёжность и характер.",
+      brand_unixfit: "Современные тренажёры для дома и зала с честной ценой. Всё в наличии в Москве — быстрая доставка.",
+      flagshipsTitle: "Флагманы из Италии",
+      flagshipsLead: "Цена рассчитывается индивидуально — оставьте заявку, менеджер подготовит предложение.",
+      inStockTitle: "В наличии в Москве",
+      inStockLead: "Доставим и соберём в ближайшие дни.",
+      viewAll: "Смотреть все",
+      categoriesTitle: "Каталог",
+      businessEyebrow: "Для бизнеса",
+      businessTitle: "Оснастим ваш зал под ключ",
+      businessLead: "Фитнес-клубы, отели, студии и корпоративные залы: подбор оборудования, планировка, поставка, монтаж и сервис.",
+      businessCta: "Обсудить проект",
+      benefit1Title: "Доставка и сборка",
+      benefit1Body: "По Москве и области, в регионы — транспортными компаниями.",
+      benefit3Title: "Подбор оборудования",
+      benefit3Body: "Поможем выбрать тренажёр под задачу, площадь и бюджет.",
+      benefit4Title: "Удобная оплата",
+      benefit4Body: "После подтверждения заказа или по счёту для компаний.",
+      benefit2Title: "Гарантия и сервис",
+      benefit2Body: "Гарантия на всё оборудование, помощь с обслуживанием.",
+      brandOnRequest: "Модели и цены — по запросу",
+      brandAsk: "Оставить заявку",
+    },
   },
   en: {
     common: {
@@ -1155,8 +1243,6 @@ export const translations: Record<Locale, Translation> = {
       collections: "Collections",
       wellness: "Wellness",
       design: "Design",
-      cardio: "Cardio",
-      strength: "Strength",
       strengthStations: "Strength stations",
       treadmills: "Treadmills",
       bikes: "Bikes",
@@ -1180,6 +1266,10 @@ export const translations: Record<Locale, Translation> = {
       forBusiness: "For business",
       allProducts: "All products",
       shippingShort: "Delivery",
+      brands: "Brands",
+      inStockMoscow: "In stock in Moscow",
+      cardio: "Cardio",
+      strength: "Strength",
     },
     categories: {
       treadmills: "Treadmills",
@@ -1280,6 +1370,9 @@ export const translations: Record<Locale, Translation> = {
       requestErrName: "Enter your name",
       requestErrPhone: "Enter a phone number we can call",
       requestErrEmail: "Enter a valid email",
+      description: "Description",
+      readMore: "Read more",
+      readLess: "Show less",
     },
     compare: {
       title: "Compare products",
@@ -1377,7 +1470,6 @@ export const translations: Record<Locale, Translation> = {
       price: "Price (₽)",
       category: "Category",
       badgeOptional: "Badge (optional)",
-      featuresPerLine: "Features (one per line)",
       inStock: "In stock",
       outOfStock: "Out of stock",
       saving: "Saving…",
@@ -1505,6 +1597,10 @@ export const translations: Record<Locale, Translation> = {
       importPreview: "To create: {created}, update: {updated}, delete: {deleted}.",
       importDone: "Done. Created: {created}, updated: {updated}, deleted: {deleted}.",
       importErrors: "Nothing imported — fix these errors:",
+      slugHint: "Filled in from the name. It is the product page address.",
+      brandHint: "Pick from the list: country, availability and price on request are filled in for you.",
+      priceHiddenHint: "The price is hidden on the site — shoppers see “Request a price”. Enter it for your reference or leave 0.",
+      featuresPerLine: "Specifications — one per line, “Name: value”",
     },
     locale: {
       chooseCountry: "Choose your country",
@@ -1643,6 +1739,42 @@ export const translations: Record<Locale, Translation> = {
       nothingHint: "Check the spelling or browse the whole catalog.",
       hint: "For example: treadmill, bench, Technogym",
       openSearch: "Search the catalog",
+    },
+    home: {
+      heroEyebrow: "Technogym · Panatta · UNIX Fit",
+      heroTitle: "Equipment you will want to train on",
+      heroLead: "Italian Technogym and Panatta equipment to order and UNIX Fit in stock in Moscow. For homes, studios and gyms.",
+      heroCatalog: "Shop the catalog",
+      heroBusiness: "For gyms",
+      brandsTitle: "Our brands",
+      brandsLead: "Three manufacturers — from a home treadmill to a fully equipped club.",
+      brandModels: "{count} models",
+      brandInStock: "In stock in Moscow",
+      brandToOrder: "Made to order in Italy",
+      brandView: "View models",
+      brand_technogym: "The Italian leader in premium fitness: design, technology and comfort chosen by the world's best clubs.",
+      brand_panatta: "Professional Italian strength equipment — biomechanics, durability and character.",
+      brand_unixfit: "Modern equipment for home and gym at an honest price. In stock in Moscow — fast delivery.",
+      flagshipsTitle: "Italian flagships",
+      flagshipsLead: "Priced individually — leave a request and a manager will prepare an offer.",
+      inStockTitle: "In stock in Moscow",
+      inStockLead: "Delivered and assembled within days.",
+      viewAll: "View all",
+      categoriesTitle: "Catalog",
+      businessEyebrow: "For business",
+      businessTitle: "We will equip your gym end to end",
+      businessLead: "Gyms, hotels, studios and corporate fitness rooms: equipment selection, layout, delivery, installation and service.",
+      businessCta: "Discuss a project",
+      benefit1Title: "Delivery and assembly",
+      benefit1Body: "Across Moscow and the region; nationwide by carrier.",
+      benefit3Title: "Expert advice",
+      benefit3Body: "We help you choose for your goals, space and budget.",
+      benefit4Title: "Convenient payment",
+      benefit4Body: "After order confirmation or by invoice for companies.",
+      benefit2Title: "Warranty and service",
+      benefit2Body: "Warranty on all equipment and help with maintenance.",
+      brandOnRequest: "Models and prices on request",
+      brandAsk: "Send a request",
     },
   },
 };

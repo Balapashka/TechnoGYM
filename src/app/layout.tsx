@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -13,12 +13,20 @@ import { CompareBar } from "@/components/shop/CompareBar";
 import { CompareToast } from "@/components/shop/CompareToast";
 import { SITE_INDEXABLE, SITE_URL } from "@/lib/site";
 import { getSettings } from "@/lib/settings";
+import { getShopNav } from "@/lib/catalog";
 
 const inter = Inter({
   variable: "--font-sans",
   // The storefront is Russian, so the Cyrillic subset must ship too — without
   // it every Russian glyph falls back to a system font.
   subsets: ["latin", "cyrillic"],
+});
+
+/** Wide grotesque for headings — the premium, Technogym-like voice. */
+const display = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin", "cyrillic"],
+  weight: ["500", "600", "700", "800"],
 });
 
 const title = "SPORT LINER — интернет-магазин тренажёров";
@@ -48,15 +56,15 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getSettings();
+  const [settings, nav] = await Promise.all([getSettings(), getShopNav()]);
   return (
-    <html lang="ru" className={`${inter.variable} h-full`}>
+    <html lang="ru" className={`${inter.variable} ${display.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-paper text-ink antialiased">
         <NavigationProgress />
         <MotionProvider>
           <Header />
           {children}
-          <Footer settings={settings} />
+          <Footer settings={settings} nav={nav} />
           <CookieBanner />
           <QuickViewDrawer />
           <QuoteRequestModal />

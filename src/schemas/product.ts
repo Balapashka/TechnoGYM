@@ -30,9 +30,10 @@ export const productSchema = z.object({
     .trim()
     .min(10, "Добавьте описание (минимум 10 символов)")
     .max(10000),
+  // May be 0 for "price on request" items (checked in superRefine below).
   priceRub: z
     .number({ message: "Укажите цену" })
-    .positive("Цена должна быть больше нуля")
+    .min(0, "Цена не может быть отрицательной")
     .max(100_000_000, "Слишком большая цена"),
   brand: z.string().min(2, "Укажите бренд"),
   originCountry: z.string().min(2, "Укажите страну производства"),

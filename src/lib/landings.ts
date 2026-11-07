@@ -1,8 +1,7 @@
 import type { LandingContent } from "@/components/content/ThemedLanding";
-import { CATEGORY_IMAGES, FALLBACK_IMAGES } from "../../prisma/seed-images";
 
 /** Тексты лендингов «Здоровье» и «Дизайн».
- *  Фото берутся из того же проверенного Unsplash-пула, что и каталог;
+ *  Фото лежат в public/media (сервер в РФ не загружает внешние фотостоки);
  *  `image: null` = свой ассет ещё не предоставлен (блок рендерится без фото). */
 export const landings: Record<string, LandingContent> = {
   wellness: {
@@ -19,9 +18,9 @@ export const landings: Record<string, LandingContent> = {
       { title: "Питание", text: "Простые решения в питании, чтобы поддержать вашу работу.", image: null },
     ],
     sections: [
-      { heading: "Под ваш ритм дня", body: "Короткие гибкие тренировки, которые вписываются в плотный график: без дороги в зал и без отговорок.", image: CATEGORY_IMAGES["cardio-accessories"][2] },
-      { heading: "Прогресс, который чувствуется", body: "Следите за нагрузкой и восстановлением, чтобы тренироваться с умом, а не только на пределе.", image: CATEGORY_IMAGES["strength"][0] },
-      { heading: "Для любого тела", body: "Каким бы ни был ваш старт, здесь найдётся путь, который подойдёт именно вам.", image: FALLBACK_IMAGES[1] },
+      { heading: "Под ваш ритм дня", body: "Короткие гибкие тренировки, которые вписываются в плотный график: без дороги в зал и без отговорок.", image: "/media/wellness-1.jpg" },
+      { heading: "Прогресс, который чувствуется", body: "Следите за нагрузкой и восстановлением, чтобы тренироваться с умом, а не только на пределе.", image: "/media/wellness-2.jpg" },
+      { heading: "Для любого тела", body: "Каким бы ни был ваш старт, здесь найдётся путь, который подойдёт именно вам.", image: "/media/wellness-3.jpg" },
     ],
     ctaLabel: "Смотреть каталог",
     ctaHref: "/collections",
