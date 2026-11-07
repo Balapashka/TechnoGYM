@@ -18,6 +18,12 @@ export type LandingContent = {
   tagline: string;
   /** Tailwind gradient classes for the hero band. */
   gradient: string;
+  /** Hero photo under the gradient (public/media). */
+  heroImage?: string;
+  /** Overlay over the hero photo so the white text stays readable. */
+  heroOverlay?: string;
+  /** Wide photo between the spec rail and the closing blocks (design page). */
+  featureImage?: string;
   tiles: Tile[];
   sections: Section[];
   ctaLabel: string;
@@ -34,6 +40,16 @@ export function ThemedLanding({ content }: { content: LandingContent }) {
     <div className="flex-1">
       {/* Hero band */}
       <section className={`relative overflow-hidden ${content.gradient} text-paper`}>
+        {content.heroImage && (
+          <>
+            <Media src={content.heroImage} alt="" sizes="100vw" priority />
+            <div
+              className={`absolute inset-0 ${
+                content.heroOverlay ?? "bg-gradient-to-r from-black/80 via-black/55 to-black/20"
+              }`}
+            />
+          </>
+        )}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_60%)]" />
         <div className="container-page relative py-24 md:py-32">
           <motion.p
@@ -79,7 +95,7 @@ export function ThemedLanding({ content }: { content: LandingContent }) {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.5, ease, delay: i * 0.05 }}
               whileHover={{ y: -6 }}
-              className="min-w-[18rem] max-w-[18rem] shrink-0 snap-start rounded-2xl border border-stone bg-gradient-to-br from-mist to-paper p-6"
+              className="min-w-[18rem] max-w-[18rem] shrink-0 snap-start overflow-hidden rounded-2xl border border-stone bg-gradient-to-br from-mist to-paper p-6"
             >
               {tile.image && (
                 <Media
@@ -87,7 +103,7 @@ export function ThemedLanding({ content }: { content: LandingContent }) {
                   alt={tile.title}
                   aspect="3/2"
                   sizes="18rem"
-                  className="mb-4 rounded-xl"
+                  className="-mx-6 -mt-6 mb-5"
                 />
               )}
               <span className="text-3xl font-black text-stone">

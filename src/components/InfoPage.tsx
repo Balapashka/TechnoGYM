@@ -3,6 +3,7 @@ import { LEGAL_UPDATED } from "@/lib/pages";
 import type { StoreSettings } from "@/lib/settings-shape";
 import { BRAND_NAME } from "@/lib/brand";
 import { InfoContacts, InfoContactForm, InfoUpdated } from "@/components/InfoPageParts";
+import { Media } from "@/components/ui/Media";
 
 /** Generic content page used for all informational and legal routes. */
 export function InfoPage({
@@ -36,6 +37,15 @@ export function InfoPage({
         <div className="container-page grid gap-10 py-12 lg:grid-cols-[1fr_1.2fr]">
           {content.contacts && <InfoContacts settings={settings} />}
           {content.form && <InfoContactForm />}
+          {!content.form && content.image && (
+            <Media
+              src={content.image}
+              alt={content.title}
+              aspect="4/3"
+              sizes="(max-width: 1024px) 100vw, 55vw"
+              className="self-start rounded-2xl"
+            />
+          )}
         </div>
       )}
 

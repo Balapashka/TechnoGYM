@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { Reveal } from "@/components/motion/Reveal";
 import { LeadForm } from "@/components/shop/LeadForm";
 import { useTranslation } from "@/i18n/useTranslation";
+import { Media } from "@/components/ui/Media";
 
 /** B2B landing: benefits + a request form that lands in the admin inbox. */
 export function BusinessContact() {
@@ -17,8 +18,10 @@ export function BusinessContact() {
   return (
     <div className="flex-1">
       <section className="relative overflow-hidden bg-gradient-to-br from-sky-800 to-slate-900 text-paper">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,237,0,0.2),transparent_55%)]" />
-        <div className="container-page relative py-24">
+        <Media src="/media/home-gym.jpg" alt="" sizes="100vw" priority />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-sky-950/70 to-sky-900/30" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,237,0,0.15),transparent_55%)]" />
+        <div className="container-page relative py-24 md:py-32">
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}

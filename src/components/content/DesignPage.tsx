@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useScroll } from "motion/react";
 import { landings } from "@/lib/landings";
 import { useTranslation } from "@/i18n/useTranslation";
+import { Media } from "@/components/ui/Media";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const c = landings.design;
@@ -30,8 +31,8 @@ export function DesignPage() {
 
   return (
     <div className="flex-1 bg-zinc-950 text-zinc-100">
-      {/* Split hero: oversized type left, vertical label right */}
-      <section className="container-page grid items-end gap-6 py-24 md:grid-cols-[1fr_auto]">
+      {/* Split hero: oversized type left, photo right */}
+      <section className="container-page grid items-center gap-10 py-16 md:grid-cols-2 md:py-24">
         <div>
           <motion.span
             initial={{ scaleX: 0 }}
@@ -56,9 +57,22 @@ export function DesignPage() {
             {c.tagline}
           </motion.p>
         </div>
-        <p className="hidden text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 [writing-mode:vertical-rl] md:block">
-          {c.eyebrow} — SPORT LINER
-        </p>
+        {c.heroImage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease, delay: 0.15 }}
+          >
+            <Media
+              src={c.heroImage}
+              alt={c.title}
+              aspect="4/3"
+              sizes="(max-width: 768px) 100vw, 45vw"
+              priority
+              className="rounded-3xl"
+            />
+          </motion.div>
+        )}
       </section>
 
       {/* Horizontal panels — native scroll-snap rail (trackpad, touch, wheel
@@ -84,8 +98,18 @@ export function DesignPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-30px" }}
             transition={{ duration: 0.6, ease }}
-            className="flex min-w-[80%] snap-center flex-col justify-between rounded-3xl border border-zinc-800 bg-zinc-900 p-10 md:min-w-[34rem]"
+            className="flex min-w-[80%] snap-center flex-col justify-between overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900 p-10 md:min-w-[34rem]"
           >
+            {tile.image && (
+              <Media
+                src={tile.image}
+                alt={tile.title}
+                aspect="16/10"
+                sizes="(max-width: 768px) 80vw, 34rem"
+                className="-mx-10 -mt-10 mb-8"
+                imgClassName="transition-transform duration-700 hover:scale-[1.03]"
+              />
+            )}
             <div className="flex items-start justify-between">
               <span className="text-7xl font-black text-zinc-700">
                 {String(i + 1).padStart(2, "0")}
@@ -129,6 +153,25 @@ export function DesignPage() {
           </button>
         </div>
       </div>
+
+      {c.featureImage && (
+        <section className="container-page">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, ease }}
+          >
+            <Media
+              src={c.featureImage}
+              alt={c.sections[c.sections.length - 1]?.heading ?? c.title}
+              aspect="21/9"
+              sizes="100vw"
+              className="rounded-3xl"
+            />
+          </motion.div>
+        </section>
+      )}
 
       {/* Spec list with line-by-line reveal */}
       <section className="container-page py-20">

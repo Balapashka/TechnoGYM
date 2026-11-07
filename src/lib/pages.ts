@@ -33,6 +33,8 @@ export type InfoContent = {
   contacts?: boolean;
   /** Показать форму обратной связи. */
   form?: boolean;
+  /** Фото рядом с контактами (public/media), если формы нет. */
+  image?: string;
 };
 
 /** Context the page texts are built from. */
@@ -259,6 +261,7 @@ const pages: Record<string, (ctx: InfoContext) => InfoContent> = {
       },
     ],
     contacts: true,
+    image: "/media/hero.jpg",
   }),
 
   privacy: (ctx) => {
