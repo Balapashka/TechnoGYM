@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     },
   });
 
-  if (mailEnabled()) {
+  if (await mailEnabled()) {
     const link = `${SITE_URL}/reset-password?token=${token}`;
     const text = [
       "Здравствуйте!",

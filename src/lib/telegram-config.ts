@@ -47,7 +47,9 @@ export async function clearTelegramConfig(): Promise<void> {
 
 /** Call a Bot API method. Throws with Telegram's description on failure. */
 export async function telegramApi<T>(token: string, method: string, body?: unknown): Promise<T> {
-  const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
+  // TELEGRAM_API_BASE: a relay for servers where api.telegram.org is blocked.
+  const base = (process.env.TELEGRAM_API_BASE || "https://api.telegram.org").replace(/\/$/, "");
+  const res = await fetch(`${base}/bot${token}/${method}`, {
     method: body ? "POST" : "GET",
     headers: body ? { "Content-Type": "application/json" } : undefined,
     body: body ? JSON.stringify(body) : undefined,

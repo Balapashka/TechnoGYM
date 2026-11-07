@@ -1,0 +1,140 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useTranslation } from "@/i18n/useTranslation";
+import { field } from "@/components/auth/AuthCard";
+import { smtpPresetFor } from "@/lib/smtp-presets";
+
+type Status = { connected: boolean; user: string | null; fromEnv: boolean };
+
+/** Connect the shop's mailbox: notifications to the manager + letters to customers. */
+export function MailConnect() {
+  const t = useTranslation();
+  const [status, setStatus] = useState<Status | null>(null);
+  const [user, setUser] = useState("");
+  const [pass, setPass] = useState("");
+  const [host, setHost] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/mail")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((s) => s && setStatus(s))
+      .catch(() => null);
+  }, []);
+
+  const customDomain = user.includes("@") && user.split("@")[1].includes(".") && !smtpPresetFor(user);
+
+  async function call(method: "POST" | "DELETE") {
+    setBusy(true);
+    setError(null);
+    const res = await fetch("/api/admin/mail", {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: method === "POST" ? JSON.stringify({ user, pass, host: host || undefined }) : undefined,
+    }).catch(() => null);
+    const json = (await res?.json().catch(() => null)) as (Status & { error?: string }) | null;
+    setBusy(false);
+    if (!res?.ok || !json) {
+      setError(json?.error ?? t("admin.errGeneric"));
+      return;
+    }
+    setPass("");
+    setStatus(json);
+  }
+
+  return (
+    <section className="max-w-3xl space-y-4 rounded-2xl border border-stone p-5">
+      <div>
+        <h3 className="text-sm font-black uppercase">{t("admin.mailTitle")}</h3>
+        <p className="mt-1 text-sm text-ink-soft">{t("admin.mailLead")}</p>
+      </div>
+
+      {status?.connected && (
+        <p className="rounded-xl bg-mist p-4 text-sm font-semibold text-green-800">
+          {t("admin.mailConnected", { email: status.user ?? "" })}
+        </p>
+      )}
+
+      {status?.fromEnv ? (
+        <p className="text-sm text-ink-soft">{t("admin.mailFromEnv")}</p>
+      ) : (
+        <>
+          <ol className="list-decimal space-y-1 pl-5 text-sm text-ink-soft">
+            <li>{t("admin.mailStep1")}</li>
+            <li>{t("admin.mailStep2")}</li>
+            <li>{t("admin.mailStep3")}</li>
+          </ol>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="mail-user" className="mb-1 block text-xs font-bold uppercase">
+                {t("admin.mailUser")}
+              </label>
+              <input
+                id="mail-user"
+                type="email"
+                className={field}
+                value={user}
+                autoComplete="off"
+                placeholder="sportliner@yandex.ru"
+                onChange={(e) => setUser(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="mail-pass" className="mb-1 block text-xs font-bold uppercase">
+                {t("admin.mailPass")}
+              </label>
+              <input
+                id="mail-pass"
+                type="password"
+                className={field}
+                value={pass}
+                autoComplete="new-password"
+                onChange={(e) => setPass(e.target.value)}
+              />
+            </div>
+            {customDomain && (
+              <div className="sm:col-span-2">
+                <label htmlFor="mail-host" className="mb-1 block text-xs font-bold uppercase">
+                  {t("admin.mailHost")}
+                </label>
+                <input
+                  id="mail-host"
+                  className={field}
+                  value={host}
+                  placeholder="smtp.yandex.ru"
+                  onChange={(e) => setHost(e.target.value)}
+                />
+              </div>
+            )}
+          </div>
+
+          {error && <p className="text-sm text-red-600">{error}</p>}
+
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              disabled={busy || !user || !pass}
+              onClick={() => call("POST")}
+              className="hover-lift rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase text-ink disabled:opacity-50"
+            >
+              {busy ? t("common.loading") : t("admin.mailConnect")}
+            </button>
+            {status?.connected && (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => call("DELETE")}
+                className="rounded-full border border-stone px-6 py-3 text-sm font-bold uppercase disabled:opacity-50"
+              >
+                {t("admin.tgDisconnect")}
+              </button>
+            )}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}

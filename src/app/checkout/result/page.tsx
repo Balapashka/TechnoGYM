@@ -49,7 +49,7 @@ export default async function CheckoutResultPage({
   return (
     <main className="flex flex-1 flex-col">
       <CheckoutResult
-        emailSent={mailEnabled()}
+        emailSent={await mailEnabled()}
         order={
           order
             ? {

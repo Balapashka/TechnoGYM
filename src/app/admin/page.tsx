@@ -39,7 +39,7 @@ export default async function AdminOverview() {
       missingSettings={missingLaunchSettings(settings)}
       integrations={{
         telegram,
-        email: mailEnabled(),
+        email: await mailEnabled(),
         payments: yookassaEnabled(),
         indexing,
       }}

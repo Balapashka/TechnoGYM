@@ -123,14 +123,14 @@ rate-limited per IP by `limitRequest()` (`src/lib/rate-limit.ts`, in-memory — 
 public forms also carry a `Honeypot` field and a 152-ФЗ `Consent` checkbox (schemas require it).
 
 **Environment switches vs. store settings.** Infrastructure is env-driven (all in `.env.example`,
-table in `README.md`): `SITE_URL`, `ADMIN_*`, `TELEGRAM_*`, `SMTP_*`, `YOOKASSA_*`,
+table in `README.md`): `SITE_URL`, `ADMIN_*`, `TELEGRAM_*` (incl. `TELEGRAM_API_BASE` relay), `SMTP_*`, `YOOKASSA_*`,
 `SITE_INDEXABLE`, `SESSION_COOKIE_SECURE`, `NEXT_PUBLIC_INSTALLMENT_MONTHS` (build-time),
 `DEMO_ACCOUNTS` and `DEMO_EXPOSE_RESET_TOKEN` (both must be false publicly — the admin overview
 warns when they are on). Business content the owner edits — phone, email, address, hours, legal
 details (ИНН/ОГРН), pickup address, socials — lives in the `Setting` table, edited at
 `/admin/settings`, read with `getSettings()` (`src/lib/settings.ts`, React-`cache`d, never throws);
 the pure shape/defaults/helpers are in `src/lib/settings-shape.ts` (safe for client components).
-The root layout passes settings to `Footer`; `Header` passes the phone to `MobileMenu`.
+Telegram and SMTP can also be connected from `/admin/settings` (`TelegramConnect`, `MailConnect`); their secrets live in private `secret.*` Setting rows (`src/lib/telegram-config.ts`, `getSmtpConfig()` in `src/lib/mailer.ts`), never in `StoreSettings`, and env values win. `mailEnabled()` is async. The root layout passes settings to `Footer`; `Header` passes the phone to `MobileMenu`.
 Both metadata routes are `force-dynamic` on purpose: statically prerendered, they would bake the
 build-time env values in and silently ignore the deployment's settings.
 

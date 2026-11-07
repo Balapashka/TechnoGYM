@@ -1,7 +1,7 @@
 import "server-only";
 import { BRAND_NAME } from "@/lib/brand";
 import { SITE_URL } from "@/lib/site";
-import { sendMail, textToHtml } from "@/lib/mailer";
+import { getSmtpConfig, sendMail, textToHtml } from "@/lib/mailer";
 import { getSettings } from "@/lib/settings";
 import {
   customerOrderMessage,
@@ -19,8 +19,8 @@ import { getTelegramConfig, telegramApi } from "@/lib/telegram-config";
  *
  * - Telegram: connected in /admin/settings (bot token + chats that wrote /start
  *   to the bot), or TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID in the env.
- * - Email:    SMTP_* (see src/lib/mailer.ts) + NOTIFY_EMAIL (falls back to the
- *   store email from /admin/settings).
+ * - Email:    the "Почта" block in /admin/settings or SMTP_* (src/lib/mailer.ts);
+ *   sent to NOTIFY_EMAIL, else the store email, else the sending mailbox.
  *
  * Every function here is best-effort: it logs and swallows errors, because a
  * flaky Telegram API must never cost the shop an order.
@@ -49,7 +49,9 @@ async function sendTelegram(text: string): Promise<void> {
 async function managerEmail(): Promise<string | null> {
   if (process.env.NOTIFY_EMAIL) return process.env.NOTIFY_EMAIL;
   const s = await getSettings();
-  return s.email || null;
+  if (s.email) return s.email;
+  // Nothing set: write to the mailbox the shop sends from.
+  return (await getSmtpConfig())?.user || null;
 }
 
 async function notifyManager(subject: string, text: string): Promise<void> {

@@ -445,6 +445,17 @@ export interface Translation {
     tgDisconnect: string;
     tgConnectedTo: string;
     tgNoChats: string;
+    mailTitle: string;
+    mailLead: string;
+    mailConnected: string;
+    mailFromEnv: string;
+    mailStep1: string;
+    mailStep2: string;
+    mailStep3: string;
+    mailUser: string;
+    mailPass: string;
+    mailHost: string;
+    mailConnect: string;
     settingsSeo: string;
     setting_yandexVerification: string;
     setting_googleVerification: string;
@@ -1054,6 +1065,17 @@ export const translations: Record<Locale, Translation> = {
       tgDisconnect: "Отключить",
       tgConnectedTo: "Подключено: бот @{bot}. Получатели:",
       tgNoChats: "Бот подключён, но ему ещё никто не написал. Отправьте боту /start и нажмите «Добавить новых получателей».",
+      mailTitle: "Уведомления на почту",
+      mailLead: "Заказы и заявки будут приходить вам на почту, а покупатели — получать письма о заказе и сброс пароля.",
+      mailConnected: "Подключено: письма отправляются с {email}",
+      mailFromEnv: "Почта настроена на сервере (SMTP_* в .env).",
+      mailStep1: "Заведите почту для магазина на Яндексе (например, sportliner@yandex.ru) или используйте свою.",
+      mailStep2: "В Яндекс ID → «Безопасность» → «Пароли приложений» создайте пароль для «Почты». Для Mail.ru — «Пароли для внешних приложений».",
+      mailStep3: "Впишите адрес и этот пароль ниже и нажмите «Подключить» — придёт проверочное письмо.",
+      mailUser: "Адрес почты",
+      mailPass: "Пароль приложения",
+      mailHost: "Почтовый сервер (SMTP)",
+      mailConnect: "Подключить",
       settingsSeo: "Поисковики и аналитика",
       setting_yandexVerification: "Код Яндекс Вебмастера (content из meta-тега)",
       setting_googleVerification: "Код Google Search Console (content из meta-тега)",
@@ -1646,6 +1668,17 @@ export const translations: Record<Locale, Translation> = {
       tgDisconnect: "Disconnect",
       tgConnectedTo: "Connected: bot @{bot}. Recipients:",
       tgNoChats: "The bot is connected, but nobody has written to it yet. Send /start to the bot and press “Add new recipients”.",
+      mailTitle: "Email notifications",
+      mailLead: "Orders and requests will arrive by email, and shoppers will get order emails and password resets.",
+      mailConnected: "Connected: emails are sent from {email}",
+      mailFromEnv: "Email is configured on the server (SMTP_* in .env).",
+      mailStep1: "Create a mailbox for the shop (e.g. on Yandex) or use your own.",
+      mailStep2: "In your Yandex ID → Security → App passwords, create a password for Mail. For Mail.ru — “Passwords for external apps”.",
+      mailStep3: "Enter the address and that password below and press Connect — a test email will arrive.",
+      mailUser: "Email address",
+      mailPass: "App password",
+      mailHost: "Mail server (SMTP)",
+      mailConnect: "Connect",
       settingsSeo: "Search engines and analytics",
       setting_yandexVerification: "Yandex Webmaster code (meta tag content)",
       setting_googleVerification: "Google Search Console code (meta tag content)",
