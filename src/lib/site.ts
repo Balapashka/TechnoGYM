@@ -20,3 +20,13 @@ export const SITE_URL = (
  * real.
  */
 export const SITE_INDEXABLE = process.env.SITE_INDEXABLE === "true";
+
+/**
+ * Whether search engines may index the site right now: the env switch, or the
+ * "Открыть сайт для поисковиков" toggle in /admin/settings.
+ */
+export async function isIndexable(): Promise<boolean> {
+  if (SITE_INDEXABLE) return true;
+  const { getSettings } = await import("@/lib/settings");
+  return (await getSettings()).seoIndexable === "true";
+}

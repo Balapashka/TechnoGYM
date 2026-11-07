@@ -1,17 +1,17 @@
 import type { MetadataRoute } from "next";
-import { SITE_INDEXABLE, SITE_URL } from "@/lib/site";
+import { isIndexable, SITE_URL } from "@/lib/site";
 
-// Read per request, not baked into the build: the deployment sets
-// SITE_INDEXABLE as a runtime environment variable (see docker-compose.yml).
+// Read per request, not baked into the build: indexing is an owner setting
+// (/admin/settings) or the SITE_INDEXABLE env switch.
 export const dynamic = "force-dynamic";
 
 /**
- * robots.txt. Blocks all crawlers until `SITE_INDEXABLE=true` (set it once the
- * catalog, prices and legal details are final); then exposes the storefront
+ * robots.txt. Blocks all crawlers until indexing is turned on (admin settings
+ * or `SITE_INDEXABLE=true`); then exposes the storefront
  * while keeping private and transactional routes out of the index.
  */
-export default function robots(): MetadataRoute.Robots {
-  if (!SITE_INDEXABLE) {
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  if (!(await isIndexable())) {
     return { rules: { userAgent: "*", disallow: "/" } };
   }
 

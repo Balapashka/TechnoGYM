@@ -30,6 +30,13 @@ export type StoreSettings = {
   whatsapp: string;
   vk: string;
   youtube: string;
+  /** "true" opens the site to search engines (robots.txt, meta robots). */
+  seoIndexable: string;
+  /** Yandex Webmaster / Google Search Console verification codes. */
+  yandexVerification: string;
+  googleVerification: string;
+  /** Yandex Metrica counter number; empty = no analytics. */
+  yandexMetrikaId: string;
 };
 
 export const SETTINGS_KEYS = [
@@ -47,6 +54,10 @@ export const SETTINGS_KEYS = [
   "whatsapp",
   "vk",
   "youtube",
+  "seoIndexable",
+  "yandexVerification",
+  "googleVerification",
+  "yandexMetrikaId",
 ] as const satisfies readonly (keyof StoreSettings)[];
 
 export type SettingsKey = (typeof SETTINGS_KEYS)[number];
@@ -68,6 +79,10 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   whatsapp: "",
   vk: "",
   youtube: "",
+  seoIndexable: "",
+  yandexVerification: "",
+  googleVerification: "",
+  yandexMetrikaId: "",
 };
 
 /**

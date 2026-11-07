@@ -12,12 +12,13 @@ import {
   type OrderForMessage,
 } from "@/lib/notify-messages";
 import { orderNumber, type OrderStatusValue } from "@/lib/order-format";
+import { getTelegramConfig, telegramApi } from "@/lib/telegram-config";
 
 /**
  * Manager notifications. Two channels, both optional and env-configured:
  *
- * - Telegram: TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID (a chat or group the bot is
- *   in). The quickest way to get an alert on the phone.
+ * - Telegram: connected in /admin/settings (bot token + chats that wrote /start
+ *   to the bot), or TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID in the env.
  * - Email:    SMTP_* (see src/lib/mailer.ts) + NOTIFY_EMAIL (falls back to the
  *   store email from /admin/settings).
  *
@@ -25,32 +26,24 @@ import { orderNumber, type OrderStatusValue } from "@/lib/order-format";
  * flaky Telegram API must never cost the shop an order.
  */
 
-export function telegramEnabled(): boolean {
-  return Boolean(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID);
+export async function telegramEnabled(): Promise<boolean> {
+  const cfg = await getTelegramConfig();
+  return Boolean(cfg && cfg.chats.length > 0);
 }
 
+/** Send to every connected chat (owner, managers' group…). */
 async function sendTelegram(text: string): Promise<void> {
-  if (!telegramEnabled()) return;
-  try {
-    const res = await fetch(
-      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: process.env.TELEGRAM_CHAT_ID,
-          text,
-          disable_web_page_preview: true,
-        }),
-        signal: AbortSignal.timeout(8000),
-      },
-    );
-    if (!res.ok) {
-      console.error("[telegram] send failed:", res.status, await res.text());
-    }
-  } catch (e) {
-    console.error("[telegram] send failed:", e);
-  }
+  const cfg = await getTelegramConfig();
+  if (!cfg) return;
+  await Promise.all(
+    cfg.chats.map((chat) =>
+      telegramApi(cfg.token, "sendMessage", {
+        chat_id: chat.id,
+        text,
+        disable_web_page_preview: true,
+      }).catch((e) => console.error("[telegram] send failed:", chat.id, e)),
+    ),
+  );
 }
 
 async function managerEmail(): Promise<string | null> {

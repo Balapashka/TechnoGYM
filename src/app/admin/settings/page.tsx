@@ -1,8 +1,14 @@
 import { getSettings } from "@/lib/settings";
 import { SettingsForm } from "@/components/admin/SettingsForm";
+import { TelegramConnect } from "@/components/admin/TelegramConnect";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
-  return <SettingsForm initial={await getSettings()} />;
+  return (
+    <div className="space-y-10">
+      <TelegramConnect />
+      <SettingsForm initial={await getSettings()} />
+    </div>
+  );
 }

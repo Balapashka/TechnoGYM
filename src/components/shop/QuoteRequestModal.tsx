@@ -20,7 +20,7 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 /**
  * Global "request a price" dialog. Products imported to order (Technogym,
- * Panatta) never show a price or an add-to-cart button; every CTA for them
+ * the imported range) never show a price or an add-to-cart button; every CTA for them
  * opens this modal through the quote store. Mounted once in the layout.
  */
 export function QuoteRequestModal() {

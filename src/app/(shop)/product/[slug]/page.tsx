@@ -33,7 +33,7 @@ export async function generateMetadata({
   const description = shortDescription(product.description);
   const image = product.images[0];
   return {
-    title: `${product.name} — SPORT LINER`,
+    title: `${product.name} — ${product.priceOnRequest ? "купить под заказ" : "купить в Москве"} | SPORT LINER`,
     description,
     alternates: { canonical: `/product/${product.slug}` },
     openGraph: {

@@ -25,7 +25,7 @@ export function originFromCode(code: string): string | null {
 
 /**
  * Order in which sourcing countries lead the storefront. The catalog opens on
- * Italy (the imported-to-order Technogym / Panatta range) and follows with
+ * Italy (the imported-to-order Technogym range) and follows with
  * China (the stocked UNIX Fit range) — change this array to change that order
  * everywhere: default catalog sort, homepage carousels and collections.
  */

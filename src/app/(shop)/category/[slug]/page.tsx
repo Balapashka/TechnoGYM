@@ -14,12 +14,24 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  if (slug === "all") return { title: "Все товары — SPORT LINER" };
+  if (slug === "all") {
+    return {
+      title: "Каталог тренажёров Technogym и UNIX Fit — купить в Москве | SPORT LINER",
+      description:
+        "Каталог тренажёров для дома и фитнес-клубов: беговые дорожки, велотренажёры, эллипсы, гребные и силовые тренажёры. UNIX Fit в наличии, Technogym под заказ. Доставка по Москве и России.",
+      alternates: { canonical: "/category/all" },
+    };
+  }
 
   // Titles are not reactive, so they use the default locale's category name.
   const categories = await getCategories();
   const dbName = categories.find((c) => c.slug === slug)?.name;
-  return { title: `${categoryName(DEFAULT_LOCALE, slug, dbName)} — SPORT LINER` };
+  const name = categoryName(DEFAULT_LOCALE, slug, dbName);
+  return {
+    title: `${name} — купить в Москве, цены | SPORT LINER`,
+    description: `${name} Technogym и UNIX Fit для дома и фитнес-клуба: модели в наличии в Москве и под заказ из Италии. Доставка, сборка, гарантия.`,
+    alternates: { canonical: `/category/${slug}` },
+  };
 }
 
 export default async function CategoryPage({

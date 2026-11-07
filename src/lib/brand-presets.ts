@@ -11,7 +11,6 @@ export type BrandPreset = {
 
 export const BRAND_PRESETS: BrandPreset[] = [
   { name: "Technogym", originCountry: "Италия", inStock: false, priceOnRequest: true },
-  { name: "Panatta", originCountry: "Италия", inStock: false, priceOnRequest: true },
   { name: "UNIX Fit", originCountry: "Китай", inStock: true, priceOnRequest: false },
 ];
 

@@ -5,13 +5,13 @@ import { missingLaunchSettings } from "@/lib/settings-shape";
 import { mailEnabled } from "@/lib/mailer";
 import { telegramEnabled } from "@/lib/notify";
 import { yookassaEnabled } from "@/lib/payments/yookassa";
-import { SITE_INDEXABLE } from "@/lib/site";
+import { isIndexable } from "@/lib/site";
 import { OverviewStats } from "@/components/admin/OverviewStats";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminOverview() {
-  const [products, newOrders, orders, newLeads, users, revenue, settings] =
+  const [products, newOrders, orders, newLeads, users, revenue, settings, telegram] =
     await Promise.all([
       prisma.product.count(),
       prisma.order.count({ where: { status: "PENDING" } }),
@@ -24,7 +24,9 @@ export default async function AdminOverview() {
         _sum: { totalCents: true },
       }),
       getSettings(),
+      telegramEnabled(),
     ]);
+  const indexing = await isIndexable();
 
   return (
     <OverviewStats
@@ -36,10 +38,10 @@ export default async function AdminOverview() {
       revenue={formatPrice(revenue._sum.totalCents ?? 0)}
       missingSettings={missingLaunchSettings(settings)}
       integrations={{
-        telegram: telegramEnabled(),
+        telegram,
         email: mailEnabled(),
         payments: yookassaEnabled(),
-        indexing: SITE_INDEXABLE,
+        indexing,
       }}
       testMode={
         process.env.DEMO_ACCOUNTS === "true" ||

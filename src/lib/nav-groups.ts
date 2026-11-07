@@ -6,6 +6,9 @@
  */
 import { brandSlug } from "@/lib/catalog-url";
 
+/** Brands that have a landing page in src/lib/brand-pages.ts. */
+const BRAND_PAGE_SLUGS = ["technogym", "unix-fit"];
+
 export type NavCategory = { slug: string; name: string; count: number };
 export type NavBrand = { name: string; count: number };
 export type ShopNav = { categories: NavCategory[]; brands: NavBrand[] };
@@ -45,7 +48,9 @@ export function shopColumnsFrom(nav: ShopNav): NavColumn[] {
     {
       key: "nav.brands",
       links: nav.brands.map((b) => ({
-        href: `/category/all?brand=${brandSlug(b.name)}`,
+        href: BRAND_PAGE_SLUGS.includes(brandSlug(b.name))
+          ? `/brand/${brandSlug(b.name)}`
+          : `/category/all?brand=${brandSlug(b.name)}`,
         key: null,
         label: b.name,
       })),

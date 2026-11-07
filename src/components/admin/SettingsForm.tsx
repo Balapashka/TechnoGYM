@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { settingsSchema } from "@/schemas/settings";
 import { field, fieldError } from "@/components/auth/AuthCard";
@@ -29,6 +29,10 @@ const GROUPS: { title: string; keys: SettingsKey[]; multiline?: SettingsKey[] }[
     title: "admin.settingsSocial",
     keys: ["telegram", "whatsapp", "vk", "youtube"],
   },
+  {
+    title: "admin.settingsSeo",
+    keys: ["yandexVerification", "googleVerification", "yandexMetrikaId"],
+  },
 ];
 
 /** Store contacts, legal details and socials (saved to the Setting table). */
@@ -40,11 +44,15 @@ export function SettingsForm({ initial }: { initial: StoreSettings }) {
   const {
     register,
     handleSubmit,
+    setValue,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<StoreSettings>({
     resolver: zodResolver(settingsSchema),
     defaultValues: initial,
   });
+
+  const indexable = useWatch({ control, name: "seoIndexable" }) === "true";
 
   const onSubmit = handleSubmit(async (data) => {
     setStatus(null);
@@ -93,6 +101,21 @@ export function SettingsForm({ initial }: { initial: StoreSettings }) {
           </div>
         </fieldset>
       ))}
+
+      <label className="flex max-w-3xl items-start gap-3 rounded-2xl border border-stone p-5 text-sm">
+        <input
+          type="checkbox"
+          checked={indexable}
+          onChange={(e) =>
+            setValue("seoIndexable", e.target.checked ? "true" : "", { shouldDirty: true })
+          }
+          className="mt-1 h-4 w-4 accent-ink"
+        />
+        <span>
+          <span className="block font-bold">{t("admin.seoIndexable")}</span>
+          <span className="mt-1 block text-ink-soft">{t("admin.seoIndexableHint")}</span>
+        </span>
+      </label>
 
       <div className="flex items-center gap-4">
         <button

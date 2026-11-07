@@ -29,6 +29,11 @@ export const settingsSchema = z.object({
   whatsapp: text(200),
   vk: text(200),
   youtube: text(200),
+  seoIndexable: z.string().refine((v) => v === "" || v === "true"),
+  // Only the code itself: letters, digits, "-" and "_".
+  yandexVerification: z.string().trim().max(100).regex(/^[\w-]*$/, "Только сам код, без тега"),
+  googleVerification: z.string().trim().max(100).regex(/^[\w-]*$/, "Только сам код, без тега"),
+  yandexMetrikaId: z.string().trim().regex(/^\d{0,12}$/, "Номер счётчика — только цифры"),
 }) satisfies z.ZodType<StoreSettings>;
 
 // Compile-time guard: the schema covers exactly the known keys.

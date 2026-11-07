@@ -433,6 +433,25 @@ export interface Translation {
     slugHint: string;
     brandHint: string;
     priceHiddenHint: string;
+    tgTitle: string;
+    tgLead: string;
+    tgStep1: string;
+    tgStep2: string;
+    tgStep3: string;
+    tgToken: string;
+    tgTokenSaved: string;
+    tgConnect: string;
+    tgRefresh: string;
+    tgDisconnect: string;
+    tgConnectedTo: string;
+    tgNoChats: string;
+    settingsSeo: string;
+    setting_yandexVerification: string;
+    setting_googleVerification: string;
+    setting_yandexMetrikaId: string;
+    setting_seoIndexable: string;
+    seoIndexable: string;
+    seoIndexableHint: string;
   };
 
   // Country/Locale modal + switcher
@@ -598,7 +617,6 @@ export interface Translation {
     brandToOrder: string;
     brandView: string;
     brand_technogym: string;
-    brand_panatta: string;
     brand_unixfit: string;
     flagshipsTitle: string;
     flagshipsLead: string;
@@ -618,8 +636,7 @@ export interface Translation {
     benefit3Body: string;
     benefit4Title: string;
     benefit4Body: string;
-    brandOnRequest: string;
-    brandAsk: string;
+
   };
 }
 
@@ -1025,6 +1042,25 @@ export const translations: Record<Locale, Translation> = {
       brandHint: "Выберите из списка: страна, наличие и «цена по запросу» подставятся сами.",
       priceHiddenHint: "Цена скрыта на сайте — покупатель увидит кнопку «Запросить цену». Можно указать закупочную для себя или оставить 0.",
       featuresPerLine: "Характеристики — по одной в строке, «Название: значение»",
+      tgTitle: "Уведомления в Telegram",
+      tgLead: "Новые заказы и заявки будут приходить вам в Telegram.",
+      tgStep1: "Создайте бота у @BotFather (команда /newbot) и скопируйте токен — строку вида 123456789:AA…",
+      tgStep2: "Откройте своего бота в Telegram и отправьте ему /start. Менеджеры тоже могут написать /start или добавьте бота в общую группу.",
+      tgStep3: "Вставьте токен ниже и нажмите «Подключить» — в Telegram придёт проверочное сообщение.",
+      tgToken: "Токен бота",
+      tgTokenSaved: "Токен сохранён. Оставьте поле пустым, чтобы не менять его.",
+      tgConnect: "Подключить",
+      tgRefresh: "Добавить новых получателей",
+      tgDisconnect: "Отключить",
+      tgConnectedTo: "Подключено: бот @{bot}. Получатели:",
+      tgNoChats: "Бот подключён, но ему ещё никто не написал. Отправьте боту /start и нажмите «Добавить новых получателей».",
+      settingsSeo: "Поисковики и аналитика",
+      setting_yandexVerification: "Код Яндекс Вебмастера (content из meta-тега)",
+      setting_googleVerification: "Код Google Search Console (content из meta-тега)",
+      setting_yandexMetrikaId: "Номер счётчика Яндекс Метрики",
+      setting_seoIndexable: "Сайт открыт для поисковиков",
+      seoIndexable: "Открыть сайт для Яндекса и Google",
+      seoIndexableHint: "Поисковики начнут добавлять сайт в выдачу. Включайте, когда каталог, цены и реквизиты актуальны.",
     },
     locale: {
       chooseCountry: "Выберите вашу страну",
@@ -1165,19 +1201,15 @@ export const translations: Record<Locale, Translation> = {
       openSearch: "Поиск по каталогу",
     },
     home: {
-      heroEyebrow: "Technogym · Panatta · UNIX Fit",
       heroTitle: "Тренажёры, с которыми хочется тренироваться",
-      heroLead: "Итальянское оборудование Technogym и Panatta под заказ и тренажёры UNIX Fit в наличии в Москве. Для дома, студий и фитнес-клубов.",
       heroCatalog: "Смотреть каталог",
       heroBusiness: "Для фитнес-клубов",
       brandsTitle: "Наши бренды",
-      brandsLead: "Три производителя — от домашней беговой дорожки до полного оснащения клуба.",
       brandModels: "{count} моделей",
       brandInStock: "В наличии в Москве",
       brandToOrder: "Под заказ из Италии",
       brandView: "Смотреть модели",
       brand_technogym: "Итальянский лидер премиального фитнеса: дизайн, технологии и комфорт, которые выбирают лучшие клубы мира.",
-      brand_panatta: "Итальянские силовые тренажёры профессионального класса — биомеханика, надёжность и характер.",
       brand_unixfit: "Современные тренажёры для дома и зала с честной ценой. Всё в наличии в Москве — быстрая доставка.",
       flagshipsTitle: "Флагманы из Италии",
       flagshipsLead: "Цена рассчитывается индивидуально — оставьте заявку, менеджер подготовит предложение.",
@@ -1197,8 +1229,9 @@ export const translations: Record<Locale, Translation> = {
       benefit4Body: "После подтверждения заказа или по счёту для компаний.",
       benefit2Title: "Гарантия и сервис",
       benefit2Body: "Гарантия на всё оборудование, помощь с обслуживанием.",
-      brandOnRequest: "Модели и цены — по запросу",
-      brandAsk: "Оставить заявку",
+      heroEyebrow: "Technogym · UNIX Fit",
+      heroLead: "Итальянское оборудование Technogym под заказ и тренажёры UNIX Fit в наличии в Москве. Для дома, студий и фитнес-клубов.",
+      brandsLead: "Два производителя — от домашней беговой дорожки до полного оснащения клуба.",
     },
   },
   en: {
@@ -1601,6 +1634,25 @@ export const translations: Record<Locale, Translation> = {
       brandHint: "Pick from the list: country, availability and price on request are filled in for you.",
       priceHiddenHint: "The price is hidden on the site — shoppers see “Request a price”. Enter it for your reference or leave 0.",
       featuresPerLine: "Specifications — one per line, “Name: value”",
+      tgTitle: "Telegram notifications",
+      tgLead: "New orders and requests will arrive in your Telegram.",
+      tgStep1: "Create a bot with @BotFather (/newbot) and copy its token — a line like 123456789:AA…",
+      tgStep2: "Open your bot in Telegram and send it /start. Managers can do the same, or add the bot to a group.",
+      tgStep3: "Paste the token below and press Connect — a test message will arrive in Telegram.",
+      tgToken: "Bot token",
+      tgTokenSaved: "Token saved. Leave empty to keep it.",
+      tgConnect: "Connect",
+      tgRefresh: "Add new recipients",
+      tgDisconnect: "Disconnect",
+      tgConnectedTo: "Connected: bot @{bot}. Recipients:",
+      tgNoChats: "The bot is connected, but nobody has written to it yet. Send /start to the bot and press “Add new recipients”.",
+      settingsSeo: "Search engines and analytics",
+      setting_yandexVerification: "Yandex Webmaster code (meta tag content)",
+      setting_googleVerification: "Google Search Console code (meta tag content)",
+      setting_yandexMetrikaId: "Yandex Metrica counter number",
+      setting_seoIndexable: "Open to search engines",
+      seoIndexable: "Open the site to Yandex and Google",
+      seoIndexableHint: "Search engines will start listing the site. Turn on once the catalog, prices and legal details are final.",
     },
     locale: {
       chooseCountry: "Choose your country",
@@ -1741,19 +1793,15 @@ export const translations: Record<Locale, Translation> = {
       openSearch: "Search the catalog",
     },
     home: {
-      heroEyebrow: "Technogym · Panatta · UNIX Fit",
       heroTitle: "Equipment you will want to train on",
-      heroLead: "Italian Technogym and Panatta equipment to order and UNIX Fit in stock in Moscow. For homes, studios and gyms.",
       heroCatalog: "Shop the catalog",
       heroBusiness: "For gyms",
       brandsTitle: "Our brands",
-      brandsLead: "Three manufacturers — from a home treadmill to a fully equipped club.",
       brandModels: "{count} models",
       brandInStock: "In stock in Moscow",
       brandToOrder: "Made to order in Italy",
       brandView: "View models",
       brand_technogym: "The Italian leader in premium fitness: design, technology and comfort chosen by the world's best clubs.",
-      brand_panatta: "Professional Italian strength equipment — biomechanics, durability and character.",
       brand_unixfit: "Modern equipment for home and gym at an honest price. In stock in Moscow — fast delivery.",
       flagshipsTitle: "Italian flagships",
       flagshipsLead: "Priced individually — leave a request and a manager will prepare an offer.",
@@ -1773,8 +1821,9 @@ export const translations: Record<Locale, Translation> = {
       benefit4Body: "After order confirmation or by invoice for companies.",
       benefit2Title: "Warranty and service",
       benefit2Body: "Warranty on all equipment and help with maintenance.",
-      brandOnRequest: "Models and prices on request",
-      brandAsk: "Send a request",
+      heroEyebrow: "Technogym · UNIX Fit",
+      heroLead: "Italian Technogym equipment to order and UNIX Fit in stock in Moscow. For homes, studios and gyms.",
+      brandsLead: "Two manufacturers — from a home treadmill to a fully equipped club.",
     },
   },
 };
