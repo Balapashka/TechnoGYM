@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { normalizeApiBase, type TgChat } from "@/lib/telegram-chats";
+import { createSerial, withRetry } from "@/lib/retry";
 
 /**
  * Telegram bot settings. Stored in the Setting table under private keys —
@@ -94,16 +95,47 @@ export async function clearTelegramConfig(): Promise<void> {
   await prisma.setting.deleteMany({ where: { key: { in: [TOKEN_KEY, CHATS_KEY] } } });
 }
 
-/** Call a Bot API method. Throws with Telegram's description on failure. */
+/** Telegram (or the relay) answered, but not with ok: true. */
+export class TelegramApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+    this.name = "TelegramApiError";
+  }
+}
+
+const ATTEMPTS = 3;
+const ATTEMPT_TIMEOUT_MS = 7000;
+
+/**
+ * Call a Bot API method. Throws TelegramApiError with Telegram's description
+ * when it refuses, or the network error. A new connection from the Moscow
+ * server to the relay now and then stalls, so timeouts, network errors and
+ * 5xx are retried with a fresh attempt; a refusal (bad token, 403, 409) is not.
+ */
 export async function telegramApi<T>(target: TelegramTarget, method: string, body?: unknown): Promise<T> {
   const base = target.apiBase || DEFAULT_API_BASE;
-  const res = await fetch(`${base}/bot${target.token}/${method}`, {
-    method: body ? "POST" : "GET",
-    headers: body ? { "Content-Type": "application/json" } : undefined,
-    body: body ? JSON.stringify(body) : undefined,
-    signal: AbortSignal.timeout(10000),
-  });
-  const json = (await res.json().catch(() => ({}))) as { ok?: boolean; result?: T; description?: string };
-  if (!json.ok) throw new Error(json.description || `Telegram HTTP ${res.status}`);
-  return json.result as T;
+  return withRetry(
+    async () => {
+      const res = await fetch(`${base}/bot${target.token}/${method}`, {
+        method: body ? "POST" : "GET",
+        headers: body ? { "Content-Type": "application/json" } : undefined,
+        body: body ? JSON.stringify(body) : undefined,
+        signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
+      });
+      const json = (await res.json().catch(() => ({}))) as { ok?: boolean; result?: T; description?: string };
+      if (!json.ok) throw new TelegramApiError(json.description || `Telegram HTTP ${res.status}`, res.status);
+      return json.result as T;
+    },
+    {
+      attempts: ATTEMPTS,
+      delayMs: 400,
+      retryable: (e) => !(e instanceof TelegramApiError) || e.status >= 500,
+    },
+  );
 }
+
+/** getUpdates calls must not overlap (Telegram answers 409 Conflict). */
+export const serialUpdates = createSerial();
