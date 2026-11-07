@@ -6,5 +6,9 @@ export const metadata: Metadata = {
 };
 
 export default function ForgotPasswordPage() {
-  return <ForgotForm />;
+  return (
+    <main className="flex flex-1 flex-col">
+      <ForgotForm />
+    </main>
+  );
 }

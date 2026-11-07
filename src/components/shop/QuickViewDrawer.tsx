@@ -10,6 +10,7 @@ import { useCartStore } from "@/store/cart-store";
 import { useCartUiStore } from "@/store/cart-ui-store";
 import { useQuoteStore } from "@/store/quote-store";
 import { useTranslation } from "@/i18n/useTranslation";
+import { useEscapeToClose } from "@/lib/use-escape";
 import { PriceOrRequest, ProductInstallment } from "@/components/ui/Price";
 import { UsedBadge } from "./UsedBadge";
 
@@ -55,6 +56,8 @@ export function QuickViewDrawer() {
     close();
   };
 
+  useEscapeToClose(Boolean(product), close);
+
   return (
     <AnimatePresence>
       {product && (
@@ -68,6 +71,9 @@ export function QuickViewDrawer() {
             onClick={close}
           />
           <motion.aside
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("common.quickView")}
             className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col overflow-y-auto bg-paper shadow-2xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}

@@ -15,9 +15,9 @@ export default async function AdminLayout({
   if (user.role !== "ADMIN") redirect("/account");
 
   return (
-    <div className="container-page flex-1 py-10">
+    <main className="container-page flex-1 py-10">
       <AdminHeader />
       {children}
-    </div>
+    </main>
   );
 }

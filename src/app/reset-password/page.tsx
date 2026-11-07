@@ -6,8 +6,10 @@ export const metadata: Metadata = { title: "Новый пароль — SPORT LI
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={null}>
-      <ResetForm />
-    </Suspense>
+    <main className="flex flex-1 flex-col">
+      <Suspense fallback={null}>
+        <ResetForm />
+      </Suspense>
+    </main>
   );
 }

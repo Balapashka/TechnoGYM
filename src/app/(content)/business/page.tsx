@@ -4,5 +4,9 @@ import { BusinessContact } from "./BusinessContact";
 export const metadata: Metadata = { title: "Для бизнеса — SPORT LINER" };
 
 export default function BusinessPage() {
-  return <BusinessContact />;
+  return (
+    <main className="flex flex-1 flex-col">
+      <BusinessContact />
+    </main>
+  );
 }

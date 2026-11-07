@@ -37,9 +37,12 @@ export const POSTAL_CODE_RULES: Record<
   KG: { pattern: /^\d{6}$/, hint: "720000", message: "Индекс — 6 цифр" },
 };
 
-/** Letters (Cyrillic or Latin) joined by single spaces, hyphens or apostrophes. */
-const NAME_PATTERN =
-  /^[A-Za-zА-Яа-яЁё]+(?:[ '-][A-Za-zА-Яа-яЁё]+)*$/;
+/**
+ * Letters of any alphabet — Russian, Kazakh (Ә, Қ, Ң, Ө, Ұ, Ү, І…), Uzbek or
+ * Latin — joined by single spaces, hyphens or apostrophes (', ’, ‘, ʻ, ʼ:
+ * Uzbek Latin writes Oʻktam, Gʻulom). No digits or other punctuation.
+ */
+const NAME_PATTERN = /^\p{L}+(?:[ '’‘ʻʼ-]\p{L}+)*$/u;
 
 /** Shared phone rules (same as the price-request form). */
 const phoneField = z

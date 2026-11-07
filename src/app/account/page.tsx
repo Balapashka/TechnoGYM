@@ -35,11 +35,13 @@ export default async function AccountPage() {
   }));
 
   return (
-    <AccountView
-      name={user.name ?? null}
-      email={user.email}
-      isAdmin={user.role === "ADMIN"}
-      orders={view}
-    />
+    <main className="flex flex-1 flex-col">
+      <AccountView
+        name={user.name ?? null}
+        email={user.email}
+        isAdmin={user.role === "ADMIN"}
+        orders={view}
+      />
+    </main>
   );
 }

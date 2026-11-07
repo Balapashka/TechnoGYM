@@ -9,6 +9,7 @@ import { useCartUiStore } from "@/store/cart-ui-store";
 import { useDisplayCountry } from "@/store/locale-store";
 import { BASE_CURRENCY, formatPriceIn } from "@/lib/format";
 import { useTranslation } from "@/i18n/useTranslation";
+import { useEscapeToClose } from "@/lib/use-escape";
 
 /** Global slide-in cart. Opens when an item is added or the cart icon is tapped. */
 export function CartDrawer() {
@@ -20,6 +21,8 @@ export function CartDrawer() {
   const setQuantity = useCartStore((s) => s.setQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
   const country = useDisplayCountry();
+
+  useEscapeToClose(open, close);
 
   const total = cartTotalCents(items);
   const currency = items[0]?.currency ?? BASE_CURRENCY;
@@ -37,6 +40,9 @@ export function CartDrawer() {
             onClick={close}
           />
           <motion.aside
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("cart.yourCart")}
             className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-paper shadow-2xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}

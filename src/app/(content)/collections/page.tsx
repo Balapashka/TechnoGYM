@@ -38,7 +38,7 @@ export default async function CollectionsPage() {
     i % 5 === 0 ? "sm:col-span-2 sm:row-span-2" : "";
 
   return (
-    <div className="container-page flex-1 py-12">
+    <main className="container-page flex-1 py-12">
       <Reveal>
         <CollectionsIntro total={total} categories={categories.length} />
       </Reveal>
@@ -76,6 +76,6 @@ export default async function CollectionsPage() {
           </StaggerItem>
         ))}
       </Stagger>
-    </div>
+    </main>
   );
 }

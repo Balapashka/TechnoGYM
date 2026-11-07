@@ -56,6 +56,10 @@ describe("checkoutSchema", () => {
     it("accepts latin and hyphenated names", () => {
       expect(parseWith({ fullName: "Jane Doe" }).success).toBe(true);
       expect(parseWith({ fullName: "Анна-Мария Иванова" }).success).toBe(true);
+      // Kazakhstan, Uzbekistan and Kyrgyzstan are in the country list.
+      expect(parseWith({ fullName: "Нұрлан Әлиев" }).success).toBe(true);
+      expect(parseWith({ fullName: "Oʻktam Gʻulomov" }).success).toBe(true);
+      expect(parseWith({ fullName: "Шон О’Брайен" }).success).toBe(true);
     });
   });
 
@@ -73,6 +77,9 @@ describe("checkoutSchema", () => {
 
     it("accepts hyphenated city names", () => {
       expect(parseWith({ city: "Ростов-на-Дону" }).success).toBe(true);
+      expect(parseWith({ city: "Өскемен" }).success).toBe(true);
+      expect(parseWith({ city: "Qoʻqon" }).success).toBe(true);
+      expect(parseWith({ city: "Нұр-Сұлтан" }).success).toBe(true);
     });
 
     it("accepts a hand-typed city outside the suggestion list", () => {

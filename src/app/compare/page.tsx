@@ -8,5 +8,9 @@ export const metadata: Metadata = {
 
 /** /compare — the list lives in localStorage, so the view is fully client-side. */
 export default function ComparePage() {
-  return <CompareView />;
+  return (
+    <main className="flex flex-1 flex-col">
+      <CompareView />
+    </main>
+  );
 }

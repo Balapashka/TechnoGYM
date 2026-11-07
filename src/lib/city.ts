@@ -1,11 +1,12 @@
 import { CITIES_BY_COUNTRY } from "../../config/cities";
 
 /**
- * A valid city name: letters (Cyrillic or Latin) joined by single spaces,
- * hyphens or apostrophes — no digits or other punctuation, no leading or
- * trailing separators ("Ростов-на-Дону", "Санкт-Петербург", "L'Aquila").
+ * A valid city name: letters of any alphabet (Russian, Kazakh, Uzbek, Latin…)
+ * joined by single spaces, hyphens or apostrophes — no digits or other
+ * punctuation, no leading or trailing separators ("Ростов-на-Дону",
+ * "Өскемен", "Qoʻqon", "L'Aquila").
  */
-export const CITY_PATTERN = /^[A-Za-zА-Яа-яЁё]+(?:[ '-][A-Za-zА-Яа-яЁё]+)*$/;
+export const CITY_PATTERN = /^\p{L}+(?:[ '’‘ʻʼ-]\p{L}+)*$/u;
 
 export const CITY_ERROR_MESSAGE =
   "Укажите корректное название города (только буквы)";
