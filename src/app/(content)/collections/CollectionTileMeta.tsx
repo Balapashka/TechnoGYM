@@ -4,13 +4,14 @@ import { useTranslation } from "@/i18n/useTranslation";
 import { formatProductCount } from "@/i18n/translations";
 import { formatPriceIn } from "@/lib/format";
 import { useDisplayCountry } from "@/store/locale-store";
+import { cn } from "@/lib/cn";
 
 /** "5 товаров" tile label, with the correct Russian declension. */
-export function CollectionCount({ count }: { count: number }) {
+export function CollectionCount({ count, className }: { count: number; className?: string }) {
   const t = useTranslation();
 
   return (
-    <p className="text-xs font-bold uppercase tracking-widest text-ink-soft">
+    <p className={cn("text-xs font-bold uppercase tracking-widest text-ink-soft", className)}>
       {formatProductCount(t.locale, count)}
     </p>
   );
@@ -23,8 +24,10 @@ export function CollectionCount({ count }: { count: number }) {
  */
 export function CollectionPriceFrom({
   price,
+  className,
 }: {
   price: { cents: number; currency: string } | null;
+  className?: string;
 }) {
   const t = useTranslation();
   const country = useDisplayCountry();
@@ -32,7 +35,7 @@ export function CollectionPriceFrom({
   if (!price) return null;
 
   return (
-    <p className="mt-1 text-sm text-ink-soft">
+    <p className={cn("mt-1 text-sm text-ink-soft", className)}>
       {t("product.from")} {formatPriceIn(price.cents, price.currency, country)}
     </p>
   );
