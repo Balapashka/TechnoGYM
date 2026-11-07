@@ -130,7 +130,6 @@ cat > /etc/systemd/system/sportliner-update.timer <<'UNIT'
 [Unit]
 Description=Check for SPORT LINER updates every 10 minutes
 [Timer]
-OnBootSec=5min
 OnActiveSec=20min
 OnUnitActiveSec=10min
 [Install]
