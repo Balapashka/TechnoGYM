@@ -4,20 +4,49 @@ import { forbidUnlessAdmin } from "@/lib/auth";
 import {
   clearSmtpConfig,
   createTransporter,
+  getNotifyEmail,
   getSmtpConfig,
+  saveNotifyEmail,
   saveSmtpConfig,
   smtpFromEnv,
   type SmtpConfig,
 } from "@/lib/mailer";
+import { managerEmail } from "@/lib/notify";
 import { smtpErrorHint, smtpPresetFor } from "@/lib/smtp-presets";
 import { BRAND_NAME } from "@/lib/brand";
 
-/** GET — status only: the address, never the password. */
+async function status() {
+  const [cfg, notifyEmail, notifyTo] = await Promise.all([getSmtpConfig(), getNotifyEmail(), managerEmail()]);
+  return {
+    connected: Boolean(cfg),
+    user: cfg?.user ?? null,
+    fromEnv: smtpFromEnv(),
+    /** Saved private address ("" = not set). */
+    notifyEmail,
+    /** Where notifications actually go right now. */
+    notifyTo,
+  };
+}
+
+/** GET — status only: addresses, never the password. */
 export async function GET() {
   const forbidden = await forbidUnlessAdmin();
   if (forbidden) return forbidden;
-  const cfg = await getSmtpConfig();
-  return NextResponse.json({ connected: Boolean(cfg), user: cfg?.user ?? null, fromEnv: smtpFromEnv() });
+  return NextResponse.json(await status());
+}
+
+const patchSchema = z.object({
+  notifyEmail: z.union([z.literal(""), z.string().trim().toLowerCase().email().max(200)]),
+});
+
+/** PATCH — where to send order/lead notifications ("" = the store email). */
+export async function PATCH(request: Request) {
+  const forbidden = await forbidUnlessAdmin();
+  if (forbidden) return forbidden;
+  const parsed = patchSchema.safeParse(await request.json().catch(() => ({})));
+  if (!parsed.success) return NextResponse.json({ error: "Введите корректный email" }, { status: 400 });
+  await saveNotifyEmail(parsed.data.notifyEmail);
+  return NextResponse.json(await status());
 }
 
 const bodySchema = z.object({
@@ -58,7 +87,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: smtpErrorHint(message), detail: message.slice(0, 200) }, { status: 400 });
   }
   await saveSmtpConfig(cfg);
-  return NextResponse.json({ connected: true, user, fromEnv: false });
+  return NextResponse.json(await status());
 }
 
 /** DELETE — disconnect. */
@@ -66,5 +95,5 @@ export async function DELETE() {
   const forbidden = await forbidUnlessAdmin();
   if (forbidden) return forbidden;
   await clearSmtpConfig();
-  return NextResponse.json({ connected: false, user: null, fromEnv: smtpFromEnv() });
+  return NextResponse.json(await status());
 }

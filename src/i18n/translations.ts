@@ -483,6 +483,11 @@ export interface Translation {
     mailHost: string;
     mailConnect: string;
     mailTest: string;
+    mailNotifyTo: string;
+    mailNotifyNow: string;
+    mailNotifyHint: string;
+    mailNotifySave: string;
+    mailNotifySaved: string;
     mailTestDone: string;
     settingsSeo: string;
     setting_yandexVerification: string;
@@ -1131,6 +1136,11 @@ export const translations: Record<Locale, Translation> = {
       mailHost: "Почтовый сервер (SMTP)",
       mailConnect: "Подключить",
       mailTest: "Отправить проверочное письмо",
+      mailNotifyTo: "Куда присылать заказы и заявки",
+      mailNotifyNow: "Сейчас уведомления приходят на {email}. Этот адрес не показывается на сайте; пусто — на «Email» магазина.",
+      mailNotifyHint: "Пусто — на «Email» магазина из настроек ниже. Этот адрес не показывается на сайте.",
+      mailNotifySave: "Сохранить",
+      mailNotifySaved: "Сохранено",
       mailTestDone: "Отправлено на {email}. Если письма нет во «Входящих», загляните в «Спам» и отметьте «Не спам».",
       settingsSeo: "Поисковики и аналитика",
       setting_yandexVerification: "Код Яндекс Вебмастера (content из meta-тега)",
@@ -1762,6 +1772,11 @@ export const translations: Record<Locale, Translation> = {
       mailHost: "Mail server (SMTP)",
       mailConnect: "Connect",
       mailTest: "Send a test email",
+      mailNotifyTo: "Where to send orders and requests",
+      mailNotifyNow: "Notifications go to {email} now. This address is not shown on the site; empty = the store email.",
+      mailNotifyHint: "Empty = the store email from the settings below. This address is not shown on the site.",
+      mailNotifySave: "Save",
+      mailNotifySaved: "Saved",
       mailTestDone: "Sent to {email}. If it is not in the inbox, check Spam and mark it “Not spam”.",
       settingsSeo: "Search engines and analytics",
       setting_yandexVerification: "Yandex Webmaster code (meta tag content)",

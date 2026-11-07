@@ -5,7 +5,15 @@ import { useTranslation } from "@/i18n/useTranslation";
 import { field } from "@/components/auth/AuthCard";
 import { smtpPresetFor } from "@/lib/smtp-presets";
 
-type Status = { connected: boolean; user: string | null; fromEnv: boolean };
+type Status = {
+  connected: boolean;
+  user: string | null;
+  fromEnv: boolean;
+  /** Saved private notification address ("" = use the store email). */
+  notifyEmail: string;
+  /** Where notifications go right now. */
+  notifyTo: string | null;
+};
 
 /** Connect the shop's mailbox: notifications to the manager + letters to customers. */
 export function MailConnect() {
@@ -17,13 +25,39 @@ export function MailConnect() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [testTo, setTestTo] = useState<string | null>(null);
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const [notifySaved, setNotifySaved] = useState(false);
+
+  function apply(s: Status) {
+    setStatus(s);
+    setNotifyEmail(s.notifyEmail ?? "");
+  }
 
   useEffect(() => {
     fetch("/api/admin/mail")
       .then((r) => (r.ok ? r.json() : null))
-      .then((s) => s && setStatus(s))
+      .then((s: Status | null) => s && apply(s))
       .catch(() => null);
   }, []);
+
+  async function saveNotify() {
+    setBusy(true);
+    setError(null);
+    setNotifySaved(false);
+    const res = await fetch("/api/admin/mail", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notifyEmail: notifyEmail.trim() }),
+    }).catch(() => null);
+    const json = (await res?.json().catch(() => null)) as (Status & { error?: string }) | null;
+    setBusy(false);
+    if (!res?.ok || !json) {
+      setError(json?.error ?? t("admin.errGeneric"));
+      return;
+    }
+    apply(json);
+    setNotifySaved(true);
+  }
 
   const customDomain = user.includes("@") && user.split("@")[1].includes(".") && !smtpPresetFor(user);
 
@@ -42,7 +76,7 @@ export function MailConnect() {
       return;
     }
     setPass("");
-    setStatus(json);
+    apply(json);
   }
 
   async function sendTest() {
@@ -86,6 +120,40 @@ export function MailConnect() {
           )}
         </div>
       )}
+
+      <div>
+        <label htmlFor="mail-notify" className="mb-1 block text-xs font-bold uppercase">
+          {t("admin.mailNotifyTo")}
+        </label>
+        <div className="flex flex-wrap gap-3">
+          <input
+            id="mail-notify"
+            type="email"
+            className={`${field} min-w-0 flex-1`}
+            value={notifyEmail}
+            autoComplete="off"
+            placeholder={status?.notifyTo ?? "you@yandex.ru"}
+            onChange={(e) => {
+              setNotifyEmail(e.target.value);
+              setNotifySaved(false);
+            }}
+          />
+          <button
+            type="button"
+            disabled={busy || notifyEmail.trim() === (status?.notifyEmail ?? "")}
+            onClick={saveNotify}
+            className="rounded-full border border-ink px-5 py-2.5 text-xs font-bold uppercase disabled:opacity-40"
+          >
+            {t("admin.mailNotifySave")}
+          </button>
+        </div>
+        <p className="mt-1 text-xs text-ink-soft">
+          {status?.notifyTo
+            ? t("admin.mailNotifyNow", { email: status.notifyTo })
+            : t("admin.mailNotifyHint")}
+          {notifySaved && <span className="ml-2 font-semibold text-green-800">{t("admin.mailNotifySaved")}</span>}
+        </p>
+      </div>
 
       {status?.fromEnv ? (
         <p className="text-sm text-ink-soft">{t("admin.mailFromEnv")}</p>

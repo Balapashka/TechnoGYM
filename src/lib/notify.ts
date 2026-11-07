@@ -1,7 +1,7 @@
 import "server-only";
 import { BRAND_NAME } from "@/lib/brand";
 import { SITE_URL } from "@/lib/site";
-import { getSmtpConfig, sendMail, textToHtml } from "@/lib/mailer";
+import { getNotifyEmail, getSmtpConfig, sendMail, textToHtml } from "@/lib/mailer";
 import { getSettings } from "@/lib/settings";
 import {
   customerOrderMessage,
@@ -22,7 +22,8 @@ import { getTelegramConfig, telegramApi } from "@/lib/telegram-config";
  *   Russian data centre it goes through a relay (tools/telegram-relay). By
  *   default Telegram gets no customer contacts — they stay in the admin/email.
  * - Email:    the "Почта" block in /admin/settings or SMTP_* (src/lib/mailer.ts);
- *   sent to NOTIFY_EMAIL, else the store email, else the sending mailbox.
+ *   sent to NOTIFY_EMAIL, else the private "Куда присылать" address, else the
+ *   store email, else the sending mailbox.
  *
  * Every function here is best-effort: it logs and swallows errors, because a
  * flaky Telegram API must never cost the shop an order.
@@ -53,8 +54,11 @@ async function sendTelegram(full: string, short: string): Promise<void> {
   );
 }
 
-async function managerEmail(): Promise<string | null> {
+/** Where manager notifications go: env, the private admin field, the store email, the mailbox itself. */
+export async function managerEmail(): Promise<string | null> {
   if (process.env.NOTIFY_EMAIL) return process.env.NOTIFY_EMAIL;
+  const notify = await getNotifyEmail();
+  if (notify) return notify;
   const s = await getSettings();
   if (s.email) return s.email;
   // Nothing set: write to the mailbox the shop sends from.

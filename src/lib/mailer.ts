@@ -19,6 +19,8 @@ import { prisma } from "@/lib/prisma";
 export type SmtpConfig = { host: string; port: number; user: string; pass: string; from: string };
 
 const SMTP_KEY = "secret.smtp";
+/** Where order/lead notifications go, if not the public store email. */
+const NOTIFY_KEY = "secret.notifyEmail";
 
 export async function getSmtpConfig(): Promise<SmtpConfig | null> {
   if (process.env.SMTP_HOST) {
@@ -48,6 +50,24 @@ export async function saveSmtpConfig(cfg: SmtpConfig): Promise<void> {
 
 export async function clearSmtpConfig(): Promise<void> {
   await prisma.setting.deleteMany({ where: { key: SMTP_KEY } });
+}
+
+/**
+ * Private address for manager notifications (never shown on the site). Lets
+ * the public "Email магазина" be the shop mailbox while orders still go
+ * straight to the owner. "" = not set.
+ */
+export async function getNotifyEmail(): Promise<string> {
+  const row = await prisma.setting.findUnique({ where: { key: NOTIFY_KEY } }).catch(() => null);
+  return row?.value ?? "";
+}
+
+export async function saveNotifyEmail(email: string): Promise<void> {
+  if (!email) {
+    await prisma.setting.deleteMany({ where: { key: NOTIFY_KEY } });
+    return;
+  }
+  await prisma.setting.upsert({ where: { key: NOTIFY_KEY }, update: { value: email }, create: { key: NOTIFY_KEY, value: email } });
 }
 
 /** True when SMTP comes from the env (the admin form then only shows status). */
