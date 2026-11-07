@@ -30,6 +30,8 @@ npm run db:reset     # migrate reset --force (drops + reseeds)
 
 docker compose up --build   # full stack; entrypoint migrates, seeds an empty DB, creates admin
 docker compose -f docker-compose.prod.yml up -d --build   # + Caddy HTTPS for a real domain
+# Production server: scripts/server-setup.sh installs everything plus a systemd timer
+# (sportliner-update) that pulls the deploy branch every 10 min and rebuilds on change.
 node scripts/create-admin.mjs email 'password'            # create admin / reset its password
 node scripts/backup-db.mjs                                # VACUUM INTO data/backups
 ```
@@ -58,7 +60,12 @@ columns, so `Product.images` and `Product.features` are JSON **strings** in the 
 through `packList`/`unpackList` in `src/lib/json.ts` rather than `JSON.parse` inline. If you add a
 list-shaped product field, follow the same pattern and extend `toDTO`.
 
-**Catalog data.** `prisma/seed.ts` generates ~180 products across 10 equipment categories,
+**Catalog data.** The live store's catalog is real: ~140 UNIX Fit trainers (prices and photos
+from unixfit.ru) and ~120 Technogym models (price on request), built and uploaded by
+`tools/catalog/` (see its README) through `/admin/import`. Photos are stored on the server
+(`/uploads`), because a server in Russia cannot fetch images.unsplash.com — never point the
+storefront at external image hosts. The seed below is only the local/dev starter set.
+`prisma/seed.ts` generates ~180 products across 10 equipment categories,
 mirroring the real sourcing model: `UNIX Fit` (Китай) is stocked in Moscow (`inStock: true`),
 `Technogym`/`Panatta` (Италия) are imported to order (`inStock: false` = "Под заказ", still
 purchasable). Availability derives from `originCountry`, never at random. Per-brand price bands
@@ -167,8 +174,10 @@ Info and legal pages are data-driven: `src/lib/pages.ts` maps a slug to a functi
 rendered by `InfoPage` via `[page]` (force-dynamic so saved settings show immediately). Legal texts
 (privacy/152-ФЗ, offer, returns/ЗоЗПП, terms, cookies) are templates; bump `LEGAL_UPDATED` when
 editing them. `src/lib/landings.ts` → `ThemedLanding` (wellness, design).
-Header/footer navigation is static config in `src/lib/nav.ts` — its hrefs must match seeded
-category slugs (see `prisma/seed.ts`), which are also the keys of `src/lib/category-color.ts`.
+The shop navigation (mega menu, mobile menu, footer "Товары" column, homepage category grid) is
+built from the database: `getShopNav()` in `src/lib/catalog.ts` returns non-empty categories
+(ordered by `CATEGORY_ORDER`) and brands, grouped by `src/lib/nav-groups.ts`. Only the static
+info links (shipping, contacts, legal…) live in `src/lib/nav.ts`.
 
 **Styling.** Tailwind v4 with no `tailwind.config` — design tokens (`ink`, `paper`, `mist`,
 `stone`, `accent`) and shared utilities (`.container-page`, `.hover-lift`) are declared in
