@@ -62,6 +62,8 @@ export default async function CollectionsPage() {
                   fallbackClassName="bg-gradient-to-br from-zinc-700 to-ink"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10" />
+                {/* Keeps the count readable on light product shots. */}
+                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/50 to-transparent" />
                 <span className="absolute -right-4 -top-6 text-[6rem] font-black leading-none text-white/15 transition-transform duration-500 group-hover:scale-110 sm:text-[8rem]">
                   {String(i + 1).padStart(2, "0")}
                 </span>
