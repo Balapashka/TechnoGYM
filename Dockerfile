@@ -14,7 +14,18 @@ ENV DATABASE_URL="file:/app/data/dev.db"
 # and dependency installation stays cached.
 COPY package.json package-lock.json ./
 COPY prisma ./prisma
-RUN npm ci
+# The server's network to the npm registry can be slow and drop connections:
+# generous retries, up to three full attempts, and a cache mount so a retry
+# (or the next deploy) does not download everything again.
+RUN --mount=type=cache,target=/root/.npm \
+    npm config set fetch-retries 6 \
+ && npm config set fetch-retry-mintimeout 20000 \
+ && npm config set fetch-retry-maxtimeout 180000 \
+ && for attempt in 1 2 3; do \
+      npm ci --no-audit --no-fund && break; \
+      echo "npm ci failed (attempt $attempt), retrying in 20s..."; sleep 20; \
+    done \
+ && test -x node_modules/.bin/next
 
 COPY . .
 # Build-time setting (inlined into the browser bundle), see .env.example.

@@ -93,22 +93,26 @@ if [ "$DNS_IP" != "$SERVER_IP" ]; then
   echo "   (A-записи @ и www → $SERVER_IP). Caddy будет пробовать сам."
 fi
 
-say "7/7 Сборка и запуск (5–10 минут при первом запуске)"
-docker compose -f docker-compose.prod.yml up -d --build
-
-# Daily database backup at 03:30.
-CRON="30 3 * * * cd $DIR && docker compose -f docker-compose.prod.yml exec -T app node scripts/backup-db.mjs >/dev/null 2>&1"
-{ crontab -l 2>/dev/null | grep -v 'backup-db.mjs' || true; echo "$CRON"; } | crontab -
-
-# Auto-update: every 10 minutes pull the branch; rebuild only when it changed.
+say "Автообновление"
+# Auto-update + self-heal: every 10 minutes pull the branch and rebuild when
+# it changed OR when the shop is not running (e.g. a build that failed on a
+# flaky network is retried automatically). Installed before the first build.
 cat > /usr/local/bin/sportliner-update <<UPD
 #!/bin/sh
 set -e
 cd $DIR
 git fetch -q origin $BRANCH
+NEED=0
 if [ "\$(git rev-parse HEAD)" != "\$(git rev-parse origin/$BRANCH)" ]; then
   echo "Updating to \$(git rev-parse --short origin/$BRANCH)"
   git reset -q --hard origin/$BRANCH
+  NEED=1
+fi
+if [ -z "\$(docker compose -f docker-compose.prod.yml ps -q --status running app 2>/dev/null)" ]; then
+  echo "Shop is not running - (re)building"
+  NEED=1
+fi
+if [ "\$NEED" = 1 ]; then
   docker compose -f docker-compose.prod.yml up -d --build
   docker image prune -f >/dev/null 2>&1 || true
 fi
@@ -127,12 +131,25 @@ cat > /etc/systemd/system/sportliner-update.timer <<'UNIT'
 Description=Check for SPORT LINER updates every 10 minutes
 [Timer]
 OnBootSec=5min
+OnActiveSec=20min
 OnUnitActiveSec=10min
 [Install]
 WantedBy=timers.target
 UNIT
 systemctl daemon-reload
-systemctl enable --now sportliner-update.timer >/dev/null
+systemctl enable sportliner-update.timer >/dev/null
+systemctl start sportliner-update.timer
+
+say "7/7 Сборка и запуск (10–30 минут при первом запуске)"
+if ! docker compose -f docker-compose.prod.yml up -d --build; then
+  printf '\n\033[1;33m!  Сборка не удалась (часто это обрыв связи при скачивании). Сервер сам\n   повторит её в течение 10 минут — проверьте сайт позже.\033[0m\n'
+  exit 1
+fi
+
+# Daily database backup at 03:30.
+CRON="30 3 * * * cd $DIR && docker compose -f docker-compose.prod.yml exec -T app node scripts/backup-db.mjs >/dev/null 2>&1"
+{ crontab -l 2>/dev/null | grep -v 'backup-db.mjs' || true; echo "$CRON"; } | crontab -
+
 
 printf '   Жду запуска магазина'
 for _ in $(seq 1 60); do
