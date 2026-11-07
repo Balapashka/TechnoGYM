@@ -33,6 +33,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  // Addresses people type by habit.
+  async redirects() {
+    return [{ source: "/contacts", destination: "/contact", permanent: true }];
+  },
 };
 
 export default nextConfig;

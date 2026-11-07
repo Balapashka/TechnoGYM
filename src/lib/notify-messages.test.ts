@@ -48,6 +48,17 @@ describe("managerOrderMessage", () => {
     expect(t).toContain("Самовывоз");
     expect(t).not.toContain("Ленина");
   });
+
+  it("leaves the customer's personal data out when contacts are off", () => {
+    const t = n(managerOrderMessage(order, "https://shop.ru/admin/orders/x", { contacts: false }));
+    expect(t.split("\n")[0]).toMatch(/^🛒 Новый заказ №12345678 — 45 800 ₽$/);
+    expect(t).toContain("• Дорожка R-300 (Pro) × 2 — 45 800 ₽");
+    expect(t).toContain("Доставка: Москва");
+    expect(t).toContain("Контакты покупателя — в админке:\nhttps://shop.ru/admin/orders/x");
+    for (const secret of ["Иван", "+79991234567", "buyer@example.com", "Ленина", "101000", "после 18"]) {
+      expect(t).not.toContain(secret);
+    }
+  });
 });
 
 describe("customerOrderMessage", () => {
@@ -80,5 +91,16 @@ describe("managerLeadMessage", () => {
     expect(t.split("\n")[0]).toBe("📩 Для бизнеса: Для бизнеса: Клуб");
     expect(t).not.toContain("Email:");
     expect(t).not.toContain("Комментарий:");
+  });
+
+  it("keeps only the subject and the admin link when contacts are off", () => {
+    const t = managerLeadMessage(
+      { source: "product", productName: "Technogym Skillrun", name: "Анна", phone: "+7900", email: "a@b.ru", comment: "Срочно" },
+      "https://shop.ru/admin/quote-requests",
+      { contacts: false },
+    );
+    expect(t).toBe(
+      "📩 Запрос цены: Technogym Skillrun\n\nКонтакты и комментарий — в админке:\nhttps://shop.ru/admin/quote-requests",
+    );
   });
 });

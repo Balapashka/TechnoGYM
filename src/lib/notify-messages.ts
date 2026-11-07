@@ -63,21 +63,39 @@ function deliveryLine(order: OrderForMessage): string {
   return `Доставка: ${parts.join(", ")}`;
 }
 
+/**
+ * What a manager message may reveal. Email (Яндекс, Mail.ru — servers in
+ * Russia) gets everything; Telegram keeps its chats abroad, so by default it
+ * gets the order without the customer's personal data (152-ФЗ, ст. 12 —
+ * cross-border transfer) and the manager opens the contacts in the admin.
+ */
+export type MessageOptions = { contacts?: boolean };
+
 /** Message to the manager (Telegram / email) about a new order. */
 export function managerOrderMessage(
   order: OrderForMessage,
   adminUrl: string,
+  { contacts = true }: MessageOptions = {},
 ): string {
-  return [
+  const head = [
     `🛒 Новый заказ №${orderNumber(order.id)} — ${money(order.totalCents, order.currency)}`,
     "",
     ...itemLines(order),
     "",
+  ];
+  const payment = `Оплата: ${PAYMENT_RU[order.paymentMethod] ?? order.paymentMethod}`;
+  if (!contacts) {
+    const where =
+      order.deliveryMethod === "pickup" ? "Самовывоз" : `Доставка: ${order.city.trim() || "адрес в заказе"}`;
+    return [...head, where, payment, "", "Контакты покупателя — в админке:", adminUrl].join("\n");
+  }
+  return [
+    ...head,
     `Покупатель: ${order.customerName}`,
     `Телефон: ${order.phone}`,
     `Email: ${order.email}`,
     deliveryLine(order),
-    `Оплата: ${PAYMENT_RU[order.paymentMethod] ?? order.paymentMethod}`,
+    payment,
     ...(order.comment ? [`Комментарий: ${order.comment}`] : []),
     "",
     adminUrl,
@@ -139,10 +157,15 @@ export function customerStatusMessage(
 export function managerLeadMessage(
   lead: LeadForMessage,
   adminUrl: string,
+  { contacts = true }: MessageOptions = {},
 ): string {
   const kind = LEAD_SOURCE_RU[lead.source] ?? "Заявка";
+  const head = `📩 ${kind}: ${lead.productName}`;
+  if (!contacts) {
+    return [head, "", "Контакты и комментарий — в админке:", adminUrl].join("\n");
+  }
   return [
-    `📩 ${kind}: ${lead.productName}`,
+    head,
     "",
     `Имя: ${lead.name}`,
     `Телефон: ${lead.phone}`,

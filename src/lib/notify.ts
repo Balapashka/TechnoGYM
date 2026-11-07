@@ -18,7 +18,9 @@ import { getTelegramConfig, telegramApi } from "@/lib/telegram-config";
  * Manager notifications. Two channels, both optional and env-configured:
  *
  * - Telegram: connected in /admin/settings (bot token + chats that wrote /start
- *   to the bot), or TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID in the env.
+ *   to the bot), or TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID in the env. From a
+ *   Russian data centre it goes through a relay (tools/telegram-relay). By
+ *   default Telegram gets no customer contacts — they stay in the admin/email.
  * - Email:    the "Почта" block in /admin/settings or SMTP_* (src/lib/mailer.ts);
  *   sent to NOTIFY_EMAIL, else the store email, else the sending mailbox.
  *
@@ -31,13 +33,18 @@ export async function telegramEnabled(): Promise<boolean> {
   return Boolean(cfg && cfg.chats.length > 0);
 }
 
-/** Send to every connected chat (owner, managers' group…). */
-async function sendTelegram(text: string): Promise<void> {
+/**
+ * Send to every connected chat (owner, managers' group…). `short` is the
+ * version without the customer's personal data — used unless the owner
+ * allowed contacts in Telegram (see MessageOptions in notify-messages.ts).
+ */
+async function sendTelegram(full: string, short: string): Promise<void> {
   const cfg = await getTelegramConfig();
   if (!cfg) return;
+  const text = cfg.includeContacts ? full : short;
   await Promise.all(
     cfg.chats.map((chat) =>
-      telegramApi(cfg.token, "sendMessage", {
+      telegramApi(cfg, "sendMessage", {
         chat_id: chat.id,
         text,
         disable_web_page_preview: true,
@@ -54,11 +61,12 @@ async function managerEmail(): Promise<string | null> {
   return (await getSmtpConfig())?.user || null;
 }
 
-async function notifyManager(subject: string, text: string): Promise<void> {
+/** Email gets the full text; Telegram the short one unless contacts are allowed. */
+async function notifyManager(subject: string, full: string, short = full): Promise<void> {
   const to = await managerEmail();
   await Promise.all([
-    sendTelegram(text),
-    to ? sendMail({ to, subject, text, html: textToHtml(text) }) : null,
+    sendTelegram(full, short),
+    to ? sendMail({ to, subject, text: full, html: textToHtml(full) }) : null,
   ]);
 }
 
@@ -66,10 +74,12 @@ async function notifyManager(subject: string, text: string): Promise<void> {
 export async function notifyNewOrder(order: OrderForMessage): Promise<void> {
   try {
     const settings = await getSettings();
-    const text = managerOrderMessage(order, `${SITE_URL}/admin/orders/${order.id}`);
+    const url = `${SITE_URL}/admin/orders/${order.id}`;
+    const text = managerOrderMessage(order, url);
+    const short = managerOrderMessage(order, url, { contacts: false });
     const customer = customerOrderMessage(order, BRAND_NAME, settings.phone);
     await Promise.all([
-      notifyManager(text.split("\n")[0], text),
+      notifyManager(text.split("\n")[0], text, short),
       sendMail({
         to: order.email,
         subject: customer.subject,
@@ -107,8 +117,9 @@ export async function notifyOrderStatus(
 /** New lead (price request, business enquiry, contact form). */
 export async function notifyNewLead(lead: LeadForMessage): Promise<void> {
   try {
-    const text = managerLeadMessage(lead, `${SITE_URL}/admin/quote-requests`);
-    await notifyManager(text.split("\n")[0], text);
+    const url = `${SITE_URL}/admin/quote-requests`;
+    const text = managerLeadMessage(lead, url);
+    await notifyManager(text.split("\n")[0], text, managerLeadMessage(lead, url, { contacts: false }));
   } catch (e) {
     console.error("[notify] lead notification failed:", e);
   }

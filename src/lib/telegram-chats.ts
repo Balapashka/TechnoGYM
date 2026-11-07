@@ -39,3 +39,24 @@ export function mergeChats(saved: TgChat[], found: TgChat[]): TgChat[] {
 export function looksLikeBotToken(v: string): boolean {
   return /^\d{5,15}:[A-Za-z0-9_-]{30,}$/.test(v.trim());
 }
+
+/**
+ * Relay address as the owner may paste it: "https://relay.example/" →
+ * "https://relay.example". Only plain https URLs pass; anything else → "".
+ */
+export function normalizeApiBase(raw: string): string {
+  const value = raw.trim().replace(/\/+$/, "");
+  if (!value) return "";
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash) return "";
+    return value;
+  } catch {
+    return "";
+  }
+}
+
+/** Telegram answered and refused the token (as opposed to "could not reach it"). */
+export function isTokenRejected(message: string): boolean {
+  return /unauthorized|not found/i.test(message);
+}

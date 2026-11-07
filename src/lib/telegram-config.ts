@@ -1,55 +1,103 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
-import type { TgChat } from "@/lib/telegram-chats";
+import { normalizeApiBase, type TgChat } from "@/lib/telegram-chats";
 
 /**
- * Telegram bot credentials. Stored in the Setting table under private keys —
+ * Telegram bot settings. Stored in the Setting table under private keys —
  * never part of StoreSettings, so they are not sent to any page. Env
- * variables (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID) still work and win.
+ * variables (TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID, TELEGRAM_API_BASE) still
+ * work and win.
  */
 const TOKEN_KEY = "secret.telegramBotToken";
 const CHATS_KEY = "secret.telegramChats";
+/** Relay in front of api.telegram.org — see tools/telegram-relay. */
+const API_BASE_KEY = "secret.telegramApiBase";
+/** "true" = messages include the customer's name, phone and address. */
+const CONTACTS_KEY = "secret.telegramIncludeContacts";
 
-export type TelegramConfig = { token: string; chats: TgChat[] };
+export const DEFAULT_API_BASE = "https://api.telegram.org";
+
+export type TelegramConfig = {
+  token: string;
+  chats: TgChat[];
+  /** Relay URL from the admin; "" = straight to api.telegram.org. */
+  apiBase: string;
+  includeContacts: boolean;
+};
+
+/** What a Bot API call needs: the token and where to send it. */
+export type TelegramTarget = { token: string; apiBase?: string };
+
+/** Relay set in the env — it wins over the admin field. */
+export function envApiBase(): string {
+  return normalizeApiBase(process.env.TELEGRAM_API_BASE ?? "");
+}
+
+async function readRows(): Promise<Map<string, string>> {
+  const rows = await prisma.setting.findMany({
+    where: { key: { in: [TOKEN_KEY, CHATS_KEY, API_BASE_KEY, CONTACTS_KEY] } },
+  });
+  return new Map(rows.map((r) => [r.key, r.value]));
+}
 
 export async function getTelegramConfig(): Promise<TelegramConfig | null> {
-  if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
-    return {
-      token: process.env.TELEGRAM_BOT_TOKEN,
-      chats: process.env.TELEGRAM_CHAT_ID.split(",").map((id) => ({ id: id.trim(), title: id.trim() })),
-    };
-  }
   try {
-    const rows = await prisma.setting.findMany({ where: { key: { in: [TOKEN_KEY, CHATS_KEY] } } });
-    const token = rows.find((r) => r.key === TOKEN_KEY)?.value ?? "";
-    const chats = JSON.parse(rows.find((r) => r.key === CHATS_KEY)?.value ?? "[]") as TgChat[];
-    return token ? { token, chats } : null;
+    const rows = await readRows();
+    const apiBase = envApiBase() || normalizeApiBase(rows.get(API_BASE_KEY) ?? "");
+    const includeContacts = rows.get(CONTACTS_KEY) === "true";
+    if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
+      return {
+        token: process.env.TELEGRAM_BOT_TOKEN,
+        chats: process.env.TELEGRAM_CHAT_ID.split(",").map((id) => ({ id: id.trim(), title: id.trim() })),
+        apiBase,
+        includeContacts,
+      };
+    }
+    const token = rows.get(TOKEN_KEY) ?? "";
+    const chats = JSON.parse(rows.get(CHATS_KEY) ?? "[]") as TgChat[];
+    return token ? { token, chats, apiBase, includeContacts } : null;
   } catch (e) {
     console.error("[telegram] could not read config:", e);
     return null;
   }
 }
 
-export async function saveTelegramConfig(token: string, chats: TgChat[]): Promise<void> {
+/** The relay saved in the admin (not the env one), for the settings form. */
+export async function getSavedApiBase(): Promise<string> {
+  const row = await prisma.setting.findUnique({ where: { key: API_BASE_KEY } }).catch(() => null);
+  return normalizeApiBase(row?.value ?? "");
+}
+
+export async function getIncludeContacts(): Promise<boolean> {
+  const row = await prisma.setting.findUnique({ where: { key: CONTACTS_KEY } }).catch(() => null);
+  return row?.value === "true";
+}
+
+function upsert(key: string, value: string) {
+  return prisma.setting.upsert({ where: { key }, update: { value }, create: { key, value } });
+}
+
+export async function saveTelegramConfig(token: string, chats: TgChat[], apiBase: string): Promise<void> {
   await prisma.$transaction([
-    prisma.setting.upsert({ where: { key: TOKEN_KEY }, update: { value: token }, create: { key: TOKEN_KEY, value: token } }),
-    prisma.setting.upsert({
-      where: { key: CHATS_KEY },
-      update: { value: JSON.stringify(chats) },
-      create: { key: CHATS_KEY, value: JSON.stringify(chats) },
-    }),
+    upsert(TOKEN_KEY, token),
+    upsert(CHATS_KEY, JSON.stringify(chats)),
+    upsert(API_BASE_KEY, normalizeApiBase(apiBase)),
   ]);
 }
 
+export async function saveIncludeContacts(on: boolean): Promise<void> {
+  await upsert(CONTACTS_KEY, on ? "true" : "");
+}
+
+/** Disconnect the bot. The relay address stays — it belongs to the server. */
 export async function clearTelegramConfig(): Promise<void> {
   await prisma.setting.deleteMany({ where: { key: { in: [TOKEN_KEY, CHATS_KEY] } } });
 }
 
 /** Call a Bot API method. Throws with Telegram's description on failure. */
-export async function telegramApi<T>(token: string, method: string, body?: unknown): Promise<T> {
-  // TELEGRAM_API_BASE: a relay for servers where api.telegram.org is blocked.
-  const base = (process.env.TELEGRAM_API_BASE || "https://api.telegram.org").replace(/\/$/, "");
-  const res = await fetch(`${base}/bot${token}/${method}`, {
+export async function telegramApi<T>(target: TelegramTarget, method: string, body?: unknown): Promise<T> {
+  const base = target.apiBase || DEFAULT_API_BASE;
+  const res = await fetch(`${base}/bot${target.token}/${method}`, {
     method: body ? "POST" : "GET",
     headers: body ? { "Content-Type": "application/json" } : undefined,
     body: body ? JSON.stringify(body) : undefined,

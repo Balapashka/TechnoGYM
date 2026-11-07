@@ -445,6 +445,13 @@ export interface Translation {
     tgDisconnect: string;
     tgConnectedTo: string;
     tgNoChats: string;
+    tgUnreachable: string;
+    tgRelay: string;
+    tgRelayHint: string;
+    tgRelayToggle: string;
+    tgRelayFromEnv: string;
+    tgContacts: string;
+    tgContactsHint: string;
     mailTitle: string;
     mailLead: string;
     mailConnected: string;
@@ -1065,6 +1072,13 @@ export const translations: Record<Locale, Translation> = {
       tgDisconnect: "Отключить",
       tgConnectedTo: "Подключено: бот @{bot}. Получатели:",
       tgNoChats: "Бот подключён, но ему ещё никто не написал. Отправьте боту /start и нажмите «Добавить новых получателей».",
+      tgUnreachable: "Бот сохранён, но сейчас сервер не может связаться с Telegram — уведомления не уходят. Проверьте адрес ретранслятора.",
+      tgRelay: "Адрес ретранслятора",
+      tgRelayHint: "Нужен, если сервер не может связаться с Telegram напрямую — так бывает в российских дата-центрах. Адрес даёт разработчик.",
+      tgRelayToggle: "Сервер не видит Telegram?",
+      tgRelayFromEnv: "Ретранслятор Telegram задан в настройках сервера.",
+      tgContacts: "Присылать в Telegram имя и телефон покупателя",
+      tgContactsHint: "Telegram хранит переписку на серверах за рубежом. Без галочки в Telegram приходят номер заказа, товары и сумма, а контакты покупателя — по ссылке в админке и в письме на почту.",
       mailTitle: "Уведомления на почту",
       mailLead: "Заказы и заявки будут приходить вам на почту, а покупатели — получать письма о заказе и сброс пароля.",
       mailConnected: "Подключено: письма отправляются с {email}",
@@ -1668,6 +1682,13 @@ export const translations: Record<Locale, Translation> = {
       tgDisconnect: "Disconnect",
       tgConnectedTo: "Connected: bot @{bot}. Recipients:",
       tgNoChats: "The bot is connected, but nobody has written to it yet. Send /start to the bot and press “Add new recipients”.",
+      tgUnreachable: "The bot is saved, but the server cannot reach Telegram right now — notifications are not sent. Check the relay address.",
+      tgRelay: "Relay address",
+      tgRelayHint: "Needed when the server cannot reach Telegram directly — common in Russian data centres. Your developer provides the address.",
+      tgRelayToggle: "Server cannot reach Telegram?",
+      tgRelayFromEnv: "The Telegram relay is set in the server configuration.",
+      tgContacts: "Send the customer's name and phone to Telegram",
+      tgContactsHint: "Telegram stores chats on servers abroad. Unchecked, Telegram gets the order number, items and total, and the customer's contacts stay behind the admin link and in the email.",
       mailTitle: "Email notifications",
       mailLead: "Orders and requests will arrive by email, and shoppers will get order emails and password resets.",
       mailConnected: "Connected: emails are sent from {email}",
