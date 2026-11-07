@@ -33,7 +33,7 @@ async function status(cfg: TelegramConfig | null, bot: BotInfo | null, chats: Tg
 
 async function currentStatus() {
   const cfg = await getTelegramConfig();
-  const bot = cfg ? await telegramApi<BotInfo>(cfg, "getMe").catch(() => null) : null;
+  const bot = cfg ? await telegramApi<BotInfo>(cfg, "getMe", undefined, { attempts: 4 }).catch(() => null) : null;
   return status(cfg, bot, cfg?.chats ?? []);
 }
 
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
 
   let bot: BotInfo;
   try {
-    bot = await telegramApi<BotInfo>(target, "getMe");
+    bot = await telegramApi<BotInfo>(target, "getMe", undefined, { attempts: 4 });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     console.error("[telegram] getMe failed:", message);

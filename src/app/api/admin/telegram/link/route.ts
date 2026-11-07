@@ -31,10 +31,12 @@ export async function POST(request: Request) {
   let chat: TgChat | null;
   try {
     chat = await serialUpdates(async () => {
-      const updates = await telegramApi<Update[]>(cfg, "getUpdates", {
-        timeout: 0,
-        allowed_updates: ["message"],
-      });
+      const updates = await telegramApi<Update[]>(
+        cfg,
+        "getUpdates",
+        { timeout: 0, allowed_updates: ["message"] },
+        { attempts: 3 },
+      );
       // Drop stale updates so strangers' /start never fills the queue; fresh
       // ones stay for a parallel link (another admin tab, a manager's link).
       const offset = staleOffset(updates, Math.floor(Date.now() / 1000));

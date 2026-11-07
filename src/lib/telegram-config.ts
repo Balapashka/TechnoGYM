@@ -106,18 +106,25 @@ export class TelegramApiError extends Error {
   }
 }
 
-// A normal call takes ~0.7 s; a stalled connection does not recover, so give
-// up on it early and try a fresh one.
-const ATTEMPTS = 5;
-const ATTEMPT_TIMEOUT_MS = 4000;
+// Measured from the Moscow server (/api/admin/telegram/diagnose): ~40% of NEW
+// connections abroad never complete the handshake, while an established one
+// answers in ~0.2 s. A stalled attempt does not recover, so drop it after 3 s
+// and open a fresh connection: 8 attempts leave ~1 in 1500 messages undelivered.
+const ATTEMPTS = 8;
+const ATTEMPT_TIMEOUT_MS = 3000;
 
 /**
  * Call a Bot API method. Throws TelegramApiError with Telegram's description
- * when it refuses, or the network error. A new connection from the Moscow
- * server to the relay now and then stalls, so timeouts, network errors and
- * 5xx are retried with a fresh attempt; a refusal (bad token, 403, 409) is not.
+ * when it refuses, or the network error. Timeouts, network errors and 5xx are
+ * retried with a fresh connection; a refusal (bad token, 403, 409) is not.
+ * Interactive callers (the settings page) pass fewer `attempts` to answer fast.
  */
-export async function telegramApi<T>(target: TelegramTarget, method: string, body?: unknown): Promise<T> {
+export async function telegramApi<T>(
+  target: TelegramTarget,
+  method: string,
+  body?: unknown,
+  { attempts = ATTEMPTS }: { attempts?: number } = {},
+): Promise<T> {
   const base = target.apiBase || DEFAULT_API_BASE;
   return withRetry(
     async () => {
@@ -132,8 +139,8 @@ export async function telegramApi<T>(target: TelegramTarget, method: string, bod
       return json.result as T;
     },
     {
-      attempts: ATTEMPTS,
-      delayMs: 400,
+      attempts,
+      delayMs: 300,
       retryable: (e) => !(e instanceof TelegramApiError) || e.status >= 500,
     },
   );
