@@ -7,6 +7,7 @@ import { CompareButton } from "./CompareButton";
 import { RequestPriceButton } from "./RequestPriceButton";
 import { ProductOrigin } from "./ProductOrigin";
 import { Availability } from "./Availability";
+import { UsedBadge } from "./UsedBadge";
 import type { ProductDTO } from "@/lib/catalog";
 
 /**
@@ -41,8 +42,11 @@ export function ProductCard({ product }: { product: ProductDTO }) {
       className="group flex h-full flex-col overflow-hidden bg-paper"
     >
       <div className="relative aspect-square overflow-hidden rounded-lg bg-mist">
-        {product.badge && (
-          <Badge className="absolute left-3 top-3 z-10">{product.badge}</Badge>
+        {(product.badge || product.condition === "used") && (
+          <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-1">
+            {product.condition === "used" && <UsedBadge />}
+            {product.badge && <Badge>{product.badge}</Badge>}
+          </div>
         )}
         <Media
           src={product.images[0] ?? null}

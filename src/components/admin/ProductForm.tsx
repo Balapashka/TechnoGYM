@@ -31,6 +31,7 @@ export type ProductFormValues = {
   images: string;
   inStock: boolean;
   priceOnRequest: boolean;
+  condition: "new" | "used";
 };
 
 /** Create or edit a product. Posts to /api/admin/products[/:id]. */
@@ -75,11 +76,13 @@ export function ProductForm({
       images: initial?.images ?? "",
       inStock: initial?.inStock ?? true,
       priceOnRequest: initial?.priceOnRequest ?? false,
+      condition: initial?.condition ?? "new",
     },
   });
 
   const imageList = splitLines(useWatch({ control, name: "images" }));
   const priceOnRequest = useWatch({ control, name: "priceOnRequest" });
+  const used = useWatch({ control, name: "condition" }) === "used";
 
   // The URL is generated from the name until the owner edits it by hand
   // (and never changes for an existing product, so links stay stable).
@@ -239,8 +242,11 @@ export function ProductForm({
               const preset = brandPreset(e.target.value);
               if (preset) {
                 setValue("originCountry", preset.originCountry, { shouldValidate: true });
-                setValue("inStock", preset.inStock);
-                setValue("priceOnRequest", preset.priceOnRequest, { shouldValidate: true });
+                // A used unit is on hand and priced, whatever its brand sells like new.
+                if (getValues("condition") !== "used") {
+                  setValue("inStock", preset.inStock);
+                  setValue("priceOnRequest", preset.priceOnRequest, { shouldValidate: true });
+                }
               }
             }}
           />
@@ -325,6 +331,26 @@ export function ProductForm({
           <span className="text-xs text-ink-soft">{t("admin.uploadHint")}</span>
         </div>
         {uploadError && <p className={fieldError}>{uploadError}</p>}
+      </div>
+
+      <div className="rounded-xl border border-stone p-4">
+        <label className="flex items-center gap-2 text-sm font-semibold">
+          <input
+            type="checkbox"
+            checked={used}
+            onChange={(e) => {
+              const on = e.target.checked;
+              setValue("condition", on ? "used" : "new", { shouldDirty: true });
+              if (on) {
+                // Used equipment is sold from stock, with its price shown.
+                setValue("priceOnRequest", false, { shouldValidate: true });
+                setValue("inStock", true);
+              }
+            }}
+          />
+          {t("admin.used")}
+        </label>
+        <p className="mt-1 pl-6 text-xs text-ink-soft">{t("admin.usedHint")}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

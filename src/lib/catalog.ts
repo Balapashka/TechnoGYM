@@ -2,6 +2,7 @@ import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { unpackList } from "@/lib/json";
 import { originRank } from "@/lib/countries";
+import type { ProductCondition } from "@/lib/condition";
 
 /** Product shape used across the UI, with JSON columns already parsed. */
 export type ProductDTO = {
@@ -24,6 +25,8 @@ export type ProductDTO = {
    * `priceCents` is still populated — never render it when this is true.
    */
   priceOnRequest: boolean;
+  /** "used" = б/у: marked in the storefront, filterable, always priced. */
+  condition: ProductCondition;
   categorySlug: string;
   categoryName: string;
   variants: { id: string; name: string; priceDeltaCents: number }[];
@@ -43,6 +46,7 @@ type ProductWithRelations = {
   brand: string;
   originCountry: string;
   priceOnRequest: boolean;
+  condition: string;
   category: { slug: string; name: string };
   variants: { id: string; name: string; priceDeltaCents: number }[];
 };
@@ -68,6 +72,7 @@ function toDTO(p: ProductWithRelations): ProductDTO {
     brand: p.brand,
     originCountry: p.originCountry,
     priceOnRequest: p.priceOnRequest,
+    condition: p.condition === "used" ? "used" : "new",
     categorySlug: p.category.slug,
     categoryName: p.category.name,
     variants: p.variants,
@@ -222,17 +227,20 @@ export async function getFeaturedProducts(limit = 8): Promise<ProductDTO[]> {
  */
 export const getShopNav = cache(async () => {
   try {
-    const [categories, brands] = await Promise.all([
+    const [categories, brands, used] = await Promise.all([
       getCategories({ nonEmpty: true }),
       getBrands(),
+      prisma.product.count({ where: { condition: "used" } }),
     ]);
     return {
       categories: categories.map(({ slug, name, count }) => ({ slug, name, count })),
       brands: brands.map(({ name, count }) => ({ name, count })),
+      /** Number of used (б/у) products — the «Б/у» link shows only when > 0. */
+      used,
     };
   } catch (e) {
     console.error("[nav] could not load categories:", e);
-    return { categories: [], brands: [] };
+    return { categories: [], brands: [], used: 0 };
   }
 });
 

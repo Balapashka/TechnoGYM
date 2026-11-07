@@ -72,6 +72,7 @@ export function CatalogShell({
             .map((s) => brandOptions.find((b) => b.slug === s)?.name)
             .filter((n): n is string => Boolean(n))
         : undefined,
+      conditions: query.conditions.length ? query.conditions : undefined,
     }),
     [query, brandOptions],
   );

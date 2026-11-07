@@ -59,6 +59,7 @@ export async function POST(request: Request) {
       badge: parsed.data.badge || null,
       inStock: parsed.data.inStock,
       priceOnRequest: parsed.data.priceOnRequest,
+      condition: parsed.data.condition,
       categoryId: parsed.data.categoryId,
       variants: { create: [{ name: "Стандартная комплектация", priceDeltaCents: 0 }] },
     },

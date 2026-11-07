@@ -5,6 +5,7 @@
  * delimiter with a UTF-8 BOM, and reads either ";" or "," and either UTF-8 or
  * Windows-1251 (what Excel's plain "CSV" format saves on a Russian Windows).
  */
+import { conditionCell, parseCondition, type ProductCondition } from "@/lib/condition";
 
 /** Decode file bytes: UTF-8 (with or without BOM), else Windows-1251. */
 export function decodeCsvBytes(bytes: Uint8Array): string {
@@ -88,6 +89,7 @@ export const CATALOG_COLUMNS = [
   "price_rub",
   "price_on_request",
   "in_stock",
+  "condition",
   "badge",
   "description",
   "features",
@@ -106,6 +108,8 @@ export type CatalogRow = {
   priceCents: number;
   priceOnRequest: boolean;
   inStock: boolean;
+  /** "used" for б/у. null = the file has no such column: keep what the product has. */
+  condition: ProductCondition | null;
   badge: string | null;
   description: string;
   features: string[];
@@ -213,6 +217,7 @@ export function parseCatalogCsv(table: string[][]): ParseCatalogResult {
       priceCents: priceCents ?? 0,
       priceOnRequest,
       inStock: inStock ?? true,
+      condition: col("condition") === -1 ? null : parseCondition(get("condition")),
       badge: get("badge") || null,
       description,
       features: splitList(get("features")),
@@ -234,6 +239,7 @@ export function catalogRowToCells(r: CatalogRow): string[] {
     String(r.priceCents / 100),
     r.priceOnRequest ? "да" : "нет",
     r.inStock ? "да" : "нет",
+    conditionCell(r.condition ?? "new"),
     r.badge ?? "",
     r.description,
     r.features.join(" | "),

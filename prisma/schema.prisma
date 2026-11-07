@@ -39,6 +39,9 @@ model Product {
   /// stocked UNIX Fit range keeps its public price. `priceCents` stays filled
   /// so admins and internal reports still see a figure.
   priceOnRequest Boolean  @default(false)
+  /// "new" or "used" (б/у). A used unit always shows its price and sells
+  /// through the cart, whatever its brand; the storefront marks it «Б/у».
+  condition   String      @default("new")
   categoryId  String
   createdAt   DateTime    @default(now())
   cartItems   CartItem[]

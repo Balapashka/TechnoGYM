@@ -51,6 +51,7 @@ export interface Translation {
 
   // Navigation
   nav: {
+    used: string;
     openMenu: string;
     closeMenu: string;
     menu: string;
@@ -98,6 +99,9 @@ export interface Translation {
 
   // Catalog / PLP
   catalog: {
+    condition: string;
+    conditionNew: string;
+    conditionUsed: string;
     eyebrow: string;
     productCount: string;
     sortBy: string;
@@ -145,6 +149,8 @@ export interface Translation {
 
   // Product
   product: {
+    used: string;
+    usedHint: string;
     viewDetails: string;
     from: string;
     perMonth: string;
@@ -291,6 +297,9 @@ export interface Translation {
 
   // Admin console
   admin: {
+    used: string;
+    usedHint: string;
+    col_condition: string;
     products: string;
     categories: string;
     overview: string;
@@ -704,6 +713,7 @@ export const translations: Record<Locale, Translation> = {
       premiumHomeFitness: "Беговые дорожки, велотренажёры, силовые станции и свободные веса для дома, фитнес-клубов и корпоративных залов. Доставка по России и СНГ.",
     },
     nav: {
+      used: "Б/у тренажёры",
       openMenu: "Открыть меню",
       closeMenu: "Закрыть меню",
       menu: "Меню",
@@ -756,6 +766,9 @@ export const translations: Record<Locale, Translation> = {
       it: "Италия",
     },
     catalog: {
+      condition: "Состояние",
+      conditionNew: "Новые",
+      conditionUsed: "Б/у",
       eyebrow: "Каталог",
       productCount: "{count} товаров",
       sortBy: "Сортировка",
@@ -794,6 +807,8 @@ export const translations: Record<Locale, Translation> = {
       legalDisclaimer: "Характеристики, комплектация и внешний вид товаров могут быть изменены производителем. Актуальную информацию уточняйте у менеджера.",
     },
     product: {
+      used: "Б/у",
+      usedHint: "Бывший в употреблении — состояние и комплектация в описании",
       viewDetails: "Подробнее",
       from: "от",
       perMonth: "/ месяц",
@@ -929,6 +944,9 @@ export const translations: Record<Locale, Translation> = {
       },
     },
     admin: {
+      used: "Б/у (бывший в употреблении)",
+      usedHint: "На сайте появится отметка «Б/у»; цена показывается, товар продаётся через корзину. Год, пробег, состояние и комплектацию опишите в описании.",
+      col_condition: "б/у — для бывших в употреблении, пусто — новый",
       products: "Товары",
       categories: "Категории",
       overview: "Обзор",
@@ -1325,6 +1343,7 @@ export const translations: Record<Locale, Translation> = {
       premiumHomeFitness: "Treadmills, bikes, strength stations and free weights for home, gyms and corporate fitness rooms. Delivery across Russia and the CIS.",
     },
     nav: {
+      used: "Used equipment",
       openMenu: "Open menu",
       closeMenu: "Close menu",
       menu: "Menu",
@@ -1377,6 +1396,9 @@ export const translations: Record<Locale, Translation> = {
       it: "Italy",
     },
     catalog: {
+      condition: "Condition",
+      conditionNew: "New",
+      conditionUsed: "Used",
       eyebrow: "Catalog",
       productCount: "{count} products",
       sortBy: "Sort by",
@@ -1415,6 +1437,8 @@ export const translations: Record<Locale, Translation> = {
       legalDisclaimer: "Specifications, configuration and appearance may be changed by the manufacturer. Please confirm the details with a manager.",
     },
     product: {
+      used: "Used",
+      usedHint: "Second-hand — condition and kit are in the description",
       viewDetails: "View details",
       from: "from",
       perMonth: "/ month",
@@ -1549,6 +1573,9 @@ export const translations: Record<Locale, Translation> = {
       },
     },
     admin: {
+      used: "Used (second-hand)",
+      usedHint: "The site shows a “Used” mark; the price is shown and it sells through the cart. Describe the year, wear and kit in the description.",
+      col_condition: "“б/у” (used) for second-hand items, empty for new",
       products: "Products",
       categories: "Categories",
       overview: "Overview",

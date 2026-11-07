@@ -7,7 +7,7 @@ import { NewsletterForm } from "./NewsletterForm";
 import { useTranslation } from "@/i18n/useTranslation";
 import { BRAND_NAME } from "@/lib/brand";
 import { categoryName } from "@/i18n/translations";
-import type { ShopNav } from "@/lib/nav-groups";
+import { USED_HREF, type ShopNav } from "@/lib/nav-groups";
 import {
   phoneHref,
   socialLinksFrom,
@@ -68,6 +68,16 @@ export function Footer({
                 </Link>
               </li>
             ))}
+            {nav.used ? (
+              <li>
+                <Link
+                  href={USED_HREF}
+                  className="link-slide inline-block text-sm text-white/85 hover:text-accent"
+                >
+                  {t("nav.used")}
+                </Link>
+              </li>
+            ) : null}
           </ul>
         </div>
 

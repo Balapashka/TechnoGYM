@@ -1,4 +1,5 @@
 import type { SortKey } from "@/lib/filter";
+import { isProductCondition, type ProductCondition } from "@/lib/condition";
 
 /**
  * Catalog filter state as it lives in the URL, so listings are shareable,
@@ -11,6 +12,8 @@ export type CatalogQuery = {
   /** Price ceiling in whole roubles; null = no ceiling. */
   maxPriceRub: number | null;
   inStockOnly: boolean;
+  /** "new" / "used" (б/у); empty = both. */
+  conditions: ProductCondition[];
   sort: SortKey;
 };
 
@@ -19,6 +22,7 @@ export const DEFAULT_CATALOG_QUERY: CatalogQuery = {
   brands: [],
   maxPriceRub: null,
   inStockOnly: false,
+  conditions: [],
   sort: "featured",
 };
 
@@ -45,6 +49,7 @@ export function parseCatalogQuery(params: URLSearchParams): CatalogQuery {
     brands: parseList(params.get("brand")),
     maxPriceRub: Number.isFinite(max) && max > 0 ? Math.round(max) : null,
     inStockOnly: params.get("stock") === "1",
+    conditions: parseList(params.get("cond")).filter(isProductCondition),
     sort: sort && SORT_KEYS.includes(sort) ? sort : "featured",
   };
 }
@@ -56,6 +61,7 @@ export function serializeCatalogQuery(q: CatalogQuery): string {
   if (q.brands.length) params.set("brand", q.brands.join(","));
   if (q.maxPriceRub != null) params.set("max", String(q.maxPriceRub));
   if (q.inStockOnly) params.set("stock", "1");
+  if (q.conditions.length) params.set("cond", q.conditions.join(","));
   if (q.sort !== "featured") params.set("sort", q.sort);
   const s = params.toString();
   return s ? `?${s}` : "";

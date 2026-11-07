@@ -30,7 +30,7 @@ export const productSchema = z.object({
     .trim()
     .min(10, "Добавьте описание (минимум 10 символов)")
     .max(10000),
-  // May be 0 for "price on request" items (checked in superRefine below).
+  // May be 0 only for "price on request" items (checked in superRefine below).
   priceRub: z
     .number({ message: "Укажите цену" })
     .min(0, "Цена не может быть отрицательной")
@@ -56,6 +56,17 @@ export const productSchema = z.object({
   // Made-to-order imports keep their price in the database but never show it
   // in the storefront: the shopper gets a quote CTA instead.
   priceOnRequest: z.boolean(),
+  /** "used" = б/у: marked «Б/у» in the storefront, filterable. */
+  condition: z.enum(["new", "used"]),
+}).superRefine((data, ctx) => {
+  // A product sold through the cart needs a real price — 0 ₽ would be sold for free.
+  if (!data.priceOnRequest && !(data.priceRub > 0)) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["priceRub"],
+      message: "Укажите цену или отметьте «Цена по запросу»",
+    });
+  }
 });
 
 export type ProductInput = z.infer<typeof productSchema>;

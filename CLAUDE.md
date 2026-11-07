@@ -86,7 +86,7 @@ the browser (RSC payload, `GET /api/products`, the persisted compare store); `Pr
 `buildOrder` refuses a quote-only line so a stale or hand-edited cart cannot buy one. Leads from
 the price-request modal, `/business` and `/contact` (`LeadForm`) all land in `QuoteRequest`
 (`source` = product | business | contact) and notify the manager. The admin and
-`buildOrder` read Prisma directly, so both still see the real price. `ORIGIN_PRIORITY` in
+`buildOrder` read Prisma directly, so both still see the real price. Used equipment (`Product.condition` = "used", `src/lib/condition.ts`) is a third case: marked «Б/у» (`UsedBadge`), filterable (`?cond=used`, linked from the nav when any exist), always priced in the admin form, CSV column `condition` (absent column = keep), and `orderLineName` appends «(б/у)» to the order line. `ORIGIN_PRIORITY` in
 `src/lib/countries.ts` is the one place that decides which origin leads the catalog — it drives the
 default `featured` sort, `getFeaturedProducts` and the category listings.
 

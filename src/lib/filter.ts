@@ -1,5 +1,6 @@
 import type { ProductDTO } from "@/lib/catalog";
 import { originRank } from "@/lib/countries";
+import type { ProductCondition } from "@/lib/condition";
 
 export type SortKey = "featured" | "price-asc" | "price-desc" | "name";
 
@@ -10,12 +11,14 @@ export type FilterOptions = {
   countries?: string[];
   /** Raw `brand` values; OR within the group. */
   brands?: string[];
+  /** "new" / "used"; OR within the group. */
+  conditions?: ProductCondition[];
 };
 
 /** Filter products (groups combine as AND). Pure — safe to unit test. */
 export function filterProducts(
   products: ProductDTO[],
-  { maxPriceCents, inStockOnly, countries, brands }: FilterOptions = {},
+  { maxPriceCents, inStockOnly, countries, brands, conditions }: FilterOptions = {},
 ): ProductDTO[] {
   return products.filter((p) => {
     if (inStockOnly && !p.inStock) return false;
@@ -28,6 +31,8 @@ export function filterProducts(
     }
     if (countries?.length && !countries.includes(p.originCountry)) return false;
     if (brands?.length && !brands.includes(p.brand)) return false;
+    // Products persisted before the field existed (compare store) count as new.
+    if (conditions?.length && !conditions.includes(p.condition ?? "new")) return false;
     return true;
   });
 }
@@ -37,6 +42,8 @@ export type FacetCounts = {
   countries: Record<string, number>;
   /** brand -> product count with every filter except the brand group. */
   brands: Record<string, number>;
+  /** condition -> product count with every filter except the condition group. */
+  conditions: Record<ProductCondition, number>;
 };
 
 /**
@@ -58,7 +65,11 @@ export function facetCounts(
   for (const p of filterProducts(products, { ...options, brands: undefined })) {
     if (p.brand) brands[p.brand] = (brands[p.brand] ?? 0) + 1;
   }
-  return { countries, brands };
+  const conditions: Record<ProductCondition, number> = { new: 0, used: 0 };
+  for (const p of filterProducts(products, { ...options, conditions: undefined })) {
+    conditions[p.condition ?? "new"] += 1;
+  }
+  return { countries, brands, conditions };
 }
 
 /** Products without a public price sort after the priced ones. */

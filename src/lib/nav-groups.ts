@@ -11,7 +11,15 @@ const BRAND_PAGE_SLUGS = ["technogym", "unix-fit"];
 
 export type NavCategory = { slug: string; name: string; count: number };
 export type NavBrand = { name: string; count: number };
-export type ShopNav = { categories: NavCategory[]; brands: NavBrand[] };
+export type ShopNav = {
+  categories: NavCategory[];
+  brands: NavBrand[];
+  /** Used (б/у) products in the catalog; the «Б/у» link appears only when > 0. */
+  used?: number;
+};
+
+/** Listing of used (б/у) equipment: the whole catalog filtered by condition. */
+export const USED_HREF = "/category/all?cond=used";
 
 export const CARDIO_SLUGS = ["treadmills", "bikes", "ellipticals", "rowers"];
 export const STRENGTH_SLUGS = ["strength", "benches", "racks", "free-weights"];
@@ -60,6 +68,9 @@ export function shopColumnsFrom(nav: ShopNav): NavColumn[] {
       links: [
         { href: "/category/all", key: "common.allProducts", label: "All products" },
         { href: "/category/all?stock=1", key: "nav.inStockMoscow", label: "In stock" },
+        ...(nav.used
+          ? [{ href: USED_HREF, key: "nav.used", label: "Used equipment" }]
+          : []),
         { href: "/business", key: "nav.forBusiness", label: "For business" },
       ],
     },

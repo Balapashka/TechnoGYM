@@ -16,6 +16,7 @@ function product(id: string): ProductDTO {
     badge: null,
     inStock: true,
     priceOnRequest: false,
+    condition: "new",
     brand: "UNIX Fit",
     originCountry: "Китай",
     categorySlug: "treadmills",

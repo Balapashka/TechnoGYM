@@ -103,12 +103,21 @@ describe("parseCatalogCsv", () => {
   it("splits features and images on | or new lines", () => {
     const res = parseCatalogCsv([
       header,
-      ["a-1", "Дорожка", "treadmills", "Brand", "Китай", "1000", "нет", "нет", "", "Описание",
+      ["a-1", "Дорожка", "treadmills", "Brand", "Китай", "1000", "нет", "нет", "б/у", "", "Описание",
         "Мотор 2 л.с. | Скорость 16 км/ч", "https://x.ru/1.jpg\nhttps://x.ru/2.jpg"],
     ]);
     expect(res.rows[0].features).toEqual(["Мотор 2 л.с.", "Скорость 16 км/ч"]);
     expect(res.rows[0].images).toHaveLength(2);
     expect(res.rows[0].inStock).toBe(false);
+    expect(res.rows[0].condition).toBe("used");
+  });
+
+  it("leaves the condition alone when the file has no such column", () => {
+    const res = parseCatalogCsv([
+      ["slug", "name", "category", "price_rub"],
+      ["bench-2", "Скамья", "benches", "5000"],
+    ]);
+    expect(res.rows[0].condition).toBeNull();
   });
 
   it("round-trips an exported row", () => {
@@ -121,6 +130,7 @@ describe("parseCatalogCsv", () => {
       priceCents: 1299050,
       priceOnRequest: false,
       inStock: true,
+      condition: "used" as const,
       badge: "Новинка",
       description: "Описание",
       features: ["a", "b"],

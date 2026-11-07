@@ -15,6 +15,7 @@ const make = (
   brand = "Technogym",
   originCountry = "Италия",
   priceOnRequest = false,
+  condition: "new" | "used" = "new",
 ): ProductDTO => ({
   id,
   slug: id,
@@ -29,6 +30,7 @@ const make = (
   brand,
   originCountry,
   priceOnRequest,
+  condition,
   categorySlug: "c",
   categoryName: "C",
   variants: [],
@@ -231,5 +233,27 @@ describe("price-on-request products", () => {
     const facets = facetCounts(quoted, { maxPriceCents: 1000000 });
     expect(facets.countries).toEqual({ Китай: 2 });
     expect(facets.brands).toEqual({ "UNIX Fit": 2 });
+  });
+});
+
+describe("condition filter", () => {
+  const items = [
+    make("n1", "New one", 10000),
+    make("u1", "Used one", 5000, true, "Technogym", "Италия", false, "used"),
+    make("u2", "Used two", 7000, true, "UNIX Fit", "Китай", false, "used"),
+  ];
+
+  it("keeps only used (б/у) items", () => {
+    expect(filterProducts(items, { conditions: ["used"] }).map((p) => p.id)).toEqual(["u1", "u2"]);
+  });
+
+  it("keeps everything when both or none are chosen", () => {
+    expect(filterProducts(items, { conditions: ["new", "used"] })).toHaveLength(3);
+    expect(filterProducts(items, {})).toHaveLength(3);
+  });
+
+  it("counts conditions against the other filters only", () => {
+    const f = facetCounts(items, { conditions: ["used"], brands: ["Technogym"] });
+    expect(f.conditions).toEqual({ new: 1, used: 1 });
   });
 });

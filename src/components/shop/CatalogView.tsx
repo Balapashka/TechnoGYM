@@ -24,6 +24,7 @@ import {
   type Expansion,
 } from "@/lib/catalog-paging";
 import { cn } from "@/lib/cn";
+import { CONDITIONS, type ProductCondition } from "@/lib/condition";
 
 const SORT_OPTIONS: { key: SortKey; labelKey: string }[] = [
   { key: "featured", labelKey: "catalog.sortFeatured" },
@@ -104,11 +105,19 @@ export function CatalogView(props: CatalogViewProps) {
   const activeCount =
     query.countries.length +
     query.brands.length +
+    query.conditions.length +
     (query.maxPriceRub != null ? 1 : 0) +
     (query.inStockOnly ? 1 : 0);
 
   const resetAll = () =>
-    onChange({ ...query, countries: [], brands: [], maxPriceRub: null, inStockOnly: false });
+    onChange({
+      ...query,
+      countries: [],
+      brands: [],
+      conditions: [],
+      maxPriceRub: null,
+      inStockOnly: false,
+    });
 
   return (
     <div className="container-page grid gap-8 py-10 lg:grid-cols-[16rem_1fr]">
@@ -370,6 +379,16 @@ function FilterControls(props: CatalogViewProps) {
     onChange({ ...query, brands });
   };
 
+  const toggleCondition = (c: ProductCondition) => {
+    const conditions = query.conditions.includes(c)
+      ? query.conditions.filter((x) => x !== c)
+      : [...query.conditions, c];
+    onChange({ ...query, conditions });
+  };
+
+  // The group appears only once the listing actually has used (б/у) items.
+  const hasUsed = products.some((p) => p.condition === "used");
+
   return (
     <div className="space-y-8">
       {/* Animated custom sort dropdown */}
@@ -459,6 +478,25 @@ function FilterControls(props: CatalogViewProps) {
           ))}
         </div>
       </fieldset>
+
+      {(hasUsed || query.conditions.length > 0) && (
+        <fieldset>
+          <legend className="mb-3 text-xs font-bold uppercase tracking-wide">
+            {t("catalog.condition")}
+          </legend>
+          <div className="space-y-2.5">
+            {CONDITIONS.map((c) => (
+              <FilterCheckbox
+                key={c}
+                label={t(c === "used" ? "catalog.conditionUsed" : "catalog.conditionNew")}
+                count={facets.conditions[c] ?? 0}
+                checked={query.conditions.includes(c)}
+                onChange={() => toggleCondition(c)}
+              />
+            ))}
+          </div>
+        </fieldset>
+      )}
 
       {/* Themed price slider with floating value chip */}
       <div>
@@ -607,6 +645,12 @@ function ActiveChips(
       label: brandOptions.find((b) => b.slug === slug)?.name ?? slug,
       remove: () =>
         onChange({ ...query, brands: query.brands.filter((b) => b !== slug) }),
+    })),
+    ...query.conditions.map((c) => ({
+      key: `cond-${c}`,
+      label: t(c === "used" ? "catalog.conditionUsed" : "catalog.conditionNew"),
+      remove: () =>
+        onChange({ ...query, conditions: query.conditions.filter((x) => x !== c) }),
     })),
     ...(query.maxPriceRub != null
       ? [

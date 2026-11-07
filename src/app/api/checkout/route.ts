@@ -52,6 +52,7 @@ export async function POST(request: Request) {
       name: true,
       priceCents: true,
       priceOnRequest: true,
+      condition: true,
       variants: { select: { id: true, name: true, priceDeltaCents: true } },
     },
   });
@@ -62,6 +63,7 @@ export async function POST(request: Request) {
         name: p.name,
         priceCents: p.priceCents,
         priceOnRequest: p.priceOnRequest,
+        condition: p.condition,
         variants: p.variants,
       },
     ]),

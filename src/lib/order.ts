@@ -26,8 +26,17 @@ export type CatalogEntry = {
   priceCents: number;
   /** Quote-only products are not sold through the cart — see buildOrder. */
   priceOnRequest: boolean;
+  /** "used" (б/у) is written into the order line so nobody mistakes it for new. */
+  condition?: string;
   variants: { id: string; name: string; priceDeltaCents: number }[];
 };
+
+/** Order-line name: a used unit says so, unless its name already does. */
+export function orderLineName(name: string, condition?: string): string {
+  // `\b` does not work for Cyrillic, hence the explicit "no letter after".
+  if (condition !== "used" || /(^|[^а-яё])б\s*[/.]?\s*у(?![а-яё])/i.test(name)) return name;
+  return `${name} (б/у)`;
+}
 
 export type BuildOrderResult =
   | { ok: true; order: BuiltOrder }
@@ -79,7 +88,7 @@ export function buildOrder(
     items.push({
       productId: line.productId,
       // Snapshot the catalog's name and price, not the ones in the request.
-      nameSnapshot: product.name,
+      nameSnapshot: orderLineName(product.name, product.condition),
       variantName,
       priceCents: product.priceCents + priceDeltaCents,
       quantity: line.quantity,

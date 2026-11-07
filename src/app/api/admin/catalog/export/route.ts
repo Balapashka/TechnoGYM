@@ -24,6 +24,7 @@ export async function GET() {
         priceCents: p.priceCents,
         priceOnRequest: p.priceOnRequest,
         inStock: p.inStock,
+        condition: p.condition === "used" ? "used" : "new",
         badge: p.badge,
         description: p.description,
         features: unpackList(p.features),

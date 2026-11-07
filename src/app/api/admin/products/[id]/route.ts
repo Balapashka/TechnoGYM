@@ -60,6 +60,7 @@ export async function PUT(request: Request, { params }: Ctx) {
       badge: parsed.data.badge || null,
       inStock: parsed.data.inStock,
       priceOnRequest: parsed.data.priceOnRequest,
+      condition: parsed.data.condition,
       categoryId: parsed.data.categoryId,
       features: packList(splitLines(parsed.data.features)),
       // Only touch photos when the form sent the field.

@@ -12,6 +12,7 @@ import { BRAND_NAME } from "@/lib/brand";
 import { BreadcrumbHome, ProductSpecs, SectionTitle } from "./ProductDetailText";
 import { splitFeatures } from "@/lib/features";
 import { Description } from "./Description";
+import { UsedBadge } from "@/components/shop/UsedBadge";
 
 /** Absolute URL for an image path ("/uploads/…" → "https://site/uploads/…"). */
 function absolute(src: string): string {
@@ -33,7 +34,9 @@ export async function generateMetadata({
   const description = shortDescription(product.description);
   const image = product.images[0];
   return {
-    title: `${product.name} — ${product.priceOnRequest ? "купить под заказ" : "купить в Москве"} | SPORT LINER`,
+    title: `${product.name}${product.condition === "used" ? " (б/у)" : ""} — ${
+      product.priceOnRequest ? "купить под заказ" : "купить в Москве"
+    } | SPORT LINER`,
     description,
     alternates: { canonical: `/product/${product.slug}` },
     openGraph: {
@@ -71,6 +74,10 @@ function productJsonLd(product: ProductDTO) {
             availability: product.inStock
               ? "https://schema.org/InStock"
               : "https://schema.org/BackOrder",
+            itemCondition:
+              product.condition === "used"
+                ? "https://schema.org/UsedCondition"
+                : "https://schema.org/NewCondition",
             seller: { "@type": "Organization", name: BRAND_NAME },
             url: `${SITE_URL}/product/${product.slug}`,
           },
@@ -124,6 +131,7 @@ export default async function ProductPage({
                 fallback={product.categoryName}
               />
             </p>
+            {product.condition === "used" && <UsedBadge large className="mt-2" />}
             <h1 className="mt-1 text-3xl font-semibold uppercase leading-tight md:text-4xl">
               {product.name}
             </h1>

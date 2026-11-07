@@ -11,6 +11,7 @@ import { useCartUiStore } from "@/store/cart-ui-store";
 import { useQuoteStore } from "@/store/quote-store";
 import { useTranslation } from "@/i18n/useTranslation";
 import { PriceOrRequest, ProductInstallment } from "@/components/ui/Price";
+import { UsedBadge } from "./UsedBadge";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -92,10 +93,15 @@ export function QuickViewDrawer() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.12, duration: 0.5, ease }}
             >
-              {product.badge && (
-                <span className="absolute left-4 top-4 z-10 rounded bg-accent px-2 py-1 text-xs font-bold uppercase">
-                  {product.badge}
-                </span>
+              {(product.badge || product.condition === "used") && (
+                <div className="absolute left-4 top-4 z-10 flex flex-col items-start gap-1">
+                  {product.condition === "used" && <UsedBadge large />}
+                  {product.badge && (
+                    <span className="rounded bg-ink px-2 py-1 text-xs font-bold uppercase text-paper">
+                      {product.badge}
+                    </span>
+                  )}
+                </div>
               )}
               <Media
                 src={product.images[0] ?? null}

@@ -70,6 +70,8 @@ export async function POST(request: Request) {
           priceOnRequest: r.priceOnRequest,
           inStock: r.inStock,
           badge: r.badge,
+          // No «condition» column in the file: keep what each product has.
+          ...(r.condition ? { condition: r.condition } : {}),
           categoryId: categoryId.get(r.categorySlug)!,
         };
         // Empty photo / feature cells keep what the product already has, so

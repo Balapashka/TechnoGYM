@@ -39,6 +39,7 @@ export default async function EditProductPage({
           images: unpackList(product.images).join("\n"),
           inStock: product.inStock,
           priceOnRequest: product.priceOnRequest,
+          condition: product.condition === "used" ? "used" : "new",
         }}
       />
     </div>

@@ -23,7 +23,7 @@ describe("parseCatalogQuery", () => {
   it("parses lists, price, stock and sort", () => {
     const q = parseCatalogQuery(
       new URLSearchParams(
-        "country=cn,it&brand=unix-fit&max=250000&stock=1&sort=price-asc",
+        "country=cn,it&brand=unix-fit&max=250000&stock=1&cond=used&sort=price-asc",
       ),
     );
     expect(q).toEqual({
@@ -31,13 +31,14 @@ describe("parseCatalogQuery", () => {
       brands: ["unix-fit"],
       maxPriceRub: 250000,
       inStockOnly: true,
+      conditions: ["used"],
       sort: "price-asc",
     });
   });
 
   it("drops malformed values", () => {
     const q = parseCatalogQuery(
-      new URLSearchParams("max=abc&sort=hack&country=,,&stock=2"),
+      new URLSearchParams("max=abc&sort=hack&country=,,&stock=2&cond=broken"),
     );
     expect(q).toEqual(DEFAULT_CATALOG_QUERY);
   });
@@ -59,6 +60,7 @@ describe("serializeCatalogQuery", () => {
       brands: ["technogym", "panatta"],
       maxPriceRub: 900000,
       inStockOnly: true,
+      conditions: ["new" as const, "used" as const],
       sort: "price-desc" as const,
     };
     const s = serializeCatalogQuery(q);

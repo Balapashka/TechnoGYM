@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildOrder, type CatalogEntry } from "./order";
+import { buildOrder, orderLineName, type CatalogEntry } from "./order";
 import type { CheckoutPayload } from "@/schemas/checkout";
 
 const customer: CheckoutPayload["customer"] = {
@@ -146,5 +146,27 @@ describe("buildOrder", () => {
       catalog,
     );
     expect(result.ok).toBe(false);
+  });
+});
+
+describe("orderLineName", () => {
+  it("marks a used unit in the order line", () => {
+    expect(orderLineName("Technogym Run 700", "used")).toBe("Technogym Run 700 (б/у)");
+  });
+  it("does not repeat the mark or touch new products", () => {
+    expect(orderLineName("Technogym Run 700 (б/у)", "used")).toBe("Technogym Run 700 (б/у)");
+    expect(orderLineName("Беговая дорожка Б/У", "used")).toBe("Беговая дорожка Б/У");
+    expect(orderLineName("Technogym Run 700", "new")).toBe("Technogym Run 700");
+    expect(orderLineName("Technogym Run 700")).toBe("Technogym Run 700");
+  });
+  it("is what buildOrder snapshots", () => {
+    const used = new Map<string, CatalogEntry>([
+      ["u1", { name: "Run 700", priceCents: 100000, priceOnRequest: false, condition: "used", variants: [] }],
+    ]);
+    const result = buildOrder(
+      { ...payload, items: [{ productId: "u1", variantId: null, quantity: 1, name: "x", unitPriceCents: 1 }] },
+      used,
+    );
+    expect(result.ok && result.order.items[0].nameSnapshot).toBe("Run 700 (б/у)");
   });
 });
