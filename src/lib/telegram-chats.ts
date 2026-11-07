@@ -8,7 +8,7 @@ export type TgChat = { id: string; title: string };
 type Chat = { id: number | string; type?: string; title?: string; first_name?: string; last_name?: string; username?: string };
 export type Update = {
   update_id?: number;
-  message?: { chat?: Chat; text?: string };
+  message?: { chat?: Chat; text?: string; date?: number };
 };
 
 export function chatTitle(c: Chat): string {
@@ -76,8 +76,14 @@ export function findLinkedChat(updates: Update[], code: string): TgChat | null {
   return null;
 }
 
-/** Highest update_id in a batch — confirm with offset = max + 1. */
-export function maxUpdateId(updates: Update[]): number | null {
-  const ids = updates.map((u) => u.update_id).filter((id): id is number => typeof id === "number");
-  return ids.length ? Math.max(...ids) : null;
+/**
+ * Offset that confirms only updates older than `maxAgeSec`: fresh ones stay
+ * in the queue so a second admin tab (or manager link) still sees its own
+ * "/start <code>"; stale ones are dropped so strangers cannot fill it up.
+ */
+export function staleOffset(updates: Update[], nowSec: number, maxAgeSec = 15 * 60): number | null {
+  const ids = updates
+    .filter((u) => typeof u.update_id === "number" && (u.message?.date ?? 0) <= nowSec - maxAgeSec)
+    .map((u) => u.update_id as number);
+  return ids.length ? Math.max(...ids) + 1 : null;
 }

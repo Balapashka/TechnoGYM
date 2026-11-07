@@ -4,7 +4,7 @@ import {
   findLinkedChat,
   isTokenRejected,
   looksLikeBotToken,
-  maxUpdateId,
+  staleOffset,
   mergeChats,
   newLinkCode,
   normalizeApiBase,
@@ -73,8 +73,15 @@ describe("link codes", () => {
     expect(findLinkedChat(updates.slice(0, 2), code)).toBeNull();
   });
 
-  it("finds the update id to confirm", () => {
-    expect(maxUpdateId(updates)).toBe(8);
-    expect(maxUpdateId([])).toBeNull();
+  it("confirms only stale updates, so a fresh code survives for other pollers", () => {
+    const now = 1_000_000;
+    const batch = [
+      { update_id: 10, message: { text: "/start", date: now - 3600 } },
+      { update_id: 11, message: { text: "/start x", date: now - 1000 } },
+      { update_id: 12, message: { text: `/start ${code}`, date: now - 30 } },
+    ];
+    expect(staleOffset(batch, now)).toBe(12);
+    expect(staleOffset(batch.slice(2), now)).toBeNull();
+    expect(staleOffset([], now)).toBeNull();
   });
 });

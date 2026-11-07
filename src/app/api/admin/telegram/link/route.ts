@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { forbidUnlessAdmin } from "@/lib/auth";
 import { getSavedApiBase, getTelegramConfig, saveTelegramConfig, telegramApi } from "@/lib/telegram-config";
-import { LINK_CODE_RE, findLinkedChat, maxUpdateId, mergeChats, type Update } from "@/lib/telegram-chats";
+import { LINK_CODE_RE, findLinkedChat, mergeChats, staleOffset, type Update } from "@/lib/telegram-chats";
 import { BRAND_NAME } from "@/lib/brand";
 
 const bodySchema = z.object({ code: z.string().regex(LINK_CODE_RE) });
@@ -30,10 +30,11 @@ export async function POST(request: Request) {
   }
 
   const chat = findLinkedChat(updates, parsed.data.code);
-  // Confirm what we have read so the queue never fills up with strangers' /start.
-  const last = maxUpdateId(updates);
-  if (last !== null) {
-    await telegramApi(cfg, "getUpdates", { offset: last + 1, limit: 1, timeout: 0 }).catch(() => null);
+  // Drop stale updates so strangers' /start never fills the queue; fresh ones
+  // stay for a parallel link (another admin tab, a manager's link).
+  const offset = staleOffset(updates, Math.floor(Date.now() / 1000));
+  if (offset !== null) {
+    await telegramApi(cfg, "getUpdates", { offset, limit: 1, timeout: 0 }).catch(() => null);
   }
   if (!chat) return NextResponse.json({ linked: false });
 
