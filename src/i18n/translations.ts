@@ -785,7 +785,7 @@ export const translations: Record<Locale, Translation> = {
       subscribeButton: "Подписаться",
       socialLinks: "Мы в соцсетях",
 
-      getTipsAndOffers: "Новинки, акции и советы по выбору оборудования — не чаще пары писем в месяц.",
+      getTipsAndOffers: "Новинки, акции и советы по выбору оборудования.",
       contactsTitle: "Связаться с нами",
       seller: "Продавец",
       inn: "ИНН",
@@ -1406,7 +1406,7 @@ export const translations: Record<Locale, Translation> = {
       subscribeButton: "Subscribe",
       socialLinks: "Follow us",
 
-      getTipsAndOffers: "New arrivals, offers and equipment tips — a couple of emails a month at most.",
+      getTipsAndOffers: "New arrivals, offers and equipment tips.",
       contactsTitle: "Contact us",
       seller: "Seller",
       inn: "INN",
