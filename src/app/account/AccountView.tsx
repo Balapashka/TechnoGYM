@@ -5,6 +5,7 @@ import { useTranslation } from "@/i18n/useTranslation";
 import { orderStatusLabel } from "@/i18n/translations";
 import { formatPrice } from "@/lib/format";
 import { Reveal } from "@/components/motion/Reveal";
+import { ChangePasswordForm } from "./ChangePasswordForm";
 
 /** Order item as serialized by the account page for the client view. */
 export type AccountOrderItem = {
@@ -139,6 +140,8 @@ export function AccountView({
           ))}
         </div>
       )}
+
+      <ChangePasswordForm />
     </div>
   );
 }

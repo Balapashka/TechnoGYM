@@ -55,3 +55,21 @@ export const resetSchema = z
   });
 
 export type ResetInput = z.infer<typeof resetSchema>;
+
+/** Logged-in user changes their own password (account page). */
+export const changePasswordSchema = z
+  .object({
+    current: z.string().min(1, "Введите текущий пароль").max(200),
+    password: newPasswordField,
+    confirm: z.string().min(1, "Повторите пароль"),
+  })
+  .refine((d) => d.password === d.confirm, {
+    message: "Пароли не совпадают",
+    path: ["confirm"],
+  })
+  .refine((d) => d.password !== d.current, {
+    message: "Новый пароль совпадает с текущим",
+    path: ["password"],
+  });
+
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

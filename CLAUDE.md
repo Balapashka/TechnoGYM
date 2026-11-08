@@ -44,7 +44,7 @@ Test accounts `admin@movigym.test` / `admin1234` (ADMIN) and `demo@movigym.test`
 exist **only when `DEMO_ACCOUNTS=true`**: the seed creates them, the Docker entrypoint re-ensures
 them (resetting passwords) and the login page lists them. On a live store the administrator comes
 from `ADMIN_EMAIL`/`ADMIN_PASSWORD` via `scripts/create-admin.mjs` (never overwrites an existing
-password unless `ADMIN_RESET_PASSWORD=true`). The tracked `prisma/dev.db` is seeded with
+password unless `ADMIN_RESET_PASSWORD=true`). After that, admins manage the team themselves at `/admin/team` (`/api/admin/team`, rules in `src/lib/team.ts`: promote an existing account or create one with a one-time temporary password; never demote yourself or the last admin), and anyone changes their own password in `/account` (`/api/auth/change-password`, closes the account's other sessions). The tracked `prisma/dev.db` is seeded with
 `DEMO_ACCOUNTS=true` for local development.
 
 ## Architecture

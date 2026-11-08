@@ -285,6 +285,13 @@ export interface Translation {
 
   // Account area
   account: {
+    changePassword: string;
+    currentPassword: string;
+    newPassword: string;
+    repeatPassword: string;
+    savePassword: string;
+    passwordChanged: string;
+    cancel: string;
     title: string;
     greeting: string;
     guest: string;
@@ -297,6 +304,23 @@ export interface Translation {
 
   // Admin console
   admin: {
+    team: string;
+    teamLead: string;
+    teamYou: string;
+    teamRemove: string;
+    teamConfirmRemove: string;
+    teamAddTitle: string;
+    teamName: string;
+    teamAddHint: string;
+    teamAdd: string;
+    teamPromoted: string;
+    teamCreated: string;
+    teamHandoverLogin: string;
+    teamHandoverPassword: string;
+    teamHandoverChange: string;
+    teamCopy: string;
+    teamCopied: string;
+    teamOnce: string;
     used: string;
     usedHint: string;
     col_condition: string;
@@ -935,6 +959,13 @@ export const translations: Record<Locale, Translation> = {
       benefitPricingBody: "Специальные условия для проектов и оптовых поставок.",
     },
     account: {
+      changePassword: "Сменить пароль",
+      currentPassword: "Текущий пароль",
+      newPassword: "Новый пароль (минимум 8 символов)",
+      repeatPassword: "Повторите новый пароль",
+      savePassword: "Сохранить пароль",
+      passwordChanged: "Пароль изменён. На других устройствах нужно будет войти заново.",
+      cancel: "Отмена",
       title: "Личный кабинет",
       greeting: "Здравствуйте, {name}",
       guest: "гость",
@@ -951,6 +982,23 @@ export const translations: Record<Locale, Translation> = {
       },
     },
     admin: {
+      team: "Команда",
+      teamLead: "Администраторы могут всё то же, что и вы: добавлять и менять товары, вести заказы и заявки, менять настройки и команду. Давайте доступ только тем, кому доверяете.",
+      teamYou: "это вы",
+      teamRemove: "Убрать права",
+      teamConfirmRemove: "Убрать права администратора у {email}? Аккаунт останется обычным покупательским.",
+      teamAddTitle: "Добавить администратора",
+      teamName: "Имя (необязательно)",
+      teamAddHint: "Если человек уже зарегистрирован на сайте с этим email, он просто получит права и войдёт под своим паролем. Если нет — создадим вход с временным паролем, который вы ему передадите.",
+      teamAdd: "Добавить",
+      teamPromoted: "Готово: {email} теперь администратор. Пусть войдёт на сайт под своим паролем — откроется админка.",
+      teamCreated: "Готово: создан вход для {email}. Передайте сотруднику:",
+      teamHandoverLogin: "Вход в админку: {url}",
+      teamHandoverPassword: "Временный пароль: {password}",
+      teamHandoverChange: "После входа смените пароль: личный кабинет → «Сменить пароль».",
+      teamCopy: "Скопировать",
+      teamCopied: "Скопировано",
+      teamOnce: "Пароль показывается один раз. Если его потеряли — уберите права и добавьте человека заново.",
       used: "Б/у (бывший в употреблении)",
       usedHint: "На сайте появится отметка «Б/у»; цена показывается, товар продаётся через корзину. Год, пробег, состояние и комплектацию опишите в описании.",
       col_condition: "б/у — для бывших в употреблении, пусто — новый",
@@ -1571,6 +1619,13 @@ export const translations: Record<Locale, Translation> = {
       benefitPricingBody: "Special terms for projects and bulk orders.",
     },
     account: {
+      changePassword: "Change password",
+      currentPassword: "Current password",
+      newPassword: "New password (at least 8 characters)",
+      repeatPassword: "Repeat the new password",
+      savePassword: "Save password",
+      passwordChanged: "Password changed. Other devices will need to log in again.",
+      cancel: "Cancel",
       title: "My account",
       greeting: "Hi, {name}",
       guest: "there",
@@ -1587,6 +1642,23 @@ export const translations: Record<Locale, Translation> = {
       },
     },
     admin: {
+      team: "Team",
+      teamLead: "Admins can do everything you can: add and edit products, handle orders and requests, change settings and the team. Give access only to people you trust.",
+      teamYou: "you",
+      teamRemove: "Remove access",
+      teamConfirmRemove: "Remove admin rights from {email}? The account stays as a regular customer account.",
+      teamAddTitle: "Add an admin",
+      teamName: "Name (optional)",
+      teamAddHint: "If the person already has an account with this email, they get the rights and keep their password. Otherwise we create a login with a temporary password for you to pass on.",
+      teamAdd: "Add",
+      teamPromoted: "Done: {email} is now an admin. They log in with their own password.",
+      teamCreated: "Done: a login was created for {email}. Pass this on:",
+      teamHandoverLogin: "Admin login: {url}",
+      teamHandoverPassword: "Temporary password: {password}",
+      teamHandoverChange: "After logging in, change the password: account → “Change password”.",
+      teamCopy: "Copy",
+      teamCopied: "Copied",
+      teamOnce: "The password is shown only once. If it is lost, remove the rights and add the person again.",
       used: "Used (second-hand)",
       usedHint: "The site shows a “Used” mark; the price is shown and it sells through the cart. Describe the year, wear and kit in the description.",
       col_condition: "“б/у” (used) for second-hand items, empty for new",
